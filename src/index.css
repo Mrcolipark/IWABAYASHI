@@ -1,45 +1,482 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .scrollbar-thin::-webkit-scrollbar {
-    @apply w-2 h-2;
-  }
-  .scrollbar-thin::-webkit-scrollbar-track {
-    @apply bg-gray-800;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    @apply bg-green-600 rounded-full;
+/* 岩林主题色彩变量 */
+:root {
+  --primary-forest: #1f4e3d;     /* 深森林绿 - 主色 */
+  --primary-jade: #2d6a4f;       /* 玉绿色 - 辅助色 */
+  --primary-moss: #40916c;       /* 苔藓绿 - 高亮色 */
+  --primary-sage: #52b788;       /* 鼠尾草绿 - 强调色 */
+  --accent-stone: #6c757d;       /* 石灰色 - 中性色 */
+  --dark-charcoal: #1a1a1a;      /* 炭黑色 - 深色背景 */
+  --dark-slate: #2f3e46;         /* 深青灰 - 卡片背景 */
+  --warm-gray: #52796f;          /* 暖灰绿 - 文字颜色 */
+  --light-sage: #a7c5b0;        /* 浅鼠尾草 - 淡色元素 */
+  
+  /* 阴影效果 */
+  --shadow-forest: 0 25px 50px -12px rgba(31, 78, 61, 0.25);
+  --shadow-jade: 0 25px 50px -12px rgba(45, 106, 79, 0.25);
+  --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: 'cv11', 'ss01';
+  font-variation-settings: 'opsz' 32;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
+               'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 
+               'Helvetica Neue', sans-serif;
+  background: var(--dark-charcoal);
+  color: #f8fafc;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* 自定义滚动条 - 岩林主题 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark-slate);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-forest), var(--primary-jade));
+  border-radius: 10px;
+  border: 2px solid var(--dark-slate);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--primary-jade), var(--primary-moss));
+}
+
+/* 选择文本样式 */
+::selection {
+  background: rgba(31, 78, 61, 0.3);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: rgba(31, 78, 61, 0.3);
+  color: #ffffff;
+}
+
+/* 焦点样式 */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  ring: 2px;
+  ring-color: var(--primary-moss);
+  ring-offset: 2px;
+  ring-offset-color: var(--dark-charcoal);
+}
+
+/* 基础组件样式 */
+@layer components {
+  /* 玻璃形态效果 - 岩林风格 */
+  .glass {
+    background: rgba(31, 78, 61, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(31, 78, 61, 0.2);
   }
 
-  .fade-in {
-    animation: fadeIn 0.3s ease-out;
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(82, 185, 136, 0.1);
   }
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+
+  /* 岩林渐变文字 */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--primary-forest), var(--primary-jade), var(--primary-moss));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  /* 悬浮卡片效果 */
+  .card-elevated {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    will-change: transform;
+  }
+
+  .card-elevated:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-forest);
+  }
+
+  /* 按钮样式 - 岩林主题 */
+  .btn-primary {
+    @apply px-8 py-4 rounded-lg font-semibold text-white;
+    background: linear-gradient(135deg, var(--primary-forest), var(--primary-jade));
+    @apply transform hover:scale-105 transition-all duration-300 shadow-2xl;
+    box-shadow: var(--shadow-forest);
+    @apply active:scale-95;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-primary:hover::before {
+    left: 100%;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-4 rounded-lg font-semibold backdrop-blur-sm;
+    border: 2px solid var(--primary-moss);
+    color: var(--primary-moss);
+    @apply hover:text-white transition-all duration-300;
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-secondary:hover {
+    background: var(--primary-moss);
+  }
+
+  /* 输入框样式 */
+  .input-field {
+    @apply w-full px-4 py-3 rounded-lg text-white placeholder-gray-400 backdrop-blur-sm;
+    @apply transition-all duration-300;
+    background: rgba(47, 62, 70, 0.5);
+    border: 1px solid var(--dark-slate);
+  }
+
+  .input-field:focus {
+    border-color: var(--primary-moss);
+    box-shadow: 0 0 0 2px rgba(82, 185, 136, 0.2);
+  }
+
+  /* 加载动画 */
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(31, 78, 61, 0.1);
+    border-left: 4px solid var(--primary-forest);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  /* 脉冲动画 */
+  .pulse-ring {
+    animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+  }
+
+  /* 浮动动画 */
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .float-delayed {
+    animation: float 3s ease-in-out infinite;
+    animation-delay: 1s;
+  }
+
+  /* 打字机光标 */
+  .typewriter-cursor {
+    animation: blink 1s step-end infinite;
+  }
+
+  /* 滚动进度条 */
+  .scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-forest), var(--primary-moss));
+    transform-origin: 0%;
+    z-index: 9999;
+  }
+
+  /* 粒子容器 */
+  .particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* 英雄区域特效 */
+  .hero-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--dark-charcoal) 0%,
+      var(--dark-slate) 25%,
+      var(--dark-charcoal) 50%,
+      var(--dark-slate) 75%,
+      var(--dark-charcoal) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  /* 网格背景 */
+  .grid-bg {
+    background-image: 
+      linear-gradient(rgba(31, 78, 61, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(31, 78, 61, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  /* 卡片发光效果 */
+  .card-glow {
+    position: relative;
+  }
+
+  .card-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, var(--primary-forest), var(--primary-jade), var(--primary-moss));
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+    filter: blur(10px);
+  }
+
+  .card-glow:hover::before {
+    opacity: 0.3;
+  }
+
+  /* 梯形分割样式 */
+.trapezoid-left {
+  clip-path: polygon(0 0, 60% 0, 45% 100%, 0 100%);
+}
+
+.trapezoid-right {
+  clip-path: polygon(50% 0, 100% 0, 100% 100%, 35% 100%);
+}
+
+  /* 导航栏毛玻璃效果 */
+  .nav-glass {
+    background: rgba(26, 26, 26, 0.8);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(31, 78, 61, 0.2);
+  }
+
+  /* 岩林主题配色工具类 */
+  .bg-forest { background-color: var(--primary-forest); }
+  .bg-jade { background-color: var(--primary-jade); }
+  .bg-moss { background-color: var(--primary-moss); }
+  .bg-sage { background-color: var(--primary-sage); }
+  .bg-stone { background-color: var(--accent-stone); }
+  .bg-charcoal { background-color: var(--dark-charcoal); }
+  .bg-slate { background-color: var(--dark-slate); }
+
+  .text-forest { color: var(--primary-forest); }
+  .text-jade { color: var(--primary-jade); }
+  .text-moss { color: var(--primary-moss); }
+  .text-sage { color: var(--primary-sage); }
+  .text-stone { color: var(--accent-stone); }
+
+  .border-forest { border-color: var(--primary-forest); }
+  .border-jade { border-color: var(--primary-jade); }
+  .border-moss { border-color: var(--primary-moss); }
+  .border-sage { border-color: var(--primary-sage); }
+}
+
+/* 工具类样式 */
+@layer utilities {
+  /* 响应式间距 */
+  .section-padding {
+    @apply py-16 md:py-24 lg:py-32;
+  }
+
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* 文字大小 */
+  .text-hero {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl;
+  }
+
+  .text-section-title {
+    @apply text-3xl sm:text-4xl md:text-5xl;
+  }
+
+  .text-card-title {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+
+  /* 岩林主题阴影变体 */
+  .shadow-forest {
+    box-shadow: var(--shadow-forest);
+  }
+
+  .shadow-jade {
+    box-shadow: var(--shadow-jade);
+  }
+
+  /* 岩林主题渐变背景 */
+  .bg-gradient-forest {
+    background: linear-gradient(135deg, var(--primary-forest), var(--primary-jade));
+  }
+
+  .bg-gradient-jade {
+    background: linear-gradient(135deg, var(--primary-jade), var(--primary-moss));
+  }
+
+  .bg-gradient-moss {
+    background: linear-gradient(135deg, var(--primary-moss), var(--primary-sage));
+  }
+
+  .bg-gradient-iwabayashi {
+    background: linear-gradient(135deg, var(--primary-forest), var(--primary-jade), var(--primary-moss));
+  }
+
+  /* 隐藏滚动条 */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 性能优化 */
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
   }
 }
 
+/* 关键帧动画 */
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.33);
+    opacity: 1;
+  }
+  80%, 100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 媒体查询优化 */
+@media (max-width: 768px) {
+  .hero-gradient {
+    background-size: 200% 200%;
+  }
+
+  .card-elevated:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .text-hero {
+    line-height: 1.1;
+  }
+
+  .trapezoid-left,
+  .trapezoid-right {
+    clip-path: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-padding {
+    @apply px-8;
+  }
+}
+
+@media (min-width: 1280px) {
+  .section-padding {
+    @apply py-40;
+  }
+}
+
+/* 深色模式优化 */
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
   }
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-body {
-  @apply scrollbar-thin antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  @apply outline-none ring-2 ring-emerald-400 ring-offset-2 ring-offset-gray-900;
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
