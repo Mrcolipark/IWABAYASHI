@@ -25,14 +25,14 @@ function App() {
         description: '专业的中日贸易综合服务商',
         keywords: '日本贸易,保健品进口,岩林株式会社'
       },
-      menu: ["首页", "会社概要", "事业内容", "ニュース", "お問い合わせ"],
+      menu: ["首页", "关于我们", "事业内容", "ニュース", "お問い合わせ"],
       home: {
         slogan: "上質な製品でユーザーとつながる",
-        subtitle: "搭建中日优质商品流通桥梁",
+        subtitle: "连接中日，品质为先",
         description: "岩林株式会社致力于成为具有国际影响力的贸易服务商"
       },
       about: {
-        title: "会社概要",
+        title: "关于我们",
         subtitle: "年轻而充满活力的中日贸易桥梁",
         companyInfo: {
           name: "岩林株式会社",
@@ -121,7 +121,6 @@ function App() {
 
   // 安全的字典获取函数
   const getDictionary = useCallback((language) => {
-    // 确保 langData 存在且包含指定语言
     if (!langData || !langData[language]) {
       console.warn(`Language '${language}' not found, falling back to Chinese`);
       return langData?.zh || getDefaultDict();
@@ -129,7 +128,7 @@ function App() {
     return langData[language];
   }, [getDefaultDict]);
 
-  // 获取当前语言的字典，使用 useMemo 优化性能
+  // 获取当前语言的字典
   const dict = React.useMemo(() => getDictionary(lang), [lang, getDictionary]);
 
   // 初始化应用
@@ -163,22 +162,6 @@ function App() {
         }
         metaKeywords.setAttribute('content', dict.meta.keywords || '中日贸易,岩林株式会社');
       }
-      
-      // 预加载关键资源
-      const preloadImages = [
-        '/logo.png',
-        '/banner1.jpg',
-        '/banner2.jpg',
-        '/banner3.jpg'
-      ];
-      
-      preloadImages.forEach(src => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = src;
-        document.head.appendChild(link);
-      });
 
     } catch (error) {
       console.error('Error in useEffect:', error);
@@ -187,21 +170,19 @@ function App() {
     // 模拟初始加载
     const timer = setTimeout(() => {
       setIsInitialLoading(false);
-    }, 1500);
+    }, 1200); // 稍微减少加载时间
 
     return () => clearTimeout(timer);
   }, [lang, dict]);
 
   // 语言切换处理
   const handleLanguageChange = useCallback((newLang) => {
-    // 检查新语言是否在支持的语言列表中
     const supportedLanguages = ['zh', 'ja', 'en'];
     if (!supportedLanguages.includes(newLang)) {
       console.error(`Language '${newLang}' not supported`);
       return;
     }
     
-    // 检查语言数据是否存在
     if (!langData || !langData[newLang]) {
       console.error(`Language data for '${newLang}' not available`);
       return;
@@ -221,10 +202,10 @@ function App() {
     <ErrorBoundary>
       <React.Suspense 
         fallback={
-          <div className="min-h-screen flex items-center justify-center bg-charcoal">
+          <div className="min-h-screen flex items-center justify-center bg-white">
             <div className="text-center">
-              <div className="w-16 h-16 border-4 border-moss border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-sage">页面加载中...</p>
+              <div className="w-16 h-16 border-4 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-brand-green">页面加载中...</p>
             </div>
           </div>
         }
@@ -237,7 +218,7 @@ function App() {
   // 如果 langData 完全没有加载，显示错误信息
   if (!langData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-charcoal text-white">
+      <div className="min-h-screen flex items-center justify-center bg-white text-brand-green">
         <div className="text-center">
           <h1 className="text-2xl mb-4">语言数据加载失败</h1>
           <p>请刷新页面重试</p>
@@ -252,7 +233,7 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-charcoal text-gray-100">
+      <div className="min-h-screen bg-white text-brand-green">
         <Layout lang={lang} setLang={handleLanguageChange} dict={dict}>
           <Routes>
             {/* 主页 */}
@@ -265,7 +246,7 @@ function App() {
               } 
             />
             
-            {/* 会社概要 */}
+            {/* 关于我们 */}
             <Route 
               path="/about" 
               element={
@@ -310,10 +291,10 @@ function App() {
               path="*" 
               element={
                 <PageWrapper>
-                  <div className="min-h-screen flex items-center justify-center bg-charcoal">
+                  <div className="min-h-screen flex items-center justify-center bg-white">
                     <div className="text-center">
-                      <h1 className="text-6xl font-bold text-moss mb-4">404</h1>
-                      <p className="text-xl text-gray-400 mb-8">
+                      <h1 className="text-6xl font-bold text-brand-green mb-4">404</h1>
+                      <p className="text-xl text-text-gray mb-8">
                         {dict?.notFound || "页面未找到"}
                       </p>
                       <a 
