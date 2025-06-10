@@ -43,6 +43,7 @@ const Layout = ({ children, lang, setLang, dict }) => {
         setLang={setLang}
         scrollY={scrollY}
         currentPath={location.pathname}
+        dict={dict}
       />
       
       {/* 主要内容区域 */}

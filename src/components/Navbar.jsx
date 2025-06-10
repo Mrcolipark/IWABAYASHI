@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { trackEvent } from '../utils/Analytics';
+import { safeGet, getMenuLabel, safeArrayGet } from '../utils/dictUtils';
 
-const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
+const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [logoError, setLogoError] = useState(false);
@@ -18,8 +19,15 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
     { id: 'contact', path: '/contact', labelKey: 'contact' }
   ];
 
-  // 多语言标签
-  const getNavLabel = (labelKey) => {
+  // 多语言标签 - 使用安全访问
+  const getNavLabel = (labelKey, index) => {
+    // 首先尝试从字典的menu数组获取
+    const menuItem = safeArrayGet(safeGet(dict, 'menu', []), index, null);
+    if (menuItem) {
+      return menuItem;
+    }
+
+    // 如果menu数组不可用，使用备用标签
     const labels = {
       zh: { 
         home: '首页', 
@@ -43,7 +51,8 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
         contact: 'Contact' 
       }
     };
-    return labels[lang][labelKey] || labelKey;
+    
+    return safeGet(labels, `${lang}.${labelKey}`, labelKey);
   };
 
   // 滚动监听
@@ -78,8 +87,10 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
 
   // 语言切换
   const handleLanguageChange = (newLang) => {
-    setLang(newLang);
-    trackEvent('language_changed', { from: lang, to: newLang });
+    if (typeof setLang === 'function') {
+      setLang(newLang);
+      trackEvent('language_changed', { from: lang, to: newLang });
+    }
     setIsOpen(false);
   };
 
@@ -96,6 +107,20 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
   // 检查当前路径是否激活
   const isActive = (path) => {
     return location.pathname === path;
+  };
+
+  // 安全获取公司名称
+  const getCompanyName = () => {
+    return safeGet(dict, 'about.companyInfo.name', '岩林株式会社');
+  };
+
+  // 安全获取联系信息
+  const getContactEmail = () => {
+    return safeGet(dict, 'contact.info.email', 'info@iwabayashi.com');
+  };
+
+  const getContactPhone = () => {
+    return safeGet(dict, 'contact.info.phone', '+81-3-1234-5678');
   };
 
   return (
@@ -120,7 +145,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
               {!logoError ? (
                 <img 
                   src="/logo.png" 
-                  alt="岩林株式会社Logo" 
+                  alt={`${getCompanyName()}Logo`}
                   className="h-10 md:h-12 w-auto object-contain"
                   onError={() => setLogoError(true)} 
                   draggable={false}
@@ -135,7 +160,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
             </div>
             <div className="hidden sm:block">
               <span className="text-lg md:text-xl font-bold text-white group-hover:text-moss transition-colors duration-300">
-                岩林株式会社
+                {getCompanyName()}
               </span>
             </div>
           </Link>
@@ -199,7 +224,9 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
             
             {/* 菜单标题 */}
             <div className="px-6 py-4 bg-gradient-to-r from-forest to-jade">
-              <h3 className="text-white font-bold text-lg">メニュー</h3>
+              <h3 className="text-white font-bold text-lg">
+                {safeGet(dict, 'menu.title', 'メニュー')}
+              </h3>
             </div>
 
             {/* 导航链接 */}
@@ -220,7 +247,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
                 >
                   <div className="flex items-center space-x-3">
                     <span className="w-2 h-2 bg-current rounded-full"></span>
-                    <span>{getNavLabel(item.labelKey)}</span>
+                    <span>{getNavLabel(item.labelKey, index)}</span>
                   </div>
                 </Link>
               ))}
@@ -228,19 +255,25 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
 
             {/* 移动端语言切换 */}
             <div className="md:hidden px-6 py-4 border-t border-forest/20">
-              <p className="text-gray-400 text-sm mb-3">言語 / Language</p>
+              <p className="text-gray-400 text-sm mb-3">
+                {safeGet(dict, 'language.label', '言語 / Language')}
+              </p>
               <div className="flex space-x-2">
-                {['zh', 'ja', 'en'].map((langCode) => (
+                {[
+                  { code: 'zh', label: '中文' },
+                  { code: 'ja', label: '日本語' },
+                  { code: 'en', label: 'English' }
+                ].map((language) => (
                   <button
-                    key={langCode}
-                    onClick={() => handleLanguageChange(langCode)}
+                    key={language.code}
+                    onClick={() => handleLanguageChange(language.code)}
                     className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                      lang === langCode
+                      lang === language.code
                         ? 'bg-moss text-white'
                         : 'bg-forest/30 text-gray-400 hover:text-white hover:bg-forest/50'
                     }`}
                   >
-                    {langCode === 'zh' ? '中文' : langCode === 'ja' ? '日本語' : 'English'}
+                    {language.label}
                   </button>
                 ))}
               </div>
@@ -248,13 +281,13 @@ const Navbar = ({ lang, setLang, scrollY, currentPath }) => {
 
             {/* 联系信息 */}
             <div className="px-6 py-4 bg-charcoal/50 border-t border-forest/20">
-              <div className="flex items-center space-x-3 text-sm text-gray-400">
+              <div className="flex items-center space-x-3 text-sm text-gray-400 mb-2">
                 <span>📧</span>
-                <span>info@iwabayashi.com</span>
+                <span>{getContactEmail()}</span>
               </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-400 mt-2">
+              <div className="flex items-center space-x-3 text-sm text-gray-400">
                 <span>📞</span>
-                <span>+81-3-1234-5678</span>
+                <span>{getContactPhone()}</span>
               </div>
             </div>
           </div>

@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { trackEvent } from '../utils/Analytics';
 
+// 导入新的打字机组件
+import MultiLanguageTypingEffect from '../components/MultiLanguageTypingEffect';
+
 // 轮播组件
 const ImageCarousel = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
 
-  // 风景照片列表（放在public文件夹中）
+  // 风景照片列表
   const images = [
     '/banner1.jpg',
     '/banner2.jpg', 
@@ -24,10 +26,6 @@ const ImageCarousel = () => {
 
     return () => clearInterval(interval);
   }, [isAutoPlaying, images.length]);
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
 
   const goToSlide = (index) => {
     setCurrentImage(index);
@@ -54,7 +52,6 @@ const ImageCarousel = () => {
               className="w-full h-full object-cover"
               loading={i === 0 ? "eager" : "lazy"}
               onError={(e) => {
-                // 如果图片加载失败，显示占位图
                 e.target.src = `data:image/svg+xml,${encodeURIComponent(`
                   <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
                     <rect width="100%" height="100%" fill="#2f3e46"/>
@@ -65,7 +62,6 @@ const ImageCarousel = () => {
                 `)}`;
               }}
             />
-            {/* 图片遮罩层 */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent"></div>
           </div>
         ))}
@@ -86,7 +82,6 @@ const ImageCarousel = () => {
           />
         ))}
       </div>
-
 
       {/* 导航箭头 */}
       <button
@@ -111,44 +106,12 @@ const ImageCarousel = () => {
   );
 };
 
-// 打字机效果组件
-const TypingEffect = ({ text, speed = 120 }) => {
-  const [displayText, setDisplayText] = useState('');
-  const [showCursor, setShowCursor] = useState(true);
-
-  useEffect(() => {
-    let index = 0;
-    setDisplayText('');
-    
-    const timer = setInterval(() => {
-      if (index < text.length) {
-        setDisplayText(text.slice(0, index + 1));
-        index++;
-      } else {
-        clearInterval(timer);
-        setShowCursor(false);
-      }
-    }, speed);
-
-    return () => clearInterval(timer);
-  }, [text, speed]);
-
-  return (
-    <span className="relative">
-      {displayText}
-      {showCursor && <span className="animate-pulse ml-1 text-sage">|</span>}
-    </span>
-  );
-};
-
 const Home = ({ dict }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const sectionRef = useRef(null);
 
   useEffect(() => {
     setIsLoaded(true);
-    
-    // 追踪首页访问
     trackEvent('home_page_viewed');
   }, []);
 
@@ -156,10 +119,25 @@ const Home = ({ dict }) => {
     trackEvent('home_cta_clicked', { action });
   };
 
+  // 安全获取文本内容
+  const safeGet = (obj, path, defaultValue = '') => {
+    if (!obj || typeof obj !== 'object') return defaultValue;
+    const keys = path.split('.');
+    let result = obj;
+    for (const key of keys) {
+      if (result && typeof result === 'object' && key in result) {
+        result = result[key];
+      } else {
+        return defaultValue;
+      }
+    }
+    return result !== undefined && result !== null ? result : defaultValue;
+  };
+
   return (
     <div className="min-h-screen bg-charcoal">
       
-      {/* 主要梯形分割区域 - 修复布局 */}
+      {/* 主要梯形分割区域 */}
       <section ref={sectionRef} className="relative min-h-screen pt-20 md:pt-24 lg:pt-28 pb-16 flex items-center justify-center overflow-hidden">
         
         {/* 背景装饰 */}
@@ -180,26 +158,27 @@ const Home = ({ dict }) => {
               </div>
             </div>
 
-            {/* 右侧梯形 - Slogan */}
+            {/* 右侧梯形 - 多语言打字机Slogan */}
             <div className="absolute inset-0 w-full h-full">
               <div className="trapezoid-right absolute top-0 left-0 w-full h-full bg-gradient-to-br from-forest via-jade to-moss flex items-center justify-center">
                 <div className="text-white text-center max-w-lg px-6 lg:px-8 ml-auto mr-8 lg:mr-12">
                   
-
-                  {/* 主要Slogan */}
-                  <div className={`mb-6 transform transition-all duration-1000 delay-500 ${
+                  {/* 新的多语言打字机效果 */}
+                  <div className={`transform transition-all duration-1000 delay-500 ${
                     isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                   }`}>
-                    <h1 className="text-xl lg:text-2xl xl:text-3xl font-bold mb-3 text-white leading-tight">
-                      <TypingEffect text={dict.home.slogan} speed={100} />
-                    </h1>
-                    <p className="text-white/80 text-sm lg:text-base leading-relaxed">
-                      {dict.home.subtitle}
-                    </p>
+                    <MultiLanguageTypingEffect
+                      chineseText={safeGet(dict, 'home.subtitle', '搭建中日优质商品流通桥梁，促进两国经贸繁荣')}
+                      japaneseText={safeGet(dict, 'home.slogan', '上質な製品でユーザーとつながる')}
+                      englishText="Connecting users with high-quality products"
+                      typingSpeed={120}
+                      pauseDuration={2500}
+                      erasingSpeed={60}
+                    />
                   </div>
 
                   {/* 装饰性元素 */}
-                  <div className={`flex items-center justify-center space-x-3 transform transition-all duration-1000 delay-700 ${
+                  <div className={`flex items-center justify-center space-x-3 mt-8 transform transition-all duration-1000 delay-700 ${
                     isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                   }`}>
                     <div className="w-8 h-0.5 bg-gradient-to-r from-transparent to-white/60"></div>
@@ -219,7 +198,7 @@ const Home = ({ dict }) => {
               <ImageCarousel />
             </div>
             
-            {/* 下部分 - Slogan */}
+            {/* 下部分 - 多语言打字机Slogan */}
             <div className="bg-gradient-to-br from-charcoal via-slate to-forest p-8 text-white text-center">
               
               {/* 公司标识 */}
@@ -230,12 +209,17 @@ const Home = ({ dict }) => {
                 <h2 className="text-sm font-medium text-sage">岩林株式会社</h2>
               </div>
 
-              <h1 className="text-xl font-bold mb-4 text-moss leading-tight">
-                <TypingEffect text={dict.home.slogan} speed={80} />
-              </h1>
-              <p className="text-sage text-base leading-relaxed mb-6">
-                {dict.home.subtitle}
-              </p>
+              {/* 移动端打字机效果 */}
+              <div className="mb-6">
+                <MultiLanguageTypingEffect
+                  chineseText={safeGet(dict, 'home.subtitle', '搭建中日优质商品流通桥梁，促进两国经贸繁荣')}
+                  japaneseText={safeGet(dict, 'home.slogan', '上質な製品でユーザーとつながる')}
+                  englishText="Connecting users with high-quality products"
+                  typingSpeed={100}
+                  pauseDuration={2000}
+                  erasingSpeed={50}
+                />
+              </div>
               
               <div className="flex items-center justify-center space-x-3">
                 <div className="w-8 h-0.5 bg-moss"></div>
@@ -303,17 +287,6 @@ const Home = ({ dict }) => {
           </div>
         </div>
 
-        {/* 滚动提示 */}
-        <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 transition-all duration-1000 delay-1500 ${
-          isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-        }`}>
-          <div className="flex flex-col items-center animate-bounce">
-            <span className="text-gray-400 text-sm mb-2">探索更多</span>
-            <div className="w-6 h-10 border-2 border-moss rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-moss rounded-full mt-2 animate-pulse"></div>
-            </div>
-          </div>
-        </div>
       </section>
     </div>
   );
