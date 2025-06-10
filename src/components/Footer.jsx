@@ -21,7 +21,7 @@ const Footer = ({ dict }) => {
   ];
 
   return (
-    <footer className="relative bg-charcoal/95 backdrop-blur-sm border-t border-forest/20">
+    <footer className="relative bg-white/95 backdrop-blur-sm border-t border-gray-200">
       {/* 主要内容区域 */}
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid md:grid-cols-4 gap-8">
@@ -29,15 +29,29 @@ const Footer = ({ dict }) => {
           {/* 公司信息 */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-forest to-moss rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-xl">岩</span>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden bg-white shadow-sm">
+                <img 
+                  src="/logo.png" 
+                  alt="岩林株式会社 Logo"
+                  className="w-10 h-10 object-contain"
+                  onError={(e) => {
+                    // 如果logo加载失败，显示文字备选
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'flex';
+                  }}
+                />
+                <div 
+                  className="w-12 h-12 bg-gradient-to-br from-green-700 to-green-500 rounded-xl items-center justify-center text-white font-bold text-xl hidden"
+                >
+                  岩
+                </div>
               </div>
               <div>
-                <span className="text-xl font-bold text-white">IWABAYASHI</span>
-                <div className="text-sm text-sage">岩林株式会社</div>
+                <span className="text-xl font-bold text-green-800">IWABAYASHI</span>
+                <div className="text-sm text-green-900">岩林株式会社</div>
               </div>
             </div>
-            <p className="text-gray-400 mb-6 leading-relaxed">
+            <p className="text-gray-600 mb-6 leading-relaxed">
               {dict?.footer?.description || "岩林株式会社致力于成为中日贸易领域最受信赖的合作伙伴，为客户提供专业、高效的贸易解决方案。"}
             </p>
             
@@ -47,7 +61,7 @@ const Footer = ({ dict }) => {
                 <a 
                   key={index}
                   href={social.href}
-                  className="w-10 h-10 bg-slate hover:bg-forest rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                  className="w-10 h-10 bg-gray-100 hover:bg-green-50 border border-gray-200 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-green-300"
                   aria-label={social.name}
                   title={social.name}
                 >
@@ -59,7 +73,7 @@ const Footer = ({ dict }) => {
           
           {/* 快速链接 */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-moss">
+            <h3 className="text-lg font-semibold mb-6 text-green-700">
               {dict?.footer?.quickLinks || "快速链接"}
             </h3>
             <ul className="space-y-3">
@@ -67,9 +81,9 @@ const Footer = ({ dict }) => {
                 <li key={index}>
                   <Link 
                     to={link.path}
-                    className="text-gray-400 hover:text-moss transition-colors duration-300 flex items-center space-x-2 group"
+                    className="text-gray-600 hover:text-green-600 transition-colors duration-300 flex items-center space-x-2 group"
                   >
-                    <span className="w-1 h-1 bg-moss rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                    <span className="w-1 h-1 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                     <span>{link.label}</span>
                   </Link>
                 </li>
@@ -79,20 +93,20 @@ const Footer = ({ dict }) => {
           
           {/* 业务内容 */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-moss">
+            <h3 className="text-lg font-semibold mb-6 text-green-700">
               {dict?.footer?.business || "业务内容"}
             </h3>
-            <ul className="space-y-3 text-gray-400">
-              <li className="hover:text-moss transition-colors duration-300">
+            <ul className="space-y-3 text-gray-600">
+              <li className="hover:text-green-600 transition-colors duration-300">
                 日本保健品进口代理
               </li>
-              <li className="hover:text-moss transition-colors duration-300">
+              <li className="hover:text-green-600 transition-colors duration-300">
                 中国大宗商品出口
               </li>
-              <li className="hover:text-moss transition-colors duration-300">
+              <li className="hover:text-green-600 transition-colors duration-300">
                 市场咨询服务
               </li>
-              <li className="hover:text-moss transition-colors duration-300">
+              <li className="hover:text-green-600 transition-colors duration-300">
                 供应链管理
               </li>
             </ul>
@@ -100,17 +114,17 @@ const Footer = ({ dict }) => {
           
           {/* 联系方式 */}
           <div>
-            <h3 className="text-lg font-semibold mb-6 text-moss">
+            <h3 className="text-lg font-semibold mb-6 text-green-700">
               {dict?.footer?.contact || "联系方式"}
             </h3>
-            <div className="space-y-4 text-gray-400">
+            <div className="space-y-4 text-gray-600">
               <div className="flex items-start space-x-3">
-                <span className="text-moss mt-1">📧</span>
+                <span className="text-green-500 mt-1">📧</span>
                 <div>
                   <div className="text-sm text-gray-500">邮箱</div>
                   <a 
                     href={`mailto:${dict?.contact?.info?.email || 'info@iwabayashi.com'}`}
-                    className="hover:text-moss transition-colors duration-300"
+                    className="hover:text-green-600 transition-colors duration-300"
                   >
                     {dict?.contact?.info?.email || 'info@iwabayashi.com'}
                   </a>
@@ -118,12 +132,12 @@ const Footer = ({ dict }) => {
               </div>
               
               <div className="flex items-start space-x-3">
-                <span className="text-moss mt-1">📞</span>
+                <span className="text-green-500 mt-1">📞</span>
                 <div>
                   <div className="text-sm text-gray-500">电话</div>
                   <a 
                     href={`tel:${dict?.contact?.info?.phone || '+81-3-1234-5678'}`}
-                    className="hover:text-moss transition-colors duration-300"
+                    className="hover:text-green-600 transition-colors duration-300"
                   >
                     {dict?.contact?.info?.phone || '+81-3-1234-5678'}
                   </a>
@@ -131,7 +145,7 @@ const Footer = ({ dict }) => {
               </div>
               
               <div className="flex items-start space-x-3">
-                <span className="text-moss mt-1">📍</span>
+                <span className="text-green-500 mt-1">📍</span>
                 <div>
                   <div className="text-sm text-gray-500">地址</div>
                   <p className="text-sm leading-relaxed">
@@ -141,7 +155,7 @@ const Footer = ({ dict }) => {
               </div>
               
               <div className="flex items-start space-x-3">
-                <span className="text-moss mt-1">🕒</span>
+                <span className="text-green-500 mt-1">🕒</span>
                 <div>
                   <div className="text-sm text-gray-500">营业时间</div>
                   <p className="text-sm">
@@ -155,7 +169,7 @@ const Footer = ({ dict }) => {
       </div>
       
       {/* 底部版权区域 */}
-      <div className="border-t border-forest/20 bg-charcoal/50">
+      <div className="border-t border-gray-200 bg-gray-50/50">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             
@@ -164,7 +178,7 @@ const Footer = ({ dict }) => {
               <p className="text-gray-500 text-sm">
                 &copy; {currentYear} 岩林株式会社 (IWABAYASHI Corporation). All rights reserved.
               </p>
-              <p className="text-gray-600 text-xs mt-1">
+              <p className="text-gray-400 text-xs mt-1">
                 专业的中日贸易综合服务商
               </p>
             </div>
@@ -173,19 +187,19 @@ const Footer = ({ dict }) => {
             <div className="flex space-x-6 text-sm">
               <a 
                 href="/privacy" 
-                className="text-gray-500 hover:text-moss transition-colors duration-300"
+                className="text-gray-500 hover:text-green-600 transition-colors duration-300"
               >
                 {dict?.footer?.links?.privacy || "隐私政策"}
               </a>
               <a 
                 href="/terms" 
-                className="text-gray-500 hover:text-moss transition-colors duration-300"
+                className="text-gray-500 hover:text-green-600 transition-colors duration-300"
               >
                 {dict?.footer?.links?.terms || "使用条款"}
               </a>
               <a 
                 href="/sitemap" 
-                className="text-gray-500 hover:text-moss transition-colors duration-300"
+                className="text-gray-500 hover:text-green-600 transition-colors duration-300"
               >
                 {dict?.footer?.links?.sitemap || "网站地图"}
               </a>
@@ -193,8 +207,8 @@ const Footer = ({ dict }) => {
           </div>
           
           {/* 备案信息（如需要） */}
-          <div className="text-center mt-4 pt-4 border-t border-forest/10">
-            <p className="text-gray-600 text-xs">
+          <div className="text-center mt-4 pt-4 border-t border-gray-100">
+            <p className="text-gray-400 text-xs">
               Built with ❤️ for connecting China and Japan
             </p>
           </div>

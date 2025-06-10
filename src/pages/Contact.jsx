@@ -46,7 +46,7 @@ const Contact = ({ dict }) => {
     setIsSubmitting(true);
     
     try {
-      // 模拟表单提交（实际项目中可以集成EmailJS或其他服务）
+      // 模拟表单提交
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       trackEvent('contact_form_submitted', {
@@ -77,13 +77,14 @@ const Contact = ({ dict }) => {
   };
 
   return (
-    <div className="min-h-screen bg-charcoal pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20">
       
-      {/* Hero区域 */}
-      <section className="relative py-24 bg-gradient-to-b from-slate to-charcoal overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-forest/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-moss/10 rounded-full blur-3xl"></div>
+      {/* Hero区域 - 墨绿色主题 */}
+      <section className="relative py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
+        {/* 背景装饰 */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-gray-800/5 to-green-800/8 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tr from-slate-600/5 to-gray-700/6 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
@@ -91,11 +92,11 @@ const Contact = ({ dict }) => {
             isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
           }`}>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-forest via-moss to-sage bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-gray-800 via-slate-700 to-green-800 bg-clip-text text-transparent">
                 {contactData.title}
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
               {contactData.subtitle}
             </p>
           </div>
@@ -114,21 +115,21 @@ const Contact = ({ dict }) => {
             }`}>
               
               {/* 联系方式卡片 */}
-              <div className="glass rounded-2xl p-8 border border-forest/20 mb-8">
-                <h3 className="text-2xl font-bold text-moss mb-8">联系方式</h3>
+              <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg mb-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-8">联系方式</h3>
                 
                 <div className="space-y-6">
                   {/* 邮箱 */}
-                  <div className="flex items-center space-x-4 p-4 bg-slate/30 rounded-lg hover:bg-forest/10 transition-colors duration-300">
-                    <div className="w-12 h-12 bg-gradient-to-br from-forest to-moss rounded-xl flex items-center justify-center">
+                  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors duration-300 group">
+                    <div className="w-12 h-12 bg-gradient-to-br from-gray-800 to-green-800 rounded-xl flex items-center justify-center">
                       <span className="text-white text-xl">📧</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-gray-400 text-sm">邮箱地址</p>
+                      <p className="text-gray-500 text-sm">邮箱地址</p>
                       <a 
                         href={`mailto:${contactData.info.email}`}
                         onClick={() => handleContactMethodClick('email')}
-                        className="text-white font-semibold hover:text-moss transition-colors text-lg"
+                        className="text-gray-800 font-semibold hover:text-green-800 transition-colors text-lg group-hover:text-green-800"
                       >
                         {contactData.info.email}
                       </a>
@@ -136,16 +137,16 @@ const Contact = ({ dict }) => {
                   </div>
 
                   {/* 电话 */}
-                  <div className="flex items-center space-x-4 p-4 bg-slate/30 rounded-lg hover:bg-forest/10 transition-colors duration-300">
-                    <div className="w-12 h-12 bg-gradient-to-br from-moss to-sage rounded-xl flex items-center justify-center">
+                  <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors duration-300 group">
+                    <div className="w-12 h-12 bg-gradient-to-br from-slate-700 to-gray-800 rounded-xl flex items-center justify-center">
                       <span className="text-white text-xl">📞</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-gray-400 text-sm">电话号码</p>
+                      <p className="text-gray-500 text-sm">电话号码</p>
                       <a 
                         href={`tel:${contactData.info.phone}`}
                         onClick={() => handleContactMethodClick('phone')}
-                        className="text-white font-semibold hover:text-moss transition-colors text-lg"
+                        className="text-gray-800 font-semibold hover:text-green-800 transition-colors text-lg group-hover:text-green-800"
                       >
                         {contactData.info.phone}
                       </a>
@@ -153,26 +154,26 @@ const Contact = ({ dict }) => {
                   </div>
 
                   {/* 地址 */}
-                  <div className="flex items-start space-x-4 p-4 bg-slate/30 rounded-lg">
-                    <div className="w-12 h-12 bg-gradient-to-br from-sage to-forest rounded-xl flex items-center justify-center mt-1">
+                  <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-800 to-slate-600 rounded-xl flex items-center justify-center mt-1">
                       <span className="text-white text-xl">📍</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-gray-400 text-sm">办公地址</p>
-                      <p className="text-white font-semibold leading-relaxed">
+                      <p className="text-gray-500 text-sm">办公地址</p>
+                      <p className="text-gray-800 font-semibold leading-relaxed">
                         {contactData.info.address}
                       </p>
                     </div>
                   </div>
 
                   {/* 营业时间 */}
-                  <div className="flex items-start space-x-4 p-4 bg-slate/30 rounded-lg">
-                    <div className="w-12 h-12 bg-gradient-to-br from-forest to-sage rounded-xl flex items-center justify-center mt-1">
+                  <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="w-12 h-12 bg-gradient-to-br from-gray-700 to-green-800 rounded-xl flex items-center justify-center mt-1">
                       <span className="text-white text-xl">🕒</span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-gray-400 text-sm">营业时间</p>
-                      <p className="text-white font-semibold">
+                      <p className="text-gray-500 text-sm">营业时间</p>
+                      <p className="text-gray-800 font-semibold">
                         {contactData.info.businessHours}
                       </p>
                     </div>
@@ -181,8 +182,8 @@ const Contact = ({ dict }) => {
               </div>
 
               {/* 交通信息 */}
-              <div className="glass rounded-2xl p-8 border border-forest/20">
-                <h4 className="text-xl font-bold text-moss mb-6">交通信息</h4>
+              <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
+                <h4 className="text-xl font-bold text-gray-800 mb-6">交通信息</h4>
                 <div className="space-y-4">
                   {[
                     '东京Metro银座线、丸之内线 赤坂见附站 步行5分钟',
@@ -190,10 +191,10 @@ const Contact = ({ dict }) => {
                     'JR中央线、总武线 四谷站 步行10分钟'
                   ].map((access, index) => (
                     <div key={index} className="flex items-start space-x-3">
-                      <div className="w-6 h-6 bg-moss/20 text-moss rounded-full flex items-center justify-center text-xs font-bold mt-1">
+                      <div className="w-6 h-6 bg-green-100 text-green-800 rounded-full flex items-center justify-center text-xs font-bold mt-1">
                         {index + 1}
                       </div>
-                      <p className="text-gray-300 text-sm leading-relaxed">{access}</p>
+                      <p className="text-gray-600 text-sm leading-relaxed">{access}</p>
                     </div>
                   ))}
                 </div>
@@ -204,15 +205,15 @@ const Contact = ({ dict }) => {
             <div className={`transform transition-all duration-1000 ${
               isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'
             }`}>
-              <div className="glass rounded-2xl p-8 border border-forest/20">
-                <h3 className="text-2xl font-bold text-moss mb-8">发送消息</h3>
+              <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
+                <h3 className="text-2xl font-bold text-gray-800 mb-8">发送消息</h3>
                 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   
                   {/* 姓名和公司 */}
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
                         {contactData.form?.name || '姓名'} *
                       </label>
                       <input
@@ -221,12 +222,12 @@ const Contact = ({ dict }) => {
                         value={formData.name}
                         onChange={handleInputChange}
                         required
-                        className="input-field"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-800/20 focus:border-green-800 transition-all duration-300"
                         placeholder="请输入您的姓名"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
                         {contactData.form?.company || '公司名称'}
                       </label>
                       <input
@@ -234,7 +235,7 @@ const Contact = ({ dict }) => {
                         name="company"
                         value={formData.company}
                         onChange={handleInputChange}
-                        className="input-field"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-800/20 focus:border-green-800 transition-all duration-300"
                         placeholder="请输入公司名称"
                       />
                     </div>
@@ -243,7 +244,7 @@ const Contact = ({ dict }) => {
                   {/* 邮箱和电话 */}
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
                         {contactData.form?.email || '邮箱地址'} *
                       </label>
                       <input
@@ -252,12 +253,12 @@ const Contact = ({ dict }) => {
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="input-field"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-800/20 focus:border-green-800 transition-all duration-300"
                         placeholder="请输入邮箱地址"
                       />
                     </div>
                     <div>
-                      <label className="block text-gray-300 text-sm font-medium mb-2">
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
                         {contactData.form?.phone || '联系电话'}
                       </label>
                       <input
@@ -265,7 +266,7 @@ const Contact = ({ dict }) => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className="input-field"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-800/20 focus:border-green-800 transition-all duration-300"
                         placeholder="请输入联系电话"
                       />
                     </div>
@@ -273,7 +274,7 @@ const Contact = ({ dict }) => {
 
                   {/* 咨询主题 */}
                   <div>
-                    <label className="block text-gray-300 text-sm font-medium mb-2">
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
                       {contactData.form?.subject || '咨询主题'} *
                     </label>
                     <select
@@ -281,7 +282,7 @@ const Contact = ({ dict }) => {
                       value={formData.subject}
                       onChange={handleInputChange}
                       required
-                      className="input-field"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-800/20 focus:border-green-800 transition-all duration-300"
                     >
                       <option value="">请选择咨询主题</option>
                       <option value="保健品进口代理">日本保健品进口代理</option>
@@ -295,7 +296,7 @@ const Contact = ({ dict }) => {
 
                   {/* 留言内容 */}
                   <div>
-                    <label className="block text-gray-300 text-sm font-medium mb-2">
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
                       {contactData.form?.message || '留言内容'} *
                     </label>
                     <textarea
@@ -304,7 +305,7 @@ const Contact = ({ dict }) => {
                       onChange={handleInputChange}
                       required
                       rows={6}
-                      className="input-field resize-none"
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-800/20 focus:border-green-800 transition-all duration-300 resize-none"
                       placeholder="请详细描述您的需求或问题，我们会尽快回复您..."
                     />
                   </div>
@@ -313,7 +314,7 @@ const Contact = ({ dict }) => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-4 bg-gradient-to-r from-forest to-moss rounded-lg font-semibold text-white hover:scale-105 transition-all duration-300 shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="w-full py-4 bg-gradient-to-r from-gray-800 to-green-800 rounded-lg font-semibold text-white hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   >
                     {isSubmitting ? (
                       <div className="flex items-center justify-center space-x-2">
@@ -329,8 +330,8 @@ const Contact = ({ dict }) => {
                   {submitStatus && (
                     <div className={`p-4 rounded-lg text-center transition-all duration-300 ${
                       submitStatus === 'success' 
-                        ? 'bg-moss/20 text-moss border border-moss/30' 
-                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                        ? 'bg-green-50 text-green-800 border border-green-200' 
+                        : 'bg-red-50 text-red-600 border border-red-200'
                     }`}>
                       {submitStatus === 'success' 
                         ? (contactData.form?.success || '消息发送成功！我们会尽快回复您。')
@@ -346,11 +347,11 @@ const Contact = ({ dict }) => {
       </section>
 
       {/* 常见问题 */}
-      <section className="py-24 bg-gradient-to-b from-charcoal to-slate">
+      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-4xl font-bold text-moss mb-6">常见问题</h3>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">常见问题</h3>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               以下是客户经常咨询的问题，希望能为您提供帮助
             </p>
           </div>
@@ -382,9 +383,9 @@ const Contact = ({ dict }) => {
                 answer: '您可以通过电话、邮件或在线表单联系我们。我们会安排专业顾问与您沟通，了解您的具体需求，并为您制定合适的服务方案。'
               }
             ].map((faq, index) => (
-              <div key={index} className="glass rounded-2xl p-6 border border-forest/20 hover:border-moss/50 transition-all duration-300">
-                <h4 className="text-lg font-bold text-moss mb-4">{faq.question}</h4>
-                <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+              <div key={index} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                <h4 className="text-lg font-bold text-gray-800 mb-4">{faq.question}</h4>
+                <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
               </div>
             ))}
           </div>
@@ -392,11 +393,11 @@ const Contact = ({ dict }) => {
       </section>
 
       {/* 地图和位置信息 */}
-      <section className="py-24 bg-slate">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-4xl font-bold text-moss mb-6">我们的位置</h3>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">我们的位置</h3>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               欢迎您到访我们位于东京的办公室
             </p>
           </div>
@@ -405,13 +406,13 @@ const Contact = ({ dict }) => {
             
             {/* 地图占位 */}
             <div className="relative">
-              <div className="aspect-video bg-slate/50 rounded-2xl border border-forest/20 flex items-center justify-center">
+              <div className="aspect-video bg-gray-100 rounded-2xl border border-gray-200 flex items-center justify-center shadow-lg">
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-forest to-moss rounded-xl flex items-center justify-center text-2xl mx-auto mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-green-800 rounded-xl flex items-center justify-center text-2xl mx-auto mb-4">
                     📍
                   </div>
-                  <h4 className="text-xl font-bold text-white mb-2">东京办公室位置</h4>
-                  <p className="text-gray-400 mb-4">
+                  <h4 className="text-xl font-bold text-gray-800 mb-2">东京办公室位置</h4>
+                  <p className="text-gray-600 mb-4">
                     {contactData.info.address}
                   </p>
                   <button 
@@ -419,7 +420,7 @@ const Contact = ({ dict }) => {
                       trackEvent('map_view_clicked');
                       window.open(`https://maps.google.com/?q=${encodeURIComponent(contactData.info.address)}`, '_blank');
                     }}
-                    className="px-6 py-3 bg-gradient-to-r from-forest to-moss rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-300"
+                    className="px-6 py-3 bg-gradient-to-r from-gray-800 to-green-800 rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-300"
                   >
                     在地图中查看
                   </button>
@@ -430,46 +431,46 @@ const Contact = ({ dict }) => {
             {/* 详细地址信息 */}
             <div className="space-y-8">
               <div>
-                <h4 className="text-2xl font-bold text-moss mb-6">详细地址</h4>
+                <h4 className="text-2xl font-bold text-gray-800 mb-6">详细地址</h4>
                 <div className="space-y-4">
-                  <div className="flex items-start space-x-4 p-4 glass rounded-lg">
-                    <span className="text-moss text-xl mt-1">🏢</span>
+                  <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <span className="text-green-800 text-xl mt-1">🏢</span>
                     <div>
-                      <div className="font-semibold text-white mb-1">办公地址</div>
-                      <div className="text-gray-300">{contactData.info.address}</div>
+                      <div className="font-semibold text-gray-800 mb-1">办公地址</div>
+                      <div className="text-gray-600">{contactData.info.address}</div>
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-4 p-4 glass rounded-lg">
-                    <span className="text-moss text-xl mt-1">🚇</span>
+                  <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <span className="text-green-800 text-xl mt-1">🚇</span>
                     <div>
-                      <div className="font-semibold text-white mb-1">最近车站</div>
-                      <div className="text-gray-300">赤坂见附站 / 赤坂站 / 四谷站</div>
+                      <div className="font-semibold text-gray-800 mb-1">最近车站</div>
+                      <div className="text-gray-600">赤坂见附站 / 赤坂站 / 四谷站</div>
                     </div>
                   </div>
                   
-                  <div className="flex items-start space-x-4 p-4 glass rounded-lg">
-                    <span className="text-moss text-xl mt-1">🕐</span>
+                  <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                    <span className="text-green-800 text-xl mt-1">🕐</span>
                     <div>
-                      <div className="font-semibold text-white mb-1">接待时间</div>
-                      <div className="text-gray-300">{contactData.info.businessHours}</div>
-                      <div className="text-sm text-gray-400 mt-1">※ 拜访前请提前预约</div>
+                      <div className="font-semibold text-gray-800 mb-1">接待时间</div>
+                      <div className="text-gray-600">{contactData.info.businessHours}</div>
+                      <div className="text-sm text-gray-500 mt-1">※ 拜访前请提前预约</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* 预约拜访 */}
-              <div className="glass rounded-2xl p-6 border border-forest/20">
-                <h5 className="text-xl font-bold text-moss mb-4">预约拜访</h5>
-                <p className="text-gray-300 mb-6 leading-relaxed">
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-lg">
+                <h5 className="text-xl font-bold text-gray-800 mb-4">预约拜访</h5>
+                <p className="text-gray-600 mb-6 leading-relaxed">
                   如果您希望到访我们的办公室进行面谈，请提前通过电话或邮件与我们预约。我们将为您安排合适的时间，并提供详细的交通指引。
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4">
                   <a
                     href={`tel:${contactData.info.phone}`}
                     onClick={() => handleContactMethodClick('phone_appointment')}
-                    className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-forest to-moss rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-300"
+                    className="flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-gray-800 to-green-800 rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-300"
                   >
                     <span>📞</span>
                     <span>电话预约</span>
@@ -477,7 +478,7 @@ const Contact = ({ dict }) => {
                   <a
                     href={`mailto:${contactData.info.email}?subject=预约拜访咨询`}
                     onClick={() => handleContactMethodClick('email_appointment')}
-                    className="flex items-center justify-center space-x-2 px-6 py-3 border-2 border-moss text-moss rounded-lg font-semibold hover:bg-moss hover:text-white transition-all duration-300"
+                    className="flex items-center justify-center space-x-2 px-6 py-3 border-2 border-gray-800 text-gray-800 rounded-lg font-semibold hover:bg-gray-800 hover:text-white transition-all duration-300"
                   >
                     <span>📧</span>
                     <span>邮件预约</span>
@@ -490,7 +491,7 @@ const Contact = ({ dict }) => {
       </section>
 
       {/* 联系承诺 */}
-      <section className="py-16 bg-gradient-to-r from-forest to-moss">
+      <section className="py-16 bg-gradient-to-r from-gray-800 to-green-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold text-white mb-6">我们的服务承诺</h3>
           <div className="grid md:grid-cols-3 gap-8 mb-8">
@@ -499,24 +500,24 @@ const Contact = ({ dict }) => {
                 ⚡
               </div>
               <h4 className="text-xl font-bold text-white mb-2">快速响应</h4>
-              <p className="text-white/80">24小时内回复您的咨询</p>
+              <p className="text-white/90">24小时内回复您的咨询</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
                 💡
               </div>
               <h4 className="text-xl font-bold text-white mb-2">专业建议</h4>
-              <p className="text-white/80">提供专业的贸易咨询服务</p>
+              <p className="text-white/90">提供专业的贸易咨询服务</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
                 🤝
               </div>
               <h4 className="text-xl font-bold text-white mb-2">长期合作</h4>
-              <p className="text-white/80">建立长期稳定的合作关系</p>
+              <p className="text-white/90">建立长期稳定的合作关系</p>
             </div>
           </div>
-          <p className="text-xl text-white/90">
+          <p className="text-xl text-white/95">
             我们期待与您建立合作关系，共同开拓中日贸易新机遇
           </p>
         </div>

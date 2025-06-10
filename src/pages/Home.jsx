@@ -22,43 +22,11 @@ const Home = ({ dict, lang = 'zh' }) => {
     setIsLoaded(true);
     trackEvent('home_page_viewed');
 
-    // 确保视频自动播放并强制填充
+    // 确保视频自动播放
     if (videoRef.current) {
       videoRef.current.play().catch(err => {
         console.log('Video autoplay failed:', err);
       });
-
-      // 动态调整视频尺寸以完全填充容器
-      const adjustVideoSize = () => {
-        const video = videoRef.current;
-        if (video && video.videoWidth && video.videoHeight) {
-          const container = video.closest('.video-block');
-          const containerRect = container.getBoundingClientRect();
-          
-          const videoAspectRatio = video.videoWidth / video.videoHeight;
-          const containerAspectRatio = containerRect.width / containerRect.height;
-          
-          if (videoAspectRatio > containerAspectRatio) {
-            // 视频更宽，按高度缩放
-            video.style.width = 'auto';
-            video.style.height = '130%';
-            video.style.transform = 'translate(-50%, -15%) scale(1.2)';
-          } else {
-            // 视频更高，按宽度缩放
-            video.style.width = '130%';
-            video.style.height = 'auto';
-            video.style.transform = 'translate(-15%, -50%) scale(1.2)';
-          }
-          
-          video.style.position = 'absolute';
-          video.style.top = '50%';
-          video.style.left = '50%';
-        }
-      };
-
-      videoRef.current.addEventListener('loadedmetadata', adjustVideoSize);
-      // 延迟执行，确保容器已渲染
-      setTimeout(adjustVideoSize, 100);
     }
   }, []);
 
@@ -97,7 +65,7 @@ const Home = ({ dict, lang = 'zh' }) => {
           {/* 左侧超大视频方块区域 */}
           <div className="w-3/5 flex items-center justify-center p-4 md:p-6 lg:p-8 video-container-compact">
             <div 
-              className={`video-block relative overflow-hidden shadow-2xl transform transition-all duration-1000 delay-300 ${
+              className={`video-block relative overflow-hidden rounded-3xl shadow-2xl transform transition-all duration-1000 delay-300 ${
                 isLoaded ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-10 opacity-0 scale-95'
               }`}
               style={{ 
@@ -142,12 +110,11 @@ const Home = ({ dict, lang = 'zh' }) => {
                   }}
                 />
               </video>
-              
-              
+                           
               {/* 超强化的发光效果 */}
-              <div className="absolute -inset-3 bg-gradient-to-r from-brand-green/40 via-light-green/30 to-brand-green/40 blur-xl -z-10 animate-pulse"></div>
-              <div className="absolute -inset-6 bg-gradient-to-br from-brand-green/20 to-sage-green/20 blur-3xl -z-20"></div>
-              <div className="absolute -inset-8 bg-gradient-to-r from-moss/10 to-light-green/10 blur-3xl -z-30"></div>
+              <div className="absolute -inset-3 bg-gradient-to-r from-brand-green/40 via-light-green/30 to-brand-green/40 rounded-3xl blur-xl -z-10 animate-pulse"></div>
+              <div className="absolute -inset-6 bg-gradient-to-br from-brand-green/20 to-sage-green/20 rounded-3xl blur-3xl -z-20"></div>
+              <div className="absolute -inset-8 bg-gradient-to-r from-moss/10 to-light-green/10 rounded-3xl blur-3xl -z-30"></div>
             </div>
           </div>
 
@@ -202,7 +169,7 @@ const Home = ({ dict, lang = 'zh' }) => {
           {/* 下部分 - 超大视频方块 */}
           <div className="flex-1 flex items-center justify-center">
             <div 
-              className="video-block relative overflow-hidden shadow-2xl w-full max-w-lg"
+              className="video-block relative overflow-hidden rounded-2xl shadow-2xl w-full max-w-lg"
               style={{ 
                 aspectRatio: '16/9', 
                 height: '70%',
@@ -229,7 +196,8 @@ const Home = ({ dict, lang = 'zh' }) => {
                 <source src="/videos/hero-forest-mobile.mp4" type="video/mp4" />
                 <source src="/videos/hero-forest.mp4" type="video/mp4" />
               </video>
-              <div className="absolute -inset-2 bg-gradient-to-r from-brand-green/20 to-light-green/20 blur-lg -z-10"></div>
+              <div className="absolute inset-0 rounded-2xl border-2 border-white/30 pointer-events-none"></div>
+              <div className="absolute -inset-2 bg-gradient-to-r from-brand-green/20 to-light-green/20 rounded-2xl blur-lg -z-10"></div>
             </div>
           </div>
         </div>
@@ -266,128 +234,85 @@ const Home = ({ dict, lang = 'zh' }) => {
           -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 呼吸霓虹灯效果 - 增强版 */
+        /* 呼吸霓虹灯效果 */
         .neon-breathing {
           position: relative;
-          animation: neon-breath 3s ease-in-out infinite;
+          animation: neon-breath 4s ease-in-out infinite;
         }
 
         .neon-breathing::after {
-          content: '';
+          content: attr(data-text);
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
           color: transparent;
-          -webkit-text-stroke: 2px rgba(26, 77, 50, 0.4);
-          text-stroke: 2px rgba(26, 77, 50, 0.4);
+          -webkit-text-stroke: 1px rgba(26, 77, 50, 0.3);
+          text-stroke: 1px rgba(26, 77, 50, 0.3);
           filter: 
-            drop-shadow(0 0 12px rgba(26, 77, 50, 0.8))
-            drop-shadow(0 0 24px rgba(82, 183, 136, 0.6))
-            drop-shadow(0 0 36px rgba(149, 213, 178, 0.4))
-            drop-shadow(0 0 48px rgba(26, 77, 50, 0.3))
-            drop-shadow(0 0 60px rgba(82, 183, 136, 0.2));
-          animation: neon-glow-pulse 3s ease-in-out infinite;
+            drop-shadow(0 0 8px rgba(26, 77, 50, 0.6))
+            drop-shadow(0 0 16px rgba(82, 183, 136, 0.4))
+            drop-shadow(0 0 24px rgba(149, 213, 178, 0.3))
+            drop-shadow(0 0 32px rgba(26, 77, 50, 0.2));
+          animation: neon-glow-pulse 4s ease-in-out infinite;
           z-index: -1;
-          pointer-events: none;
-        }
-
-        /* 添加第二层更强的发光效果 */
-        .neon-breathing::before {
-          content: '';
-          position: absolute;
-          top: -5px;
-          left: -5px;
-          right: -5px;
-          bottom: -5px;
-          background: linear-gradient(
-            45deg,
-            rgba(26, 77, 50, 0.1),
-            rgba(82, 183, 136, 0.15),
-            rgba(149, 213, 178, 0.1),
-            rgba(26, 77, 50, 0.1)
-          );
-          filter: blur(20px);
-          animation: neon-outer-glow 3s ease-in-out infinite;
-          z-index: -2;
           pointer-events: none;
         }
 
         @keyframes neon-breath {
           0%, 100% {
             filter: 
-              drop-shadow(0 0 12px rgba(26, 77, 50, 0.3)) 
-              drop-shadow(0 0 24px rgba(26, 77, 50, 0.15));
-            -webkit-text-stroke: 2px rgba(26, 77, 50, 0.8);
-            text-stroke: 2px rgba(26, 77, 50, 0.8);
+              drop-shadow(0 0 12px rgba(26, 77, 50, 0.2)) 
+              drop-shadow(0 0 24px rgba(26, 77, 50, 0.1));
           }
           25% {
             filter: 
-              drop-shadow(0 0 20px rgba(26, 77, 50, 0.6)) 
-              drop-shadow(0 0 40px rgba(82, 183, 136, 0.4))
-              drop-shadow(0 0 60px rgba(149, 213, 178, 0.2));
-            -webkit-text-stroke: 2px rgba(26, 77, 50, 0.9);
-            text-stroke: 2px rgba(26, 77, 50, 0.9);
+              drop-shadow(0 0 16px rgba(26, 77, 50, 0.4)) 
+              drop-shadow(0 0 32px rgba(82, 183, 136, 0.2))
+              drop-shadow(0 0 48px rgba(149, 213, 178, 0.1));
           }
           50% {
             filter: 
-              drop-shadow(0 0 28px rgba(26, 77, 50, 0.8)) 
-              drop-shadow(0 0 56px rgba(82, 183, 136, 0.6))
-              drop-shadow(0 0 84px rgba(149, 213, 178, 0.4))
-              drop-shadow(0 0 112px rgba(26, 77, 50, 0.2));
-            -webkit-text-stroke: 2px rgba(26, 77, 50, 1);
-            text-stroke: 2px rgba(26, 77, 50, 1);
+              drop-shadow(0 0 20px rgba(26, 77, 50, 0.5)) 
+              drop-shadow(0 0 40px rgba(82, 183, 136, 0.3))
+              drop-shadow(0 0 60px rgba(149, 213, 178, 0.2));
           }
           75% {
             filter: 
-              drop-shadow(0 0 20px rgba(26, 77, 50, 0.6)) 
-              drop-shadow(0 0 40px rgba(82, 183, 136, 0.4))
-              drop-shadow(0 0 60px rgba(149, 213, 178, 0.2));
-            -webkit-text-stroke: 2px rgba(26, 77, 50, 0.9);
-            text-stroke: 2px rgba(26, 77, 50, 0.9);
+              drop-shadow(0 0 16px rgba(26, 77, 50, 0.4)) 
+              drop-shadow(0 0 32px rgba(82, 183, 136, 0.2))
+              drop-shadow(0 0 48px rgba(149, 213, 178, 0.1));
           }
         }
 
         @keyframes neon-glow-pulse {
           0%, 100% {
-            opacity: 0.4;
+            opacity: 0.3;
             filter: 
-              drop-shadow(0 0 8px rgba(26, 77, 50, 0.4))
-              drop-shadow(0 0 16px rgba(82, 183, 136, 0.3));
+              drop-shadow(0 0 8px rgba(26, 77, 50, 0.3))
+              drop-shadow(0 0 16px rgba(82, 183, 136, 0.2));
           }
           25% {
-            opacity: 0.7;
+            opacity: 0.6;
             filter: 
-              drop-shadow(0 0 16px rgba(26, 77, 50, 0.7))
-              drop-shadow(0 0 32px rgba(82, 183, 136, 0.5))
-              drop-shadow(0 0 48px rgba(149, 213, 178, 0.3));
+              drop-shadow(0 0 12px rgba(26, 77, 50, 0.6))
+              drop-shadow(0 0 24px rgba(82, 183, 136, 0.4))
+              drop-shadow(0 0 36px rgba(149, 213, 178, 0.2));
           }
           50% {
-            opacity: 1;
+            opacity: 0.8;
             filter: 
-              drop-shadow(0 0 24px rgba(26, 77, 50, 1))
-              drop-shadow(0 0 48px rgba(82, 183, 136, 0.7))
-              drop-shadow(0 0 72px rgba(149, 213, 178, 0.5))
-              drop-shadow(0 0 96px rgba(26, 77, 50, 0.3));
+              drop-shadow(0 0 16px rgba(26, 77, 50, 0.8))
+              drop-shadow(0 0 32px rgba(82, 183, 136, 0.5))
+              drop-shadow(0 0 48px rgba(149, 213, 178, 0.3));
           }
           75% {
-            opacity: 0.7;
+            opacity: 0.6;
             filter: 
-              drop-shadow(0 0 16px rgba(26, 77, 50, 0.7))
-              drop-shadow(0 0 32px rgba(82, 183, 136, 0.5))
-              drop-shadow(0 0 48px rgba(149, 213, 178, 0.3));
-          }
-        }
-
-        @keyframes neon-outer-glow {
-          0%, 100% {
-            opacity: 0.2;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.5;
-            transform: scale(1.05);
+              drop-shadow(0 0 12px rgba(26, 77, 50, 0.6))
+              drop-shadow(0 0 24px rgba(82, 183, 136, 0.4))
+              drop-shadow(0 0 36px rgba(149, 213, 178, 0.2));
           }
         }
 
@@ -481,6 +406,7 @@ const Home = ({ dict, lang = 'zh' }) => {
             rgba(149, 213, 178, 0.1),
             rgba(26, 77, 50, 0.15)
           );
+          border-radius: 2.5rem;
           filter: blur(30px);
           opacity: 0.6;
           animation: mega-glow-pulse 5s ease-in-out infinite;
@@ -599,22 +525,22 @@ const Home = ({ dict, lang = 'zh' }) => {
             aspect-ratio: 16/9 !important;
           }
 
-          /* 移动端霓虹灯效果保持明显 */
+          /* 移动端霓虹灯效果减弱 */
           .neon-breathing {
-            animation-duration: 3s;
+            animation-duration: 5s;
           }
 
           @keyframes neon-breath {
             0%, 100% {
               filter: 
-                drop-shadow(0 0 10px rgba(26, 77, 50, 0.25)) 
-                drop-shadow(0 0 20px rgba(26, 77, 50, 0.15));
+                drop-shadow(0 0 8px rgba(26, 77, 50, 0.15)) 
+                drop-shadow(0 0 16px rgba(26, 77, 50, 0.08));
             }
             50% {
               filter: 
-                drop-shadow(0 0 16px rgba(26, 77, 50, 0.5)) 
-                drop-shadow(0 0 32px rgba(82, 183, 136, 0.3))
-                drop-shadow(0 0 48px rgba(149, 213, 178, 0.2));
+                drop-shadow(0 0 12px rgba(26, 77, 50, 0.3)) 
+                drop-shadow(0 0 24px rgba(82, 183, 136, 0.15))
+                drop-shadow(0 0 36px rgba(149, 213, 178, 0.1));
             }
           }
         }
@@ -639,12 +565,11 @@ const Home = ({ dict, lang = 'zh' }) => {
             font-size: 1.5rem;
           }
 
-          /* 小屏幕霓虹灯效果依然明显 */
+          /* 小屏幕进一步减弱效果 */
           .neon-breathing::after {
             filter: 
-              drop-shadow(0 0 8px rgba(26, 77, 50, 0.6))
-              drop-shadow(0 0 16px rgba(82, 183, 136, 0.4))
-              drop-shadow(0 0 24px rgba(149, 213, 178, 0.2));
+              drop-shadow(0 0 4px rgba(26, 77, 50, 0.4))
+              drop-shadow(0 0 8px rgba(82, 183, 136, 0.2));
           }
         }
       `}</style>
