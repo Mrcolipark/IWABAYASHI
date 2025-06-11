@@ -35,7 +35,10 @@ i18n
 
     react: {
       useSuspense: false
-    }
+    },
+
+    // 添加返回对象选项，支持数组翻译
+    returnObjects: true
   })
   .then(() => {
     console.log('i18n initialized successfully');
