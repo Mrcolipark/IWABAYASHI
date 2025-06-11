@@ -12,14 +12,30 @@ const Layout = ({ children }) => {
   const { i18n } = useTranslation();
 
   // 滚动监听
-  useEffect(() => {
-    const handleScroll = () => {
+useEffect(() => {
+  let isSubscribed = true;
+  
+  const handleScroll = () => {
+    if (isSubscribed) {
       setScrollY(window.scrollY);
-    };
+    }
+  };
 
+  try {
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  } catch (error) {
+    console.warn('Failed to add scroll listener:', error);
+  }
+
+  return () => {
+    isSubscribed = false;
+    try {
+      window.removeEventListener('scroll', handleScroll);
+    } catch (error) {
+      console.warn('Failed to remove scroll listener:', error);
+    }
+  };
+}, []);
 
   // 页面切换时的追踪
   useEffect(() => {

@@ -1,32 +1,84 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
 
-const Navbar = ({ scrollY, currentPath }) => {
+const Navbar = React.memo(({ scrollY, currentPath }) => {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const navRef = useRef(null);
   const location = useLocation();
 
-  // 导航项配置 - 使用新的翻译系统
-  const navItems = [
+  // 缓存导航项配置，避免每次渲染都重新创建
+  const navItems = useMemo(() => [
     { id: 'home', path: '/', labelKey: 'navigation.home' },
     { id: 'about', path: '/about', labelKey: 'navigation.about' },
     { id: 'services', path: '/services', labelKey: 'navigation.services' },
     { id: 'news', path: '/news', labelKey: 'navigation.news' },
     { id: 'contact', path: '/contact', labelKey: 'navigation.contact' }
-  ];
+  ], []);
 
-  // 滚动监听
-  const [isScrolled, setIsScrolled] = useState(false);
-  useEffect(() => {
-    setIsScrolled(scrollY > 50);
-  }, [scrollY]);
+  // 缓存语言选项
+  const languageOptions = useMemo(() => [
+    { code: 'zh', label: '中' },
+    { code: 'ja', label: '日' },
+    { code: 'en', label: 'EN' }
+  ], []);
 
-  // 点击外部关闭菜单
+  // 滚动状态计算优化 - 减少重新计算
+  const isScrolled = useMemo(() => scrollY > 50, [scrollY]);
+
+  // 优化语言切换处理器 - 使用useCallback防止重新创建
+  const handleLanguageChange = useCallback((newLang) => {
+    console.log('Changing language to:', newLang);
+    
+    try {
+      i18n.changeLanguage(newLang);
+      console.log('Language changed successfully to:', newLang);
+      trackEvent('language_changed', { from: i18n.language, to: newLang });
+    } catch (error) {
+      console.error('Language change failed:', error);
+    }
+    
+    setIsOpen(false);
+  }, [i18n]);
+
+  // 优化菜单点击处理器
+  const handleMenuClick = useCallback((item) => {
+    trackEvent('navigation_click', { 
+      from: location.pathname, 
+      to: item.path,
+      section: item.id 
+    });
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  // 检查当前路径是否激活 - 缓存函数
+  const isActive = useCallback((path) => {
+    return location.pathname === path;
+  }, [location.pathname]);
+
+  // 获取当前语言 - 缓存函数
+  const getCurrentLanguage = useCallback(() => {
+    return i18n.language || localStorage.getItem('i18nextLng') || 'zh';
+  }, [i18n.language]);
+
+  // 安全的翻译函数 - 缓存
+  const safeT = useCallback((key, defaultValue = '') => {
+    try {
+      const translation = t(key);
+      return translation === key ? defaultValue : translation;
+    } catch (error) {
+      console.warn(`Translation error for key: ${key}`, error);
+      return defaultValue;
+    }
+  }, [t]);
+
+  // 优化外部点击监听 - 只在菜单打开时添加监听器
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target)) {
         setIsOpen(false);
@@ -39,51 +91,15 @@ const Navbar = ({ scrollY, currentPath }) => {
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
-    }
+    // 使用passive选项优化性能
+    document.addEventListener('mousedown', handleClickOutside, { passive: true });
+    document.addEventListener('keydown', handleEscape, { passive: true });
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen]);
-
-  // 语言切换 - 修复版本
-  const handleLanguageChange = (newLang) => {
-    console.log('Changing language to:', newLang);
-    
-    try {
-      i18n.changeLanguage(newLang);
-      console.log('Language changed successfully to:', newLang);
-      trackEvent('language_changed', { from: i18n.language, to: newLang });
-    } catch (error) {
-      console.error('Language change failed:', error);
-    }
-    
-    setIsOpen(false);
-  };
-
-  // 菜单项点击
-  const handleMenuClick = (item) => {
-    trackEvent('navigation_click', { 
-      from: location.pathname, 
-      to: item.path,
-      section: item.id 
-    });
-    setIsOpen(false);
-  };
-
-  // 检查当前路径是否激活
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
-
-  // 获取当前语言
-  const getCurrentLanguage = () => {
-    return i18n.language || localStorage.getItem('i18nextLng') || 'zh';
-  };
 
   return (
     <nav 
@@ -120,7 +136,7 @@ const Navbar = ({ scrollY, currentPath }) => {
             </div>
             <div className="hidden sm:block">
               <span className="company-name font-elegant text-base text-brand-green">
-                {t('about.companyInfo.name', '岩林株式会社')}
+                {safeT('about.companyInfo.name', '岩林株式会社')}
               </span>
             </div>
           </Link>
@@ -137,11 +153,7 @@ const Navbar = ({ scrollY, currentPath }) => {
             
             {/* 桌面端语言切换 */}
             <div className="hidden md:flex items-center space-x-1 bg-white/90 border border-gray-200 rounded-xl p-1 shadow-sm">
-              {[
-                { code: 'zh', label: '中' },
-                { code: 'ja', label: '日' },
-                { code: 'en', label: 'EN' }
-              ].map((language) => (
+              {languageOptions.map((language) => (
                 <button
                   key={language.code}
                   onClick={() => handleLanguageChange(language.code)}
@@ -195,7 +207,7 @@ const Navbar = ({ scrollY, currentPath }) => {
                 <div>
                   <h3 className="text-white font-bold text-lg">IWABAYASHI</h3>
                   <p className="text-white/90 text-xs font-elegant">
-                    {t('about.companyInfo.name', '岩林株式会社')}
+                    {safeT('about.companyInfo.name', '岩林株式会社')}
                   </p>
                 </div>
               </div>
@@ -221,7 +233,7 @@ const Navbar = ({ scrollY, currentPath }) => {
                     <span className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       isActive(item.path) ? 'bg-brand-green' : 'bg-gray-400 group-hover:bg-brand-green'
                     }`}></span>
-                    <span className="font-elegant">{t(item.labelKey, item.labelKey)}</span>
+                    <span className="font-elegant">{safeT(item.labelKey, item.labelKey)}</span>
                   </div>
                 </Link>
               ))}
@@ -352,6 +364,14 @@ const Navbar = ({ scrollY, currentPath }) => {
       `}</style>
     </nav>
   );
-};
+}, (prevProps, nextProps) => {
+  // 自定义比较函数，只在真正需要时重新渲染
+  return (
+    prevProps.scrollY === nextProps.scrollY &&
+    prevProps.currentPath === nextProps.currentPath
+  );
+});
+
+Navbar.displayName = 'Navbar';
 
 export default Navbar;

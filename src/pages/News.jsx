@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
 
 const News = ({ dict }) => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState(null);
@@ -26,8 +28,8 @@ const News = ({ dict }) => {
     return () => observer.disconnect();
   }, []);
 
-  // 文章分类
-  const categories = [
+  // 文章分类 - 使用翻译
+  const categories = t('news.categories', { returnObjects: true }) || [
     { id: 'all', label: '全部', icon: '📰' },
     { id: '公司动态', label: '公司动态', icon: '🏢' },
     { id: '市场分析', label: '市场分析', icon: '📊' },
@@ -158,7 +160,7 @@ const News = ({ dict }) => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2 text-xs text-gray-500">
                         <span>📖</span>
-                        <span>阅读全文</span>
+                        <span>{t('buttons.readFullArticle', '阅读全文')}</span>
                       </div>
                       <div className="text-green-800 text-sm font-medium group-hover:translate-x-1 transition-transform duration-300">
                         →
@@ -176,8 +178,8 @@ const News = ({ dict }) => {
               <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6">
                 📰
               </div>
-              <h3 className="text-2xl font-bold text-gray-500 mb-4">暂无相关文章</h3>
-              <p className="text-gray-400">请选择其他分类查看更多内容</p>
+              <h3 className="text-2xl font-bold text-gray-500 mb-4">{t('news.noArticles', '暂无相关文章')}</h3>
+              <p className="text-gray-400">{t('news.selectOtherCategory', '请选择其他分类查看更多内容')}</p>
             </div>
           )}
         </div>
@@ -187,14 +189,16 @@ const News = ({ dict }) => {
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">行业趋势概览</h3>
+            <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+              {t('news.industryTrends.title', '行业趋势概览')}
+            </h3>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              把握中日贸易发展脉搏，洞察市场变化趋势
+              {t('news.industryTrends.description', '把握中日贸易发展脉搏，洞察市场变化趋势')}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
+            {(t('news.industryTrends.trends', { returnObjects: true }) || [
               {
                 title: '日本健康食品市场',
                 trend: '↗️ 持续增长',
@@ -216,7 +220,7 @@ const News = ({ dict }) => {
                 desc: '同比增长',
                 color: 'from-green-800 to-slate-600'
               }
-            ].map((item, index) => (
+            ]).map((item, index) => (
               <div key={index} className="text-center">
                 <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105">
                   <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center text-2xl mb-6 mx-auto`}>
@@ -236,21 +240,23 @@ const News = ({ dict }) => {
       {/* 订阅资讯 */}
       <section className="py-16 bg-gradient-to-r from-gray-800 to-green-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold text-white mb-6">订阅我们的资讯</h3>
+          <h3 className="text-3xl font-bold text-white mb-6">
+            {t('news.newsletter.title', '订阅我们的资讯')}
+          </h3>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            第一时间获取中日贸易最新动态和市场洞察
+            {t('news.newsletter.description', '第一时间获取中日贸易最新动态和市场洞察')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input
               type="email"
-              placeholder="请输入您的邮箱地址"
+              placeholder={t('news.newsletter.placeholder', '请输入您的邮箱地址')}
               className="flex-1 px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 border border-gray-300"
             />
             <button
               onClick={() => trackEvent('newsletter_subscribe_clicked')}
               className="px-8 py-3 bg-white text-gray-800 rounded-lg font-semibold hover:scale-105 transition-transform duration-300 shadow-lg"
             >
-              订阅
+              {t('news.newsletter.subscribe', '订阅')}
             </button>
           </div>
         </div>
@@ -299,7 +305,7 @@ const News = ({ dict }) => {
               <div className="mt-12 pt-8 border-t border-gray-200">
                 <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
                   <div className="text-gray-500 text-sm">
-                    发布时间：{formatDate(selectedArticle.date)}
+                    {t('time.publishTime', '发布时间')}：{formatDate(selectedArticle.date)}
                   </div>
                   <Link
                     to="/contact"
@@ -309,7 +315,7 @@ const News = ({ dict }) => {
                     }}
                     className="px-6 py-3 bg-gradient-to-r from-gray-800 to-green-800 rounded-lg font-semibold text-white hover:scale-105 transition-transform duration-300"
                   >
-                    了解更多详情
+                    {t('buttons.learnMore', '了解更多详情')}
                   </Link>
                 </div>
               </div>

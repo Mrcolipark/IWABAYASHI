@@ -14,15 +14,25 @@ const Hero = ({ dict, scrollY }) => {
   ];
 
   useEffect(() => {
-    setIsLoaded(true);
-    
-    // 文字轮播
-    const textInterval = setInterval(() => {
+  setIsLoaded(true);
+  
+  let textInterval;
+  
+  // 使用防护条件
+  if (heroTexts.length > 1) {
+    textInterval = setInterval(() => {
       setCurrentTextIndex(prev => (prev + 1) % heroTexts.length);
     }, 4000);
+  }
 
-    return () => clearInterval(textInterval);
-  }, [heroTexts.length]);
+  // 确保清理
+  return () => {
+    if (textInterval) {
+      clearInterval(textInterval);
+      textInterval = null;
+    }
+  };
+}, [heroTexts.length]);
 
   // 视差效果
   const parallaxOffset = scrollY * 0.3;

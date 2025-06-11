@@ -169,16 +169,11 @@ const Services = () => {
                   <div className="relative">
                     <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
                       
-                      {/* 服务流程图 */}
+                      {/* 服务流程图 - 使用翻译 */}
                       <div className="text-center mb-8">
                         <h4 className="text-xl font-bold text-gray-800 mb-6">服务流程</h4>
                         <div className="space-y-4">
-                          {[
-                            { step: 1, title: "产品甄选", desc: "严格筛选优质产品" },
-                            { step: 2, title: "质量检测", desc: "全面质量控制检测" },
-                            { step: 3, title: "进口代理", desc: "专业进口手续办理" },
-                            { step: 4, title: "市场推广", desc: "协助产品市场推广" }
-                          ].map((item, i) => (
+                          {t('services.currentBusiness.services.0.process', { returnObjects: true }).map((item, i) => (
                             <div key={i} className="flex items-center space-x-4 p-3 bg-gray-50 rounded-lg">
                               <div className="w-8 h-8 bg-gradient-to-r from-gray-800 to-green-800 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                 {item.step}
@@ -192,15 +187,19 @@ const Services = () => {
                         </div>
                       </div>
 
-                      {/* 关键指标 */}
+                      {/* 关键指标 - 使用翻译 */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="text-center p-4 bg-gray-50 rounded-lg">
                           <div className="text-2xl font-bold text-green-800">98%</div>
-                          <div className="text-sm text-gray-500">质量合格率</div>
+                          <div className="text-sm text-gray-500">
+                            {t('services.currentBusiness.services.0.metrics.qualityRate')}
+                          </div>
                         </div>
                         <div className="text-center p-4 bg-gray-50 rounded-lg">
                           <div className="text-2xl font-bold text-green-800">30天</div>
-                          <div className="text-sm text-gray-500">平均周期</div>
+                          <div className="text-sm text-gray-500">
+                            {t('services.currentBusiness.services.0.metrics.averageCycle')}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -291,7 +290,7 @@ const Services = () => {
                   <div className="relative">
                     <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
                       
-                      {/* 发展时间线 */}
+                      {/* 发展时间线 - 使用翻译 */}
                       <div className="text-center mb-8">
                         <h4 className="text-xl font-bold text-gray-800 mb-6">发展时间线</h4>
                         <div className="space-y-6">
@@ -315,15 +314,19 @@ const Services = () => {
                         </div>
                       </div>
 
-                      {/* 预期指标 */}
+                      {/* 预期指标 - 使用翻译 */}
                       <div className="grid grid-cols-2 gap-4">
                         <div className="text-center p-4 bg-gray-50 rounded-lg">
                           <div className="text-2xl font-bold text-slate-700">5+</div>
-                          <div className="text-sm text-gray-500">目标市场</div>
+                          <div className="text-sm text-gray-500">
+                            {t('services.futureBusiness.services.0.metrics.targetMarkets')}
+                          </div>
                         </div>
                         <div className="text-center p-4 bg-gray-50 rounded-lg">
                           <div className="text-2xl font-bold text-slate-700">100+</div>
-                          <div className="text-sm text-gray-500">合作企业</div>
+                          <div className="text-sm text-gray-500">
+                            {t('services.futureBusiness.services.0.metrics.partnerCompanies')}
+                          </div>
                         </div>
                       </div>
                     </div>

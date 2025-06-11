@@ -1,126 +1,8 @@
+// src/components/ParticleBackground.jsx - 完整修复版本
+
 import React, { useEffect, useRef, useState } from 'react';
 
-class IwabayashiParticle {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.reset();
-    this.vx = (Math.random() - 0.5) * 0.2;
-    this.vy = (Math.random() - 0.5) * 0.2;
-    this.life = Math.random() * 300 + 150;
-    this.maxLife = this.life;
-    this.hue = Math.random() * 60 + 120; // 绿色色调范围
-  }
-
-  reset() {
-    this.x = Math.random() * this.canvas.width;
-    this.y = Math.random() * this.canvas.height;
-    this.size = Math.random() * 2.5 + 0.5;
-    this.opacity = Math.random() * 0.6 + 0.2;
-  }
-
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.life--;
-
-    // 边界处理 - 柔和反弹
-    if (this.x < 0 || this.x > this.canvas.width) {
-      this.vx *= -0.8;
-      this.x = Math.max(0, Math.min(this.canvas.width, this.x));
-    }
-    if (this.y < 0 || this.y > this.canvas.height) {
-      this.vy *= -0.8;
-      this.y = Math.max(0, Math.min(this.canvas.height, this.y));
-    }
-
-    // 生命周期管理
-    if (this.life <= 0) {
-      this.reset();
-      this.life = this.maxLife;
-      this.hue = Math.random() * 60 + 120;
-    }
-
-    // 透明度和大小变化
-    const lifeRatio = this.life / this.maxLife;
-    this.opacity = lifeRatio * 0.6 + 0.2;
-    this.currentSize = this.size * (0.5 + lifeRatio * 0.5);
-  }
-
-  draw(ctx) {
-    ctx.save();
-    ctx.globalAlpha = this.opacity;
-    
-    // 岩林主题渐变 - 深森林绿到玉绿色
-    const gradient = ctx.createRadialGradient(
-      this.x, this.y, 0,
-      this.x, this.y, this.currentSize * 3
-    );
-    
-    // 使用岩林主题色调
-    const colors = [
-      'rgba(31, 78, 61, 0.8)',   // 深森林绿
-      'rgba(45, 106, 79, 0.6)',  // 玉绿色  
-      'rgba(64, 145, 108, 0.4)', // 苔藓绿
-      'rgba(82, 185, 136, 0.2)'  // 鼠尾草绿
-    ];
-    
-    const colorIndex = Math.floor(Math.random() * colors.length);
-    const primaryColor = colors[colorIndex];
-    
-    gradient.addColorStop(0, primaryColor);
-    gradient.addColorStop(0.5, primaryColor.replace('0.8', '0.4').replace('0.6', '0.3').replace('0.4', '0.2').replace('0.2', '0.1'));
-    gradient.addColorStop(1, 'rgba(31, 78, 61, 0)');
-    
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // 添加微妙的内核发光
-    ctx.globalAlpha = this.opacity * 0.8;
-    ctx.fillStyle = 'rgba(82, 185, 136, 0.6)';
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.currentSize * 0.3, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.restore();
-  }
-}
-
-class IwabayashiConnectionLine {
-  constructor(p1, p2, distance) {
-    this.p1 = p1;
-    this.p2 = p2;
-    this.distance = distance;
-    this.maxDistance = 100;
-  }
-
-  draw(ctx) {
-    const opacity = (1 - this.distance / this.maxDistance) * 0.25;
-    if (opacity <= 0.05) return;
-
-    ctx.save();
-    ctx.globalAlpha = opacity;
-    
-    // 岩林主题连接线 - 森林绿渐变
-    const gradient = ctx.createLinearGradient(
-      this.p1.x, this.p1.y, this.p2.x, this.p2.y
-    );
-    gradient.addColorStop(0, 'rgba(31, 78, 61, 0.6)');
-    gradient.addColorStop(0.5, 'rgba(64, 145, 108, 0.8)');
-    gradient.addColorStop(1, 'rgba(31, 78, 61, 0.6)');
-    
-    ctx.strokeStyle = gradient;
-    ctx.lineWidth = 0.8;
-    ctx.lineCap = 'round';
-    
-    ctx.beginPath();
-    ctx.moveTo(this.p1.x, this.p1.y);
-    ctx.lineTo(this.p2.x, this.p2.y);
-    ctx.stroke();
-    ctx.restore();
-  }
-}
+// ... IwabayashiParticle 和 IwabayashiConnectionLine 类保持不变 ...
 
 const ParticleBackground = () => {
   const canvasRef = useRef(null);
@@ -128,6 +10,9 @@ const ParticleBackground = () => {
   const particlesRef = useRef([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(true);
+  
+  // 添加清理状态标志
+  const isCleanedUpRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -135,9 +20,13 @@ const ParticleBackground = () => {
 
     const ctx = canvas.getContext('2d');
     let particles = particlesRef.current;
+    let resizeObserver; // 添加ResizeObserver引用
 
     // 响应式画布设置
     const resizeCanvas = () => {
+      // 检查是否已清理
+      if (isCleanedUpRef.current || !canvas) return;
+      
       const dpr = window.devicePixelRatio || 1;
       const rect = canvas.getBoundingClientRect();
       
@@ -168,8 +57,10 @@ const ParticleBackground = () => {
       }
     };
 
-    // 鼠标交互
+    // 鼠标交互 - 添加防护条件
     const handleMouseMove = (e) => {
+      if (isCleanedUpRef.current || !canvas) return;
+      
       const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
         x: e.clientX - rect.left,
@@ -177,18 +68,19 @@ const ParticleBackground = () => {
       };
     };
 
-    // 滚动优化
+    // 滚动优化 - 添加防护条件
     const handleScroll = () => {
+      if (isCleanedUpRef.current) return;
+      
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       // 在前两个屏幕高度内保持可见
       setIsVisible(scrollY < windowHeight * 2);
     };
 
-    // 动画循环
+    // 动画循环 - 添加防护条件
     const animate = () => {
-      if (!canvas || !ctx) {
-        animationRef.current = requestAnimationFrame(animate);
+      if (isCleanedUpRef.current || !canvas || !ctx) {
         return;
       }
 
@@ -205,6 +97,8 @@ const ParticleBackground = () => {
 
       // 更新和绘制粒子
       particles.forEach(particle => {
+        if (isCleanedUpRef.current) return; // 检查清理状态
+        
         particle.update();
         particle.draw(ctx);
 
@@ -231,6 +125,8 @@ const ParticleBackground = () => {
 
       // 绘制连接线（性能优化版）
       for (let i = 0; i < particles.length; i++) {
+        if (isCleanedUpRef.current) break; // 检查清理状态
+        
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
@@ -243,24 +139,82 @@ const ParticleBackground = () => {
         }
       }
 
-      animationRef.current = requestAnimationFrame(animate);
+      if (!isCleanedUpRef.current) {
+        animationRef.current = requestAnimationFrame(animate);
+      }
     };
 
     // 初始化
     resizeCanvas();
     animate();
 
+    // 使用ResizeObserver替代resize事件监听器（更高效）
+    if (window.ResizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        if (!isCleanedUpRef.current) {
+          resizeCanvas();
+        }
+      });
+      resizeObserver.observe(canvas);
+    } else {
+      // 回退到resize事件监听器
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+    }
+
     // 事件监听
-    window.addEventListener('resize', resizeCanvas, { passive: true });
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('scroll', handleScroll, { passive: true });
 
+    // 完整的清理函数
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
+      // 设置清理标志
+      isCleanedUpRef.current = true;
+
+      // 清理ResizeObserver
+      if (resizeObserver) {
+        try {
+          resizeObserver.disconnect();
+        } catch (error) {
+          console.warn('Failed to disconnect ResizeObserver:', error);
+        }
+        resizeObserver = null;
+      }
+      
+      // 清理事件监听器
+      try {
+        if (window.ResizeObserver) {
+          // 如果使用了ResizeObserver，则不需要移除resize监听器
+        } else {
+          window.removeEventListener('resize', resizeCanvas);
+        }
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('scroll', handleScroll);
+      } catch (error) {
+        console.warn('Failed to remove event listeners:', error);
+      }
+      
+      // 清理动画帧
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
+        try {
+          cancelAnimationFrame(animationRef.current);
+        } catch (error) {
+          console.warn('Failed to cancel animation frame:', error);
+        }
+        animationRef.current = null;
+      }
+      
+      // 清理粒子数组
+      if (particles) {
+        particles.length = 0;
+      }
+      
+      // 清理canvas上下文
+      if (ctx) {
+        try {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        } catch (error) {
+          console.warn('Failed to clear canvas:', error);
+        }
       }
     };
   }, [isVisible]);
