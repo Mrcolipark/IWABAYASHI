@@ -45,8 +45,8 @@ const About = ({ dict }) => {
       <section className="relative py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
         {/* 背景装饰 */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-brand-green/5 to-light-green/8 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tr from-sage-green/5 to-accent-green/6 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-gray-800/5 to-green-800/8 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tr from-slate-600/5 to-gray-700/6 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 relative z-10">
@@ -69,8 +69,22 @@ const About = ({ dict }) => {
               isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
             }`}>
               <div className="flex items-center justify-center space-x-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-green-800 rounded-2xl flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-3xl">岩</span>
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden bg-white border border-gray-200">
+                  <img 
+                    src="/logo.png" 
+                    alt="岩林株式会社 Logo"
+                    className="w-16 h-16 object-contain"
+                    onError={(e) => {
+                      // 如果logo加载失败，显示文字备选
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div 
+                    className="w-20 h-20 bg-gradient-to-br from-gray-800 to-green-800 rounded-2xl items-center justify-center text-white font-bold text-3xl hidden"
+                  >
+                    岩
+                  </div>
                 </div>
                 <div className="text-left">
                   <h2 className="text-3xl font-bold text-gray-800">IWABAYASHI</h2>
@@ -145,8 +159,22 @@ const About = ({ dict }) => {
                 <div className="relative">
                   <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg">
                     <div className="text-center mb-8">
-                      <div className="w-24 h-24 bg-gradient-to-br from-gray-800 to-green-800 rounded-2xl flex items-center justify-center text-4xl mb-6 mx-auto shadow-lg">
-                        岩
+                      <div className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-lg mx-auto overflow-hidden bg-white border border-gray-200">
+                        <img 
+                          src="/logo.png" 
+                          alt="岩林株式会社 Logo"
+                          className="w-20 h-20 object-contain"
+                          onError={(e) => {
+                            // 如果logo加载失败，显示文字备选
+                            e.target.style.display = 'none';
+                            e.target.nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div 
+                          className="w-24 h-24 bg-gradient-to-br from-gray-800 to-green-800 rounded-2xl items-center justify-center text-white font-bold text-4xl hidden"
+                        >
+                          岩
+                        </div>
                       </div>
                       <h3 className="text-2xl font-bold text-gray-800 mb-2">{aboutData.companyInfo.name}</h3>
                       <p className="text-green-800 text-lg">{aboutData.companyInfo.englishName}</p>
@@ -226,10 +254,24 @@ const About = ({ dict }) => {
             }`}>
               <div className="max-w-4xl mx-auto">
                 <div className="bg-white border border-gray-200 rounded-2xl p-12 shadow-lg text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-gray-800 to-green-800 rounded-2xl flex items-center justify-center text-3xl mb-8 mx-auto">
-                    👥
+                  <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto overflow-hidden bg-white border border-gray-200 shadow-lg">
+                    <img 
+                      src="/logo.png" 
+                      alt="岩林株式会社 Logo"
+                      className="w-16 h-16 object-contain"
+                      onError={(e) => {
+                        // 如果logo加载失败，显示文字备选
+                        e.target.style.display = 'none';
+                        e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                    <div 
+                      className="w-20 h-20 bg-gradient-to-br from-gray-800 to-green-800 rounded-2xl items-center justify-center text-white font-bold text-3xl hidden"
+                    >
+                      岩
+                    </div>
                   </div>
-                  <h3 className="text-3xl font-bold text-gray-800 mb-8">{aboutData.team.title}</h3>
+                  <h3 className="text-3xl font-bold text-gray-800 mb-8 mt-6">{aboutData.team.title}</h3>
                   <p className="text-lg text-gray-600 leading-relaxed">
                     {aboutData.team.content}
                   </p>
