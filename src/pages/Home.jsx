@@ -8,14 +8,27 @@ const Home = ({ dict, lang = 'zh' }) => {
   const videoRef = useRef(null);
 
   // 视差滚动监听
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-
+useEffect(() => {
+  const handleScroll = () => {
+    setScrollY(window.scrollY);
+  };
+  
+  // 添加错误处理
+  try {
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  } catch (error) {
+    console.warn('Failed to add scroll listener:', error);
+  }
+  
+  // 确保清理函数正确执行
+  return () => {
+    try {
+      window.removeEventListener('scroll', handleScroll);
+    } catch (error) {
+      console.warn('Failed to remove scroll listener:', error);
+    }
+  };
+}, []);
 
   // 页面加载完成
   useEffect(() => {
