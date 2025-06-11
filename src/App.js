@@ -9,7 +9,7 @@ import { useDict } from "./hooks/useDict";
 // 导入 i18n 配置
 import './i18n';
 
-// 页面组件懒加载 - 带错误处理
+// 主要页面组件懒加载 - 带错误处理
 const Home = React.lazy(() => 
   import("./pages/Home").catch(err => {
     console.error('Failed to load Home component:', err);
@@ -42,6 +42,28 @@ const Contact = React.lazy(() =>
   import("./pages/Contact").catch(err => {
     console.error('Failed to load Contact component:', err);
     return { default: () => <div className="p-8 text-center">Contact page failed to load</div> };
+  })
+);
+
+// 法律合规页面懒加载
+const Privacy = React.lazy(() => 
+  import("./pages/Privacy").catch(err => {
+    console.error('Failed to load Privacy component:', err);
+    return { default: () => <div className="p-8 text-center">Privacy page failed to load</div> };
+  })
+);
+
+const Terms = React.lazy(() => 
+  import("./pages/Terms").catch(err => {
+    console.error('Failed to load Terms component:', err);
+    return { default: () => <div className="p-8 text-center">Terms page failed to load</div> };
+  })
+);
+
+const Sitemap = React.lazy(() => 
+  import("./pages/Sitemap").catch(err => {
+    console.error('Failed to load Sitemap component:', err);
+    return { default: () => <div className="p-8 text-center">Sitemap page failed to load</div> };
   })
 );
 
@@ -93,7 +115,7 @@ function App() {
   }, [dict]);
 
   // 页面加载包装器 - 增强版
-  const PageWrapper = ({ children }) => (
+  const PageWrapper = useCallback(({ children }) => (
     <ErrorBoundary>
       <React.Suspense 
         fallback={
@@ -109,6 +131,42 @@ function App() {
         {children}
       </React.Suspense>
     </ErrorBoundary>
+  ), []);
+
+  // 404错误页面组件
+  const NotFoundPage = () => (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center max-w-md mx-auto px-4">
+        <div className="mb-8">
+          <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <span className="text-4xl">🔍</span>
+          </div>
+          <h1 className="text-6xl font-bold text-brand-green mb-4">404</h1>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">页面未找到</h2>
+          <p className="text-gray-600 mb-8">
+            抱歉，您访问的页面不存在或已被移动。
+          </p>
+        </div>
+        
+        <div className="space-y-4">
+          <a 
+            href="/" 
+            className="btn-primary inline-block px-8 py-3 bg-brand-green text-white rounded-lg font-medium hover:bg-accent-green transition-colors duration-300"
+          >
+            返回首页
+          </a>
+          <div className="text-sm text-gray-500">
+            或者您可以：
+          </div>
+          <div className="flex flex-wrap justify-center gap-4 text-sm">
+            <a href="/about" className="text-brand-green hover:underline">关于我们</a>
+            <a href="/services" className="text-brand-green hover:underline">服务内容</a>
+            <a href="/contact" className="text-brand-green hover:underline">联系我们</a>
+            <a href="/sitemap" className="text-brand-green hover:underline">网站地图</a>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 
   if (isInitialLoading) {
@@ -122,7 +180,7 @@ function App() {
       <div className="min-h-screen bg-white text-brand-green">
         <Layout>
           <Routes>
-            {/* 主页 */}
+            {/* 主要页面路由 */}
             <Route 
               path="/" 
               element={
@@ -132,7 +190,6 @@ function App() {
               } 
             />
             
-            {/* 关于我们 */}
             <Route 
               path="/about" 
               element={
@@ -142,7 +199,6 @@ function App() {
               } 
             />
             
-            {/* 事业内容 */}
             <Route 
               path="/services" 
               element={
@@ -152,7 +208,6 @@ function App() {
               } 
             />
             
-            {/* 新闻动态 */}
             <Route 
               path="/news" 
               element={
@@ -162,7 +217,6 @@ function App() {
               } 
             />
             
-            {/* 联系方式 */}
             <Route 
               path="/contact" 
               element={
@@ -171,26 +225,73 @@ function App() {
                 </PageWrapper>
               } 
             />
-            
-            {/* 404页面 */}
+
+            {/* 法律合规页面路由 */}
             <Route 
-              path="*" 
+              path="/privacy" 
               element={
                 <PageWrapper>
-                  <div className="min-h-screen flex items-center justify-center bg-white">
-                    <div className="text-center">
-                      <h1 className="text-6xl font-bold text-brand-green mb-4">404</h1>
-                      <p className="text-xl text-gray-600 mb-8">页面未找到</p>
-                      <a 
-                        href="/" 
-                        className="btn-primary inline-block"
-                      >
-                        返回首页
-                      </a>
-                    </div>
-                  </div>
+                  <Privacy />
                 </PageWrapper>
               } 
+            />
+            
+            <Route 
+              path="/terms" 
+              element={
+                <PageWrapper>
+                  <Terms />
+                </PageWrapper>
+              } 
+            />
+            
+            <Route 
+              path="/sitemap" 
+              element={
+                <PageWrapper>
+                  <Sitemap />
+                </PageWrapper>
+              } 
+            />
+
+            {/* 多语言路由支持（可选） */}
+            <Route path="/zh/*" element={<Routes>
+              <Route path="/" element={<PageWrapper><Home dict={dict} /></PageWrapper>} />
+              <Route path="/about" element={<PageWrapper><About dict={dict} /></PageWrapper>} />
+              <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
+              <Route path="/news" element={<PageWrapper><News dict={dict} /></PageWrapper>} />
+              <Route path="/contact" element={<PageWrapper><Contact dict={dict} /></PageWrapper>} />
+              <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
+              <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
+              <Route path="/sitemap" element={<PageWrapper><Sitemap /></PageWrapper>} />
+            </Routes>} />
+
+            <Route path="/ja/*" element={<Routes>
+              <Route path="/" element={<PageWrapper><Home dict={dict} /></PageWrapper>} />
+              <Route path="/about" element={<PageWrapper><About dict={dict} /></PageWrapper>} />
+              <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
+              <Route path="/news" element={<PageWrapper><News dict={dict} /></PageWrapper>} />
+              <Route path="/contact" element={<PageWrapper><Contact dict={dict} /></PageWrapper>} />
+              <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
+              <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
+              <Route path="/sitemap" element={<PageWrapper><Sitemap /></PageWrapper>} />
+            </Routes>} />
+
+            <Route path="/en/*" element={<Routes>
+              <Route path="/" element={<PageWrapper><Home dict={dict} /></PageWrapper>} />
+              <Route path="/about" element={<PageWrapper><About dict={dict} /></PageWrapper>} />
+              <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
+              <Route path="/news" element={<PageWrapper><News dict={dict} /></PageWrapper>} />
+              <Route path="/contact" element={<PageWrapper><Contact dict={dict} /></PageWrapper>} />
+              <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
+              <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
+              <Route path="/sitemap" element={<PageWrapper><Sitemap /></PageWrapper>} />
+            </Routes>} />
+            
+            {/* 404页面 - 必须放在最后 */}
+            <Route 
+              path="*" 
+              element={<NotFoundPage />}
             />
           </Routes>
         </Layout>
