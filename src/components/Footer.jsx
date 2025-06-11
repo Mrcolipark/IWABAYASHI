@@ -1,23 +1,52 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-const Footer = ({ dict }) => {
+const Footer = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
+
+  // 安全的翻译函数
+  const safeT = (key, defaultValue = '') => {
+    try {
+      const translation = t(key);
+      return translation === key ? defaultValue : translation;
+    } catch (error) {
+      console.warn(`Translation error for key: ${key}`, error);
+      return defaultValue;
+    }
+  };
 
   // 导航链接
   const navLinks = [
-    { path: '/', label: dict?.menu?.[0] || '首页' },
-    { path: '/about', label: dict?.menu?.[1] || '会社概要' },
-    { path: '/services', label: dict?.menu?.[2] || '事业内容' },
-    { path: '/news', label: dict?.menu?.[3] || 'ニュース' },
-    { path: '/contact', label: dict?.menu?.[4] || 'お問い合わせ' }
+    { path: '/', label: safeT('navigation.home', '首页') },
+    { path: '/about', label: safeT('navigation.about', '会社概要') },
+    { path: '/services', label: safeT('navigation.services', '事业内容') },
+    { path: '/news', label: safeT('navigation.news', 'ニュース') },
+    { path: '/contact', label: safeT('navigation.contact', 'お問い合わせ') }
   ];
 
   // 社交媒体链接
   const socialLinks = [
-    { name: 'Email', icon: '📧', href: `mailto:${dict?.contact?.info?.email || 'info@iwabayashi.com'}` },
-    { name: 'Phone', icon: '📞', href: `tel:${dict?.contact?.info?.phone || '+81-3-1234-5678'}` },
+    { 
+      name: 'Email', 
+      icon: '📧', 
+      href: `mailto:${safeT('contact.info.email', 'info@iwabayashi.com')}` 
+    },
+    { 
+      name: 'Phone', 
+      icon: '📞', 
+      href: `tel:${safeT('contact.info.phone', '+81-3-1234-5678')}` 
+    },
     { name: 'WeChat', icon: '💬', href: '#wechat' }
+  ];
+
+  // 业务内容列表
+  const businessItems = [
+    safeT('footer.businessItems.0', '日本保健品进口代理'),
+    safeT('footer.businessItems.1', '中国大宗商品出口'),
+    safeT('footer.businessItems.2', '市场咨询服务'),
+    safeT('footer.businessItems.3', '供应链管理')
   ];
 
   return (
@@ -32,10 +61,9 @@ const Footer = ({ dict }) => {
               <div className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden bg-white shadow-sm">
                 <img 
                   src="/logo.png" 
-                  alt="岩林株式会社 Logo"
+                  alt={`${safeT('about.companyInfo.name', '岩林株式会社')} Logo`}
                   className="w-10 h-10 object-contain"
                   onError={(e) => {
-                    // 如果logo加载失败，显示文字备选
                     e.target.style.display = 'none';
                     e.target.nextElementSibling.style.display = 'flex';
                   }}
@@ -48,11 +76,13 @@ const Footer = ({ dict }) => {
               </div>
               <div>
                 <span className="text-xl font-bold text-green-800">IWABAYASHI</span>
-                <div className="text-sm text-green-900">岩林株式会社</div>
+                <div className="text-sm text-green-900">
+                  {safeT('about.companyInfo.name', '岩林株式会社')}
+                </div>
               </div>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              {dict?.footer?.description || "岩林株式会社致力于成为中日贸易领域最受信赖的合作伙伴，为客户提供专业、高效的贸易解决方案。"}
+              {safeT('footer.description', '岩林株式会社致力于成为中日贸易领域最受信赖的合作伙伴，为客户提供专业、高效的贸易解决方案。')}
             </p>
             
             {/* 社交媒体 */}
@@ -74,7 +104,7 @@ const Footer = ({ dict }) => {
           {/* 快速链接 */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-green-700">
-              {dict?.footer?.quickLinks || "快速链接"}
+              {safeT('footer.quickLinks', '快速链接')}
             </h3>
             <ul className="space-y-3">
               {navLinks.map((link, index) => (
@@ -94,39 +124,34 @@ const Footer = ({ dict }) => {
           {/* 业务内容 */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-green-700">
-              {dict?.footer?.business || "业务内容"}
+              {safeT('footer.business', '业务内容')}
             </h3>
             <ul className="space-y-3 text-gray-600">
-              <li className="hover:text-green-600 transition-colors duration-300">
-                日本保健品进口代理
-              </li>
-              <li className="hover:text-green-600 transition-colors duration-300">
-                中国大宗商品出口
-              </li>
-              <li className="hover:text-green-600 transition-colors duration-300">
-                市场咨询服务
-              </li>
-              <li className="hover:text-green-600 transition-colors duration-300">
-                供应链管理
-              </li>
+              {businessItems.map((item, index) => (
+                <li key={index} className="hover:text-green-600 transition-colors duration-300">
+                  {item}
+                </li>
+              ))}
             </ul>
           </div>
           
           {/* 联系方式 */}
           <div>
             <h3 className="text-lg font-semibold mb-6 text-green-700">
-              {dict?.footer?.contact || "联系方式"}
+              {safeT('footer.contact', '联系方式')}
             </h3>
             <div className="space-y-4 text-gray-600">
               <div className="flex items-start space-x-3">
                 <span className="text-green-500 mt-1">📧</span>
                 <div>
-                  <div className="text-sm text-gray-500">邮箱</div>
+                  <div className="text-sm text-gray-500">
+                    {safeT('footer.contactItems.email', '邮箱')}
+                  </div>
                   <a 
-                    href={`mailto:${dict?.contact?.info?.email || 'info@iwabayashi.com'}`}
+                    href={`mailto:${safeT('contact.info.email', 'info@iwabayashi.com')}`}
                     className="hover:text-green-600 transition-colors duration-300"
                   >
-                    {dict?.contact?.info?.email || 'info@iwabayashi.com'}
+                    {safeT('contact.info.email', 'info@iwabayashi.com')}
                   </a>
                 </div>
               </div>
@@ -134,12 +159,14 @@ const Footer = ({ dict }) => {
               <div className="flex items-start space-x-3">
                 <span className="text-green-500 mt-1">📞</span>
                 <div>
-                  <div className="text-sm text-gray-500">电话</div>
+                  <div className="text-sm text-gray-500">
+                    {safeT('footer.contactItems.phone', '电话')}
+                  </div>
                   <a 
-                    href={`tel:${dict?.contact?.info?.phone || '+81-3-1234-5678'}`}
+                    href={`tel:${safeT('contact.info.phone', '+81-3-1234-5678')}`}
                     className="hover:text-green-600 transition-colors duration-300"
                   >
-                    {dict?.contact?.info?.phone || '+81-3-1234-5678'}
+                    {safeT('contact.info.phone', '+81-3-1234-5678')}
                   </a>
                 </div>
               </div>
@@ -147,9 +174,11 @@ const Footer = ({ dict }) => {
               <div className="flex items-start space-x-3">
                 <span className="text-green-500 mt-1">📍</span>
                 <div>
-                  <div className="text-sm text-gray-500">地址</div>
+                  <div className="text-sm text-gray-500">
+                    {safeT('footer.contactItems.address', '地址')}
+                  </div>
                   <p className="text-sm leading-relaxed">
-                    {dict?.contact?.info?.address || "日本东京都港区赤坂1-2-3 岩林大厦10F"}
+                    {safeT('contact.info.address', '日本东京都港区赤坂1-2-3 岩林大厦10F')}
                   </p>
                 </div>
               </div>
@@ -157,9 +186,11 @@ const Footer = ({ dict }) => {
               <div className="flex items-start space-x-3">
                 <span className="text-green-500 mt-1">🕒</span>
                 <div>
-                  <div className="text-sm text-gray-500">营业时间</div>
+                  <div className="text-sm text-gray-500">
+                    {safeT('footer.contactItems.hours', '营业时间')}
+                  </div>
                   <p className="text-sm">
-                    {dict?.contact?.info?.businessHours || "周一至周五 9:00-18:00 (JST)"}
+                    {safeT('contact.info.businessHours', '周一至周五 9:00-18:00 (JST)')}
                   </p>
                 </div>
               </div>
@@ -176,10 +207,10 @@ const Footer = ({ dict }) => {
             {/* 版权信息 */}
             <div className="text-center md:text-left">
               <p className="text-gray-500 text-sm">
-                &copy; {currentYear} 岩林株式会社 (IWABAYASHI Corporation). All rights reserved.
+                &copy; {currentYear} {safeT('about.companyInfo.name', '岩林株式会社')} (IWABAYASHI Corporation). All rights reserved.
               </p>
               <p className="text-gray-400 text-xs mt-1">
-                专业的中日贸易综合服务商
+                {safeT('footer.tagline', '专业的中日贸易综合服务商')}
               </p>
             </div>
             
@@ -189,27 +220,27 @@ const Footer = ({ dict }) => {
                 href="/privacy" 
                 className="text-gray-500 hover:text-green-600 transition-colors duration-300"
               >
-                {dict?.footer?.links?.privacy || "隐私政策"}
+                {safeT('footer.links.privacy', '隐私政策')}
               </a>
               <a 
                 href="/terms" 
                 className="text-gray-500 hover:text-green-600 transition-colors duration-300"
               >
-                {dict?.footer?.links?.terms || "使用条款"}
+                {safeT('footer.links.terms', '使用条款')}
               </a>
               <a 
                 href="/sitemap" 
                 className="text-gray-500 hover:text-green-600 transition-colors duration-300"
               >
-                {dict?.footer?.links?.sitemap || "网站地图"}
+                {safeT('footer.links.sitemap', '网站地图')}
               </a>
             </div>
           </div>
           
-          {/* 备案信息（如需要） */}
+          {/* 备案信息 */}
           <div className="text-center mt-4 pt-4 border-t border-gray-100">
             <p className="text-gray-400 text-xs">
-              Built with ❤️ for connecting China and Japan
+              {safeT('footer.builtWith', 'Built with ❤️ for connecting China and Japan')}
             </p>
           </div>
         </div>

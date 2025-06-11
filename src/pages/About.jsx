@@ -1,12 +1,78 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
 
 const About = ({ dict }) => {
+  const { t, i18n } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const sectionRef = useRef(null);
-  const aboutData = dict.about;
+
+  // 安全获取数据的函数
+  const safeGet = (obj, path, defaultValue = '') => {
+    try {
+      const keys = path.split('.');
+      let result = obj;
+      for (const key of keys) {
+        if (result && typeof result === 'object' && key in result) {
+          result = result[key];
+        } else {
+          return defaultValue;
+        }
+      }
+      return result !== undefined && result !== null ? result : defaultValue;
+    } catch (error) {
+      console.warn('SafeGet error:', error);
+      return defaultValue;
+    }
+  };
+
+  // 安全的翻译函数
+  const safeT = (key, defaultValue = '') => {
+    try {
+      const translation = t(key);
+      return translation === key ? defaultValue : translation;
+    } catch (error) {
+      console.warn(`Translation error for key: ${key}`, error);
+      return defaultValue;
+    }
+  };
+
+  // 获取 about 数据，带默认值
+  const aboutData = dict?.about || {
+    title: '关于我们',
+    subtitle: '年轻而充满活力的中日贸易桥梁',
+    companyInfo: {
+      name: '岩林株式会社',
+      englishName: 'IWABAYASHI Corporation',
+      established: '2025年',
+      headquarters: '日本',
+      business: '中日双边贸易综合服务'
+    },
+    description: '岩林株式会社成立于2025年，总部位于日本。作为一家致力于中日双边贸易的综合性贸易公司，我们秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。',
+    philosophy: {
+      title: '经营理念',
+      values: ['专业', '高效', '共赢']
+    },
+    vision: {
+      title: '公司愿景',
+      content: '搭建中日优质商品流通桥梁，促进两国经贸繁荣，成为具有国际影响力的贸易服务商。'
+    },
+    mission: {
+      title: '公司使命',
+      content: '精选全球好产品，服务中国与日本市场，创造更高品质的生活价值。'
+    },
+    team: {
+      title: '团队特色',
+      content: '作为一家年轻而充满活力的公司，我们拥有开放务实的团队，致力于为合作伙伴提供专业的市场咨询、灵活的供应链管理与高效的进出口服务。我们坚信，通过不断的努力与积累，必将赢得市场的信任与支持，成为中日贸易领域值得依赖的合作伙伴。'
+    },
+    cta: {
+      title: '准备与我们合作了吗？',
+      description: '我们期待与您建立长期合作关系，共同开拓中日贸易新机遇',
+      learnServices: '了解我们的服务'
+    }
+  };
 
   // 可见性检测
   useEffect(() => {
@@ -19,9 +85,7 @@ const About = ({ dict }) => {
       observer.observe(sectionRef.current);
     }
 
-    // 追踪页面访问
     trackEvent('about_page_viewed');
-
     return () => observer.disconnect();
   }, []);
 
@@ -30,20 +94,47 @@ const About = ({ dict }) => {
     trackEvent('about_tab_clicked', { tab });
   };
 
-  // 标签页配置
+  // 标签页配置 - 使用直接翻译
   const tabs = [
-    { id: 'overview', label: '公司概要', icon: '🏢' },
-    { id: 'vision', label: '愿景使命', icon: '🎯' },
-    { id: 'team', label: '团队特色', icon: '👥' },
-    { id: 'philosophy', label: '经营理念', icon: '💡' }
+    { 
+      id: 'overview', 
+      label: safeT('about.tabs.overview', '公司概要'), 
+      icon: '🏢' 
+    },
+    { 
+      id: 'vision', 
+      label: safeT('about.tabs.vision', '愿景使命'), 
+      icon: '🎯' 
+    },
+    { 
+      id: 'team', 
+      label: safeT('about.tabs.team', '团队特色'), 
+      icon: '👥' 
+    },
+    { 
+      id: 'philosophy', 
+      label: safeT('about.tabs.philosophy', '经营理念'), 
+      icon: '💡' 
+    }
   ];
+
+  // 如果数据还没有加载完成，显示加载状态
+  if (!dict || !aboutData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-brand-green">正在加载页面内容...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20">
       
-      {/* Hero区域 - 白色主题 */}
+      {/* Hero区域 */}
       <section className="relative py-24 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
-        {/* 背景装饰 */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-gray-800/5 to-green-800/8 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-tr from-slate-600/5 to-gray-700/6 rounded-full blur-3xl"></div>
@@ -55,12 +146,12 @@ const About = ({ dict }) => {
               isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
             }`}>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
-                <span className="bg-gradient-to-r from-brand-green via-accent-green to-light-green bg-clip-text text-transparent">
-                  {aboutData.title}
+                <span className="bg-gradient-to-r from-gray-800 via-slate-700 to-green-800 bg-clip-text text-transparent">
+                  {safeT('about.title', aboutData.title)}
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-text-secondary max-w-4xl mx-auto leading-relaxed">
-                {aboutData.subtitle}
+                {safeT('about.subtitle', aboutData.subtitle)}
               </p>
             </div>
             
@@ -75,7 +166,6 @@ const About = ({ dict }) => {
                     alt="岩林株式会社 Logo"
                     className="w-16 h-16 object-contain"
                     onError={(e) => {
-                      // 如果logo加载失败，显示文字备选
                       e.target.style.display = 'none';
                       e.target.nextElementSibling.style.display = 'flex';
                     }}
@@ -88,7 +178,7 @@ const About = ({ dict }) => {
                 </div>
                 <div className="text-left">
                   <h2 className="text-3xl font-bold text-gray-800">IWABAYASHI</h2>
-                  <p className="text-green-800 text-lg">{aboutData.companyInfo.name}</p>
+                  <p className="text-green-800 text-lg">{safeT('about.companyInfo.name', aboutData.companyInfo?.name)}</p>
                 </div>
               </div>
             </div>
@@ -96,7 +186,7 @@ const About = ({ dict }) => {
         </div>
       </section>
 
-      {/* 标签页导航 - 白色主题 */}
+      {/* 标签页导航 */}
       <section className="relative py-8 bg-white/80 backdrop-blur-sm border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-4">
@@ -132,25 +222,27 @@ const About = ({ dict }) => {
                 {/* 左侧：公司介绍 */}
                 <div className="space-y-8">
                   <div>
-                    <h3 className="text-3xl font-bold text-gray-800 mb-6">公司简介</h3>
+                    <h3 className="text-3xl font-bold text-gray-800 mb-6">
+                      {safeT('about.overview.title', '公司简介')}
+                    </h3>
                     <p className="text-lg text-gray-600 leading-relaxed">
-                      {aboutData.description}
+                      {safeT('about.description', aboutData.description)}
                     </p>
                   </div>
 
                   {/* 公司信息卡片 */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                      <span className="text-gray-500">成立时间</span>
-                      <span className="text-gray-800 font-semibold">{aboutData.companyInfo.established}</span>
+                      <span className="text-gray-500">{safeT('about.overview.establishedTime', '成立时间')}</span>
+                      <span className="text-gray-800 font-semibold">{safeT('about.companyInfo.established', aboutData.companyInfo?.established)}</span>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                      <span className="text-gray-500">总部位置</span>
-                      <span className="text-gray-800 font-semibold">{aboutData.companyInfo.headquarters}</span>
+                      <span className="text-gray-500">{safeT('about.overview.headquarters', '总部位置')}</span>
+                      <span className="text-gray-800 font-semibold">{safeT('about.companyInfo.headquarters', aboutData.companyInfo?.headquarters)}</span>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                      <span className="text-gray-500">业务领域</span>
-                      <span className="text-gray-800 font-semibold">{aboutData.companyInfo.business}</span>
+                      <span className="text-gray-500">{safeT('about.overview.businessScope', '业务领域')}</span>
+                      <span className="text-gray-800 font-semibold">{safeT('about.companyInfo.business', aboutData.companyInfo?.business)}</span>
                     </div>
                   </div>
                 </div>
@@ -165,7 +257,6 @@ const About = ({ dict }) => {
                           alt="岩林株式会社 Logo"
                           className="w-20 h-20 object-contain"
                           onError={(e) => {
-                            // 如果logo加载失败，显示文字备选
                             e.target.style.display = 'none';
                             e.target.nextElementSibling.style.display = 'flex';
                           }}
@@ -176,28 +267,28 @@ const About = ({ dict }) => {
                           岩
                         </div>
                       </div>
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">{aboutData.companyInfo.name}</h3>
-                      <p className="text-green-800 text-lg">{aboutData.companyInfo.englishName}</p>
+                      <h3 className="text-2xl font-bold text-gray-800 mb-2">{safeT('about.companyInfo.name', aboutData.companyInfo?.name)}</h3>
+                      <p className="text-green-800 text-lg">{safeT('about.companyInfo.englishName', aboutData.companyInfo?.englishName)}</p>
                     </div>
 
                     {/* 核心数据 */}
                     <div className="grid grid-cols-2 gap-6 mb-8">
                       <div className="text-center p-4 bg-gray-50 rounded-lg">
                         <div className="text-2xl font-bold text-green-800">2025</div>
-                        <div className="text-sm text-gray-500">成立年份</div>
+                        <div className="text-sm text-gray-500">{safeT('about.overview.coreData.foundedYear', '成立年份')}</div>
                       </div>
                       <div className="text-center p-4 bg-gray-50 rounded-lg">
                         <div className="text-2xl font-bold text-green-800">100%</div>
-                        <div className="text-sm text-gray-500">专注度</div>
+                        <div className="text-sm text-gray-500">{safeT('about.overview.coreData.dedication', '专注度')}</div>
                       </div>
                     </div>
 
                     {/* 业务特色 */}
                     <div className="space-y-3">
-                      {['专业团队', '优质服务', '创新理念', '持续发展'].map((feature, index) => (
+                      {(safeT('about.overview.features', '').split(',') || ['专业团队', '优质服务', '创新理念', '持续发展']).map((feature, index) => (
                         <div key={index} className="flex items-center space-x-3">
                           <div className="w-2 h-2 bg-green-800 rounded-full"></div>
-                          <span className="text-gray-600">{feature}</span>
+                          <span className="text-gray-600">{feature.trim() || ['专业团队', '优质服务', '创新理念', '持续发展'][index]}</span>
                         </div>
                       ))}
                     </div>
@@ -224,10 +315,10 @@ const About = ({ dict }) => {
                     <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-green-800 rounded-xl flex items-center justify-center text-2xl mb-4 mx-auto">
                       🎯
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">{aboutData.vision.title}</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">{safeT('about.vision.title', aboutData.vision?.title)}</h3>
                   </div>
                   <p className="text-lg text-gray-600 leading-relaxed text-center">
-                    {aboutData.vision.content}
+                    {safeT('about.vision.content', aboutData.vision?.content)}
                   </p>
                 </div>
 
@@ -237,10 +328,10 @@ const About = ({ dict }) => {
                     <div className="w-16 h-16 bg-gradient-to-br from-green-800 to-slate-600 rounded-xl flex items-center justify-center text-2xl mb-4 mx-auto">
                       🚀
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4">{aboutData.mission.title}</h3>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">{safeT('about.mission.title', aboutData.mission?.title)}</h3>
                   </div>
                   <p className="text-lg text-gray-600 leading-relaxed text-center">
-                    {aboutData.mission.content}
+                    {safeT('about.mission.content', aboutData.mission?.content)}
                   </p>
                 </div>
               </div>
@@ -260,7 +351,6 @@ const About = ({ dict }) => {
                       alt="岩林株式会社 Logo"
                       className="w-16 h-16 object-contain"
                       onError={(e) => {
-                        // 如果logo加载失败，显示文字备选
                         e.target.style.display = 'none';
                         e.target.nextElementSibling.style.display = 'flex';
                       }}
@@ -271,19 +361,19 @@ const About = ({ dict }) => {
                       岩
                     </div>
                   </div>
-                  <h3 className="text-3xl font-bold text-gray-800 mb-8 mt-6">{aboutData.team.title}</h3>
+                  <h3 className="text-3xl font-bold text-gray-800 mb-8 mt-6">{safeT('about.team.title', aboutData.team?.title)}</h3>
                   <p className="text-lg text-gray-600 leading-relaxed">
-                    {aboutData.team.content}
+                    {safeT('about.team.content', aboutData.team?.content)}
                   </p>
                   
                   {/* 团队特色标签 */}
                   <div className="flex flex-wrap justify-center gap-4 mt-8">
-                    {['开放务实', '专业服务', '持续成长', '合作共赢'].map((trait, index) => (
+                    {(safeT('about.team.traits', '').split(',') || ['开放务实', '专业服务', '持续成长', '合作共赢']).map((trait, index) => (
                       <span 
                         key={index}
                         className="px-4 py-2 bg-green-50 text-green-800 border border-green-200 rounded-full text-sm font-medium"
                       >
-                        {trait}
+                        {trait.trim() || ['开放务实', '专业服务', '持续成长', '合作共赢'][index]}
                       </span>
                     ))}
                   </div>
@@ -298,19 +388,19 @@ const About = ({ dict }) => {
               isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'
             }`}>
               <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-800 mb-6">{aboutData.philosophy.title}</h3>
+                <h3 className="text-3xl font-bold text-gray-800 mb-6">{safeT('about.philosophy.title', aboutData.philosophy?.title)}</h3>
               </div>
               
               <div className="grid md:grid-cols-3 gap-8">
-                {aboutData.philosophy.values.map((value, index) => (
+                {(aboutData.philosophy?.values || ['专业', '高效', '共赢']).map((value, index) => (
                   <div key={index} className="text-center">
                     <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105">
                       <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-green-800 rounded-xl flex items-center justify-center text-2xl mb-6 mx-auto">
                         {['💼', '⚡', '🤝'][index]}
                       </div>
-                      <h4 className="text-xl font-bold text-gray-800 mb-4">{value}</h4>
+                      <h4 className="text-xl font-bold text-gray-800 mb-4">{safeT(`about.philosophy.values.${index}`, value)}</h4>
                       <p className="text-gray-600">
-                        {['以专业为基础，提供高质量服务', '追求高效率，创造更大价值', '与合作伙伴共同成长发展'][index]}
+                        {safeT(`about.philosophy.descriptions.${index}`, ['以专业为基础，提供高质量服务', '追求高效率，创造更大价值', '与合作伙伴共同成长发展'][index])}
                       </p>
                     </div>
                   </div>
@@ -321,12 +411,14 @@ const About = ({ dict }) => {
         </div>
       </section>
 
-      {/* 行动号召区域 - 白色主题 */}
+      {/* CTA区域 */}
       <section className="py-16 bg-gradient-to-r from-gray-800 to-green-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h3 className="text-3xl font-bold text-white mb-6">准备与我们合作了吗？</h3>
+          <h3 className="text-3xl font-bold text-white mb-6">
+            {safeT('about.cta.title', aboutData.cta?.title)}
+          </h3>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            我们期待与您建立长期合作关系，共同开拓中日贸易新机遇
+            {safeT('about.cta.description', aboutData.cta?.description)}
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
@@ -334,14 +426,14 @@ const About = ({ dict }) => {
               onClick={() => trackEvent('about_to_services_clicked')}
               className="px-8 py-4 bg-white text-gray-800 rounded-lg font-semibold hover:scale-105 transition-transform duration-300 shadow-lg"
             >
-              了解我们的服务
+              {safeT('about.cta.learnServices', aboutData.cta?.learnServices)}
             </Link>
             <Link
               to="/contact"
               onClick={() => trackEvent('about_to_contact_clicked')}
               className="px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-gray-800 transition-all duration-300"
             >
-              联系我们
+              {safeT('navigation.contact', '联系我们')}
             </Link>
           </div>
         </div>

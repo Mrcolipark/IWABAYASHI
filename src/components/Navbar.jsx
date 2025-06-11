@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
-import i18n from '../i18n';
 
 const Navbar = ({ scrollY, currentPath }) => {
   const { t, i18n } = useTranslation();
@@ -51,21 +50,20 @@ const Navbar = ({ scrollY, currentPath }) => {
     };
   }, [isOpen]);
 
-  // 语言切换 - 添加安全检查
-const handleLanguageChange = (newLang) => {
-  console.log('Changing language to:', newLang);
-  
-  try {
-    // 直接使用导入的 i18n 实例
-    i18n.changeLanguage(newLang);
-    console.log('Language changed successfully to:', newLang);
-    trackEvent('language_changed', { from: i18n.language, to: newLang });
-  } catch (error) {
-    console.error('Language change failed:', error);
-  }
-  
-  setIsOpen(false);
-};
+  // 语言切换 - 修复版本
+  const handleLanguageChange = (newLang) => {
+    console.log('Changing language to:', newLang);
+    
+    try {
+      i18n.changeLanguage(newLang);
+      console.log('Language changed successfully to:', newLang);
+      trackEvent('language_changed', { from: i18n.language, to: newLang });
+    } catch (error) {
+      console.error('Language change failed:', error);
+    }
+    
+    setIsOpen(false);
+  };
 
   // 菜单项点击
   const handleMenuClick = (item) => {
@@ -82,10 +80,10 @@ const handleLanguageChange = (newLang) => {
     return location.pathname === path;
   };
 
-  // 获取当前语言，添加安全检查
-const getCurrentLanguage = () => {
-  return i18n.language || localStorage.getItem('i18nextLng') || 'zh';
-};
+  // 获取当前语言
+  const getCurrentLanguage = () => {
+    return i18n.language || localStorage.getItem('i18nextLng') || 'zh';
+  };
 
   return (
     <nav 

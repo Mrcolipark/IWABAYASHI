@@ -13,6 +13,7 @@ const resources = {
   en: { translation: enResources }
 };
 
+// 初始化 i18n
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -20,7 +21,7 @@ i18n
     resources,
     fallbackLng: 'zh',
     lng: localStorage.getItem('i18nextLng') || 'zh',
-    debug: false,
+    debug: process.env.NODE_ENV === 'development',
     
     interpolation: {
       escapeValue: false,
@@ -29,11 +30,18 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng',
     },
 
     react: {
       useSuspense: false
     }
+  })
+  .then(() => {
+    console.log('i18n initialized successfully');
+  })
+  .catch((error) => {
+    console.error('i18n initialization failed:', error);
   });
 
 export default i18n;
