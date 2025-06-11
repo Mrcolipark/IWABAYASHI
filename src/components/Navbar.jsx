@@ -1,61 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
-import { safeGet, getMenuLabel, safeArrayGet } from '../utils/dictUtils';
+import i18n from '../i18n';
 
-const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
+const Navbar = ({ scrollY, currentPath }) => {
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const navRef = useRef(null);
   const location = useLocation();
 
-  // 导航项配置
+  // 导航项配置 - 使用新的翻译系统
   const navItems = [
-    { id: 'home', path: '/', labelKey: 'home' },
-    { id: 'about', path: '/about', labelKey: 'about' },
-    { id: 'services', path: '/services', labelKey: 'services' },
-    { id: 'news', path: '/news', labelKey: 'news' },
-    { id: 'contact', path: '/contact', labelKey: 'contact' }
+    { id: 'home', path: '/', labelKey: 'navigation.home' },
+    { id: 'about', path: '/about', labelKey: 'navigation.about' },
+    { id: 'services', path: '/services', labelKey: 'navigation.services' },
+    { id: 'news', path: '/news', labelKey: 'navigation.news' },
+    { id: 'contact', path: '/contact', labelKey: 'navigation.contact' }
   ];
 
-  // 多语言标签 - 使用安全访问
-  const getNavLabel = (labelKey, index) => {
-    // 首先尝试从字典的menu数组获取
-    const menuItem = safeArrayGet(safeGet(dict, 'menu', []), index, null);
-    if (menuItem) {
-      return menuItem;
-    }
-
-    // 如果menu数组不可用，使用备用标签
-    const labels = {
-      zh: { 
-        home: '首页', 
-        about: '关于我们', 
-        services: '事业内容', 
-        news: 'ニュース', 
-        contact: 'お問い合わせ' 
-      },
-      ja: { 
-        home: 'ホーム', 
-        about: '会社概要', 
-        services: '事業内容', 
-        news: 'ニュース', 
-        contact: 'お問い合わせ' 
-      },
-      en: { 
-        home: 'Home', 
-        about: 'About', 
-        services: 'Services', 
-        news: 'News', 
-        contact: 'Contact' 
-      }
-    };
-    
-    return safeGet(labels, `${lang}.${labelKey}`, labelKey);
-  };
-
   // 滚动监听
+  const [isScrolled, setIsScrolled] = useState(false);
   useEffect(() => {
     setIsScrolled(scrollY > 50);
   }, [scrollY]);
@@ -85,14 +51,21 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
     };
   }, [isOpen]);
 
-  // 语言切换
-  const handleLanguageChange = (newLang) => {
-    if (typeof setLang === 'function') {
-      setLang(newLang);
-      trackEvent('language_changed', { from: lang, to: newLang });
-    }
-    setIsOpen(false);
-  };
+  // 语言切换 - 添加安全检查
+const handleLanguageChange = (newLang) => {
+  console.log('Changing language to:', newLang);
+  
+  try {
+    // 直接使用导入的 i18n 实例
+    i18n.changeLanguage(newLang);
+    console.log('Language changed successfully to:', newLang);
+    trackEvent('language_changed', { from: i18n.language, to: newLang });
+  } catch (error) {
+    console.error('Language change failed:', error);
+  }
+  
+  setIsOpen(false);
+};
 
   // 菜单项点击
   const handleMenuClick = (item) => {
@@ -109,19 +82,10 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
     return location.pathname === path;
   };
 
-  // 安全获取公司名称
-  const getCompanyName = () => {
-    return safeGet(dict, 'about.companyInfo.name', '岩林株式会社');
-  };
-
-  // 安全获取联系信息
-  const getContactEmail = () => {
-    return safeGet(dict, 'contact.info.email', 'info@iwabayashi.com');
-  };
-
-  const getContactPhone = () => {
-    return safeGet(dict, 'contact.info.phone', '+81-3-1234-5678');
-  };
+  // 获取当前语言，添加安全检查
+const getCurrentLanguage = () => {
+  return i18n.language || localStorage.getItem('i18nextLng') || 'zh';
+};
 
   return (
     <nav 
@@ -135,7 +99,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           
-          {/* 左侧Logo区域 - 高级设计 */}
+          {/* 左侧Logo区域 */}
           <Link 
             to="/"
             className="flex items-center space-x-4 group hover:opacity-90 transition-all duration-300"
@@ -145,7 +109,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
               {!logoError ? (
                 <img 
                   src="/logo.png" 
-                  alt={`${getCompanyName()}Logo`}
+                  alt="岩林株式会社Logo"
                   className="h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
                   onError={() => setLogoError(true)} 
                   draggable={false}
@@ -158,12 +122,12 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
             </div>
             <div className="hidden sm:block">
               <span className="company-name font-elegant text-base text-brand-green">
-                {getCompanyName()}
+                {t('about.companyInfo.name', '岩林株式会社')}
               </span>
             </div>
           </Link>
 
-          {/* 中间品牌标识 - 超高级字体 */}
+          {/* 中间品牌标识 */}
           <div className="hidden lg:block">
             <h1 className="brand-center text-brand-green">
               IWABAYASHI
@@ -173,7 +137,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
           {/* 右侧控制区域 */}
           <div className="flex items-center space-x-6">
             
-            {/* 桌面端语言切换 - 修复颜色对比 */}
+            {/* 桌面端语言切换 */}
             <div className="hidden md:flex items-center space-x-1 bg-white/90 border border-gray-200 rounded-xl p-1 shadow-sm">
               {[
                 { code: 'zh', label: '中' },
@@ -184,7 +148,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
                   key={language.code}
                   onClick={() => handleLanguageChange(language.code)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform hover:scale-105 ${
-                    lang === language.code
+                    getCurrentLanguage() === language.code
                       ? 'bg-brand-green text-white shadow-md'
                       : 'text-brand-green hover:bg-gray-100'
                   }`}
@@ -194,7 +158,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
               ))}
             </div>
 
-            {/* 汉堡菜单按钮 - 修复颜色 */}
+            {/* 汉堡菜单按钮 */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="relative p-3 rounded-xl bg-white/90 border border-gray-200 hover:bg-gray-50 transition-all duration-300 shadow-sm"
@@ -216,7 +180,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
           </div>
         </div>
 
-        {/* 下拉菜单 - 高级设计 */}
+        {/* 下拉菜单 */}
         <div className={`absolute top-full right-0 mt-2 w-80 md:w-96 transition-all duration-300 transform origin-top-right ${
           isOpen 
             ? 'opacity-100 scale-100 translate-y-0' 
@@ -224,7 +188,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
         }`}>
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
             
-            {/* 菜单标题 - 修复颜色 */}
+            {/* 菜单标题 */}
             <div className="px-6 py-5 bg-brand-green">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
@@ -232,12 +196,14 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
                 </div>
                 <div>
                   <h3 className="text-white font-bold text-lg">IWABAYASHI</h3>
-                  <p className="text-white/90 text-xs font-elegant">岩林株式会社</p>
+                  <p className="text-white/90 text-xs font-elegant">
+                    {t('about.companyInfo.name', '岩林株式会社')}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* 导航链接 - 修复颜色 */}
+            {/* 导航链接 */}
             <div className="py-2">
               {navItems.map((item, index) => (
                 <Link
@@ -257,13 +223,13 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
                     <span className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       isActive(item.path) ? 'bg-brand-green' : 'bg-gray-400 group-hover:bg-brand-green'
                     }`}></span>
-                    <span className="font-elegant">{getNavLabel(item.labelKey, index)}</span>
+                    <span className="font-elegant">{t(item.labelKey, item.labelKey)}</span>
                   </div>
                 </Link>
               ))}
             </div>
 
-            {/* 移动端语言切换 - 修复颜色 */}
+            {/* 移动端语言切换 */}
             <div className="md:hidden px-6 py-4 border-t border-gray-200">
               <p className="text-gray-600 text-sm mb-3 font-elegant">
                 言語 / Language
@@ -278,7 +244,7 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
                     key={language.code}
                     onClick={() => handleLanguageChange(language.code)}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                      lang === language.code
+                      getCurrentLanguage() === language.code
                         ? 'bg-brand-green text-white'
                         : 'bg-gray-100 text-gray-700 hover:text-brand-green hover:bg-gray-200'
                     }`}
@@ -289,16 +255,16 @@ const Navbar = ({ lang, setLang, scrollY, currentPath, dict }) => {
               </div>
             </div>
 
-            {/* 联系信息 - 修复颜色 */}
+            {/* 联系信息 */}
             <div className="px-6 py-5 bg-gray-50 border-t border-gray-200">
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 text-sm">
                   <span className="w-5 h-5 flex items-center justify-center bg-brand-green/10 rounded text-brand-green">📧</span>
-                  <span className="text-gray-600 font-elegant">{getContactEmail()}</span>
+                  <span className="text-gray-600 font-elegant">info@iwabayashi.com</span>
                 </div>
                 <div className="flex items-center space-x-3 text-sm">
                   <span className="w-5 h-5 flex items-center justify-center bg-brand-green/10 rounded text-brand-green">📞</span>
-                  <span className="text-gray-600 font-elegant">{getContactPhone()}</span>
+                  <span className="text-gray-600 font-elegant">+81-3-1234-5678</span>
                 </div>
               </div>
             </div>

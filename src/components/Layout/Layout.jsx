@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from '../Navbar';
 import ScrollProgress from '../ScrollProgress';
 import Footer from '../Footer';
 import { trackPageView } from '../../utils/Analytics';
 
-const Layout = ({ children, lang, setLang, dict }) => {
+const Layout = ({ children }) => {
   const [scrollY, setScrollY] = useState(0);
   const location = useLocation();
+  const { i18n } = useTranslation();
 
   // 滚动监听
   useEffect(() => {
@@ -61,11 +63,8 @@ const Layout = ({ children, lang, setLang, dict }) => {
       
       {/* 导航栏 */}
       <Navbar 
-        lang={lang} 
-        setLang={setLang}
         scrollY={scrollY}
         currentPath={location.pathname}
-        dict={dict}
       />
       
       {/* 主要内容区域 */}
@@ -74,7 +73,7 @@ const Layout = ({ children, lang, setLang, dict }) => {
       </main>
       
       {/* 页脚 */}
-      <Footer dict={dict} />
+      <Footer />
     </div>
   );
 };
