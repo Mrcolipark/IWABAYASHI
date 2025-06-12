@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>岩林株式会社 - 内容管理系统</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  
+  <!-- Netlify CMS 样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/netlify-cms@^2.0.0/dist/cms.css" />
+  
+  <!-- 自定义样式 -->
+  <style>
+    .nc-app-header {
+      background: linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%) !important;
+    }
+    
+    .nc-app-header h1 {
+      color: white !important;
+    }
+    
+    .nc-entryEditor-editor {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    /* 中文字体优化 */
+    .nc-listCard-title,
+    .nc-entryListing-cardTitle {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+    
+    /* 品牌色彩 */
+    .nc-button-primary {
+      background-color: #1a4d32 !important;
+      border-color: #1a4d32 !important;
+    }
+    
+    .nc-button-primary:hover {
+      background-color: #2d5a3d !important;
+      border-color: #2d5a3d !important;
+    }
+    
+    /* 侧边栏样式 */
+    .nc-app-aside {
+      background-color: #f8f9fa !important;
+    }
+    
+    .nc-navLink-active {
+      background-color: #1a4d32 !important;
+      color: white !important;
+    }
+    
+    /* 加载界面 */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      color: white;
+      font-family: 'Inter', sans-serif;
+    }
+    
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: bold;
+      color: #1a4d32;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .loading-text {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .loading-subtext {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top: 3px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: 20px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <!-- 加载界面 -->
+  <div id="loading" class="loading-overlay">
+    <div class="loading-logo">岩</div>
+    <div class="loading-text">岩林株式会社</div>
+    <div class="loading-subtext">内容管理系统正在加载...</div>
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Netlify CMS 容器 -->
+  <div id="nc-root"></div>
+
+  <!-- Netlify Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
+  <!-- Netlify CMS -->
+  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  
+  <!-- 自定义脚本 -->
+  <script>
+    // 隐藏加载界面
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.style.opacity = '0';
+          setTimeout(() => loading.remove(), 500);
+        }
+      }, 2000);
+    });
+
+    // Netlify Identity 配置
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            document.location.href = "/admin/";
+          });
+        }
+      });
+    }
+
+    // CMS 初始化完成后的回调
+    CMS.init({
+      config: {
+        load_config_file: true,
+      }
+    });
+
+    // 自定义预览模板
+    CMS.registerPreviewTemplate('news', function(props) {
+      const { title, date, category, summary, body } = props.entry.getIn(['data']).toJS();
+      return `
+        <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: 'Inter', sans-serif;">
+          <div style="background: #1a4d32; color: white; padding: 20px; border-radius: 10px 10px 0 0;">
+            <h1 style="margin: 0; font-size: 28px;">${title || '新闻标题'}</h1>
+            <div style="margin-top: 10px; opacity: 0.9;">
+              <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 14px;">
+                ${category || '分类'}
+              </span>
+              <span style="margin-left: 15px; font-size: 14px;">
+                ${date ? new Date(date).toLocaleDateString('zh-CN') : '发布日期'}
+              </span>
+            </div>
+          </div>
+          <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div style="font-size: 18px; line-height: 1.6; color: #666; margin-bottom: 20px; font-style: italic;">
+              ${summary || '新闻摘要将显示在这里...'}
+            </div>
+            <div style="line-height: 1.8; color: #333;">
+              ${body || '新闻内容将显示在这里...'}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    // 服务预览模板
+    CMS.registerPreviewTemplate('services', function(props) {
+      const { title, icon, status, description, features, advantages } = props.entry.getIn(['data']).toJS();
+      return `
+        <div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: 'Inter', sans-serif;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <div style="font-size: 48px; margin-bottom: 15px;">${icon || '🔧'}</div>
+            <h1 style="margin: 0; color: #1a4d32; font-size: 32px;">${title || '服务名称'}</h1>
+            <span style="background: #e8f5e8; color: #1a4d32; padding: 6px 16px; border-radius: 20px; font-size: 14px; margin-top: 10px; display: inline-block;">
+              ${status || '状态'}
+            </span>
+          </div>
+          <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <p style="font-size: 18px; line-height: 1.7; color: #555; margin-bottom: 25px;">
+              ${description || '服务描述将显示在这里...'}
+            </p>
+            ${features && features.length ? `
+              <h3 style="color: #1a4d32; margin-bottom: 15px;">服务特点</h3>
+              <ul style="list-style: none; padding: 0;">
+                ${features.map(feature => `
+                  <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+                    <span style="position: absolute; left: 0; color: #1a4d32;">✓</span>
+                    ${feature}
+                  </li>
+                `).join('')}
+              </ul>
+            ` : ''}
+            ${advantages && advantages.length ? `
+              <h3 style="color: #1a4d32; margin: 25px 0 15px;">服务优势</h3>
+              <ul style="list-style: none; padding: 0;">
+                ${advantages.map(advantage => `
+                  <li style="margin-bottom: 8px; padding-left: 20px; position: relative;">
+                    <span style="position: absolute; left: 0; color: #1a4d32;">★</span>
+                    ${advantage}
+                  </li>
+                `).join('')}
+              </ul>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    // 控制台欢迎信息
+    console.log(`
+    🎉 欢迎使用岩林株式会社内容管理系统！
+    
+    🚀 功能特点：
+    ✅ 多语言内容管理 (中文/日语/英语)
+    ✅ 新闻发布系统
+    ✅ 服务内容管理  
+    ✅ 公司信息维护
+    ✅ 实时预览功能
+    ✅ 自动备份到GitHub
+    
+    📞 技术支持：
+    如有问题，请联系技术团队
+    
+    💡 使用提示：
+    - 内容修改后会自动保存到GitHub
+    - 发布内容需要点击"发布"按钮
+    - 支持Markdown格式编辑
+    `);
+  </script>
+</body>
+</html>
