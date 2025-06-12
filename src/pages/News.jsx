@@ -52,6 +52,20 @@ const ArticleCard = React.memo(({ article, index, isVisible, onArticleClick }) =
     >
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105">
         
+        {/* 特色图片 */}
+        {article.featuredImage && (
+          <div className="aspect-video overflow-hidden">
+            <img 
+              src={article.featuredImage} 
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+        
         {/* 文章头部 */}
         <div className="p-6 pb-4">
           <div className="flex items-center justify-between mb-4">
@@ -163,6 +177,20 @@ const ArticleModal = React.memo(({ article, onClose }) => {
           </button>
         </div>
 
+        {/* 特色图片 */}
+        {article.featuredImage && (
+          <div className="aspect-video overflow-hidden">
+            <img 
+              src={article.featuredImage} 
+              alt={article.title}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+
         {/* 模态框内容 */}
         <div className="p-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">{article.title}</h2>
@@ -171,7 +199,7 @@ const ArticleModal = React.memo(({ article, onClose }) => {
           {/* 文章正文 */}
           <div className="prose prose-gray max-w-none">
             <div className="text-gray-700 leading-relaxed space-y-6">
-              {article.content.split('\n').map((paragraph, index) => (
+              {article.content && article.content.split('\n').map((paragraph, index) => (
                 paragraph.trim() && (
                   <p key={index} className="text-lg">{paragraph}</p>
                 )
@@ -202,108 +230,110 @@ const ArticleModal = React.memo(({ article, onClose }) => {
 
 ArticleModal.displayName = 'ArticleModal';
 
+// 加载新闻文章的函数
+async function loadNewsArticles() {
+  try {
+    // 从API端点加载文章索引
+    const response = await fetch('/api/news-index.json');
+    if (!response.ok) {
+      throw new Error('Failed to fetch news index');
+    }
+    
+    const articles = await response.json();
+    
+    // 只返回已发布的文章，并按日期排序
+    return articles
+      .filter(article => article.status === '已发布')
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+  } catch (error) {
+    console.error('Failed to load news articles:', error);
+    
+    // 返回静态文章作为后备
+    return [
+      {
+        id: 1,
+        title: '岩林株式会社正式成立',
+        date: '2025-01-15',
+        category: '公司动态',
+        summary: '岩林株式会社正式成立，致力于打造中日贸易新桥梁',
+        content: '2025年1月，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。\n\n公司成立之初，我们就明确了发展方向：以日本保健品进口代理为切入点，逐步拓展到大宗商品出口等领域。我们相信，通过专业的服务和不懈的努力，必将为中日两国的经贸合作贡献力量。',
+        status: '已发布'
+      },
+      {
+        id: 2,
+        title: '日本保健品市场分析报告',
+        date: '2025-01-10',
+        category: '市场分析',
+        summary: '深度解析日本保健品市场现状与发展趋势',
+        content: '日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n市场特点包括：消费者对品质要求极高、功能性产品需求旺盛、老龄化社会推动市场发展等。这为中国市场引入优质日本保健品提供了良好机遇。',
+        status: '已发布'
+      }
+    ];
+  }
+}
+
 const News = ({ dict }) => {
   const { t } = useOptimizedTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
   const sectionRef = useRef(null);
 
-  // 使用优化翻译缓存News页面数据
-  const newsData = useMemo(() => {
-    // 基础信息
-    const baseInfo = {
-      title: t('news.title', { defaultValue: '新闻动态' }),
-      subtitle: t('news.subtitle', { defaultValue: '最新动态与行业洞察' }),
-      noArticles: t('news.noArticles', { defaultValue: '暂无相关文章' }),
-      selectOtherCategory: t('news.selectOtherCategory', { defaultValue: '请选择其他分类查看更多内容' })
-    };
+  // 分类数据
+  const categories = useMemo(() => [
+    { id: 'all', label: '全部', icon: '📰' },
+    { id: '公司动态', label: '公司动态', icon: '🏢' },
+    { id: '市场分析', label: '市场分析', icon: '📊' },
+    { id: '行业洞察', label: '行业洞察', icon: '🔍' }
+  ], []);
 
-    // 分类数据
-    const categories = [
-      { id: 'all', label: t('news.categories.0.label', { defaultValue: '全部' }), icon: '📰' },
-      { id: '公司动态', label: t('news.categories.1.label', { defaultValue: '公司动态' }), icon: '🏢' },
-      { id: '市场分析', label: t('news.categories.2.label', { defaultValue: '市场分析' }), icon: '📊' },
-      { id: '行业洞察', label: t('news.categories.3.label', { defaultValue: '行业洞察' }), icon: '🔍' }
-    ];
-
-    // 文章数据
-    const articles = [
+  // 行业趋势数据
+  const industryTrends = useMemo(() => ({
+    title: '行业趋势概览',
+    description: '把握中日贸易发展脉搏，洞察市场变化趋势',
+    trends: [
       {
-        id: 1,
-        title: t('news.articles.0.title', { defaultValue: '岩林株式会社正式成立' }),
-        date: '2025-01-15',
-        category: t('news.articles.0.category', { defaultValue: '公司动态' }),
-        summary: t('news.articles.0.summary', { defaultValue: '岩林株式会社正式成立，致力于打造中日贸易新桥梁' }),
-        content: t('news.articles.0.content', { 
-          defaultValue: '2025年1月，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。\n\n公司成立之初，我们就明确了发展方向：以日本保健品进口代理为切入点，逐步拓展到大宗商品出口等领域。我们相信，通过专业的服务和不懈的努力，必将为中日两国的经贸合作贡献力量。' 
-        })
+        title: '日本健康食品市场',
+        trend: '持续增长',
+        value: '15.2%',
+        desc: '年增长率'
       },
       {
-        id: 2,
-        title: t('news.articles.1.title', { defaultValue: '日本保健品市场分析报告' }),
-        date: '2025-01-10',
-        category: t('news.articles.1.category', { defaultValue: '市场分析' }),
-        summary: t('news.articles.1.summary', { defaultValue: '深度解析日本保健品市场现状与发展趋势' }),
-        content: t('news.articles.1.content', { 
-          defaultValue: '日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n市场特点包括：消费者对品质要求极高、功能性产品需求旺盛、老龄化社会推动市场发展等。这为中国市场引入优质日本保健品提供了良好机遇。' 
-        })
+        title: '中日贸易总额',
+        trend: '稳步上升',
+        value: '¥3.2万亿',
+        desc: '2024年预计'
       },
       {
-        id: 3,
-        title: t('news.articles.2.title', { defaultValue: '中日贸易合作新机遇' }),
-        date: '2025-01-05',
-        category: t('news.articles.2.category', { defaultValue: '行业洞察' }),
-        summary: t('news.articles.2.summary', { defaultValue: '探讨中日两国贸易合作的新发展机遇' }),
-        content: t('news.articles.2.content', { 
-          defaultValue: '随着全球经济一体化的深入发展，中日两国在贸易合作方面迎来了新的发展机遇。双方在健康产业、先进制造业、绿色能源等领域具有广阔的合作空间。\n\n特别是在跨境电商快速发展的背景下，两国贸易模式正在发生深刻变化，为企业提供了更多的合作可能性。' 
-        })
+        title: '跨境电商增长',
+        trend: '快速发展',
+        value: '28.5%',
+        desc: '同比增长'
       }
-    ];
+    ]
+  }), []);
 
-    // 行业趋势数据
-    const industryTrends = {
-      title: t('news.industryTrends.title', { defaultValue: '行业趋势概览' }),
-      description: t('news.industryTrends.description', { defaultValue: '把握中日贸易发展脉搏，洞察市场变化趋势' }),
-      trends: [
-        {
-          title: t('news.industryTrends.trends.0.title', { defaultValue: '日本健康食品市场' }),
-          trend: t('news.industryTrends.trends.0.trend', { defaultValue: '持续增长' }),
-          value: t('news.industryTrends.trends.0.value', { defaultValue: '15.2%' }),
-          desc: t('news.industryTrends.trends.0.desc', { defaultValue: '年增长率' })
-        },
-        {
-          title: t('news.industryTrends.trends.1.title', { defaultValue: '中日贸易总额' }),
-          trend: t('news.industryTrends.trends.1.trend', { defaultValue: '稳步上升' }),
-          value: t('news.industryTrends.trends.1.value', { defaultValue: '¥3.2万亿' }),
-          desc: t('news.industryTrends.trends.1.desc', { defaultValue: '2024年预计' })
-        },
-        {
-          title: t('news.industryTrends.trends.2.title', { defaultValue: '跨境电商增长' }),
-          trend: t('news.industryTrends.trends.2.trend', { defaultValue: '快速发展' }),
-          value: t('news.industryTrends.trends.2.value', { defaultValue: '28.5%' }),
-          desc: t('news.industryTrends.trends.2.desc', { defaultValue: '同比增长' })
-        }
-      ]
+  // 加载文章数据
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        setLoading(true);
+        const loadedArticles = await loadNewsArticles();
+        setArticles(loadedArticles);
+        console.log('Loaded articles:', loadedArticles);
+      } catch (error) {
+        console.error('Failed to load articles:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // 订阅资讯数据
-    const newsletter = {
-      title: t('news.newsletter.title', { defaultValue: '订阅我们的资讯' }),
-      description: t('news.newsletter.description', { defaultValue: '第一时间获取中日贸易最新动态和市场洞察' }),
-      placeholder: t('news.newsletter.placeholder', { defaultValue: '请输入您的邮箱地址' }),
-      subscribe: t('news.newsletter.subscribe', { defaultValue: '订阅' })
-    };
-
-    return {
-      ...baseInfo,
-      categories,
-      articles,
-      industryTrends,
-      newsletter
-    };
-  }, [t]);
+    fetchArticles();
+  }, []);
 
   // 可见性检测
   useEffect(() => {
@@ -323,9 +353,9 @@ const News = ({ dict }) => {
   // 过滤文章
   const filteredArticles = useMemo(() => {
     return selectedCategory === 'all' 
-      ? newsData.articles 
-      : newsData.articles.filter(article => article.category === selectedCategory);
-  }, [selectedCategory, newsData.articles]);
+      ? articles 
+      : articles.filter(article => article.category === selectedCategory);
+  }, [selectedCategory, articles]);
 
   const handleCategoryChange = useCallback((category) => {
     setSelectedCategory(category);
@@ -350,13 +380,28 @@ const News = ({ dict }) => {
     if (newsletterEmail) {
       trackEvent('newsletter_subscribe_clicked', { email: newsletterEmail });
       setNewsletterEmail('');
-      // 这里可以添加实际的订阅逻辑
+      alert('订阅成功！感谢您的关注。');
     }
   }, [newsletterEmail]);
 
   const handleNewsletterEmailChange = useCallback((e) => {
     setNewsletterEmail(e.target.value);
   }, []);
+
+  // 加载状态
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-green-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-green-800 font-medium">加载新闻中...</p>
+            <p className="text-gray-500 text-sm mt-2">正在获取最新动态</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20">
@@ -374,11 +419,11 @@ const News = ({ dict }) => {
           }`}>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
               <span className="bg-gradient-to-r from-gray-800 via-slate-700 to-green-800 bg-clip-text text-transparent">
-                {newsData.title}
+                新闻动态
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              {newsData.subtitle}
+              最新动态与行业洞察
             </p>
           </div>
         </div>
@@ -388,7 +433,7 @@ const News = ({ dict }) => {
       <section className="relative py-8 bg-white/80 backdrop-blur-sm border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-4">
-            {newsData.categories.map((category) => (
+            {categories.map((category) => (
               <CategoryButton
                 key={category.id}
                 category={category}
@@ -404,6 +449,18 @@ const News = ({ dict }) => {
       <section ref={sectionRef} className="py-24">
         <div className="max-w-7xl mx-auto px-4">
           
+          {/* 显示文章总数 */}
+          <div className="text-center mb-8">
+            <p className="text-gray-600">
+              共找到 <span className="font-semibold text-green-800">{filteredArticles.length}</span> 篇文章
+              {selectedCategory !== 'all' && (
+                <span className="ml-2 text-sm text-gray-500">
+                  (分类: {categories.find(c => c.id === selectedCategory)?.label})
+                </span>
+              )}
+            </p>
+          </div>
+
           {/* 文章网格 */}
           {filteredArticles.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -423,8 +480,21 @@ const News = ({ dict }) => {
               <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6">
                 📰
               </div>
-              <h3 className="text-2xl font-bold text-gray-500 mb-4">{newsData.noArticles}</h3>
-              <p className="text-gray-400">{newsData.selectOtherCategory}</p>
+              <h3 className="text-2xl font-bold text-gray-500 mb-4">暂无相关文章</h3>
+              <p className="text-gray-400 mb-6">
+                {selectedCategory === 'all' 
+                  ? '暂时没有发布任何文章' 
+                  : `暂时没有"${categories.find(c => c.id === selectedCategory)?.label}"分类的文章`
+                }
+              </p>
+              {selectedCategory !== 'all' && (
+                <button
+                  onClick={() => setSelectedCategory('all')}
+                  className="px-6 py-3 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors duration-300"
+                >
+                  查看所有文章
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -435,15 +505,15 @@ const News = ({ dict }) => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              {newsData.industryTrends.title}
+              {industryTrends.title}
             </h3>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {newsData.industryTrends.description}
+              {industryTrends.description}
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {newsData.industryTrends.trends.map((trend, index) => (
+            {industryTrends.trends.map((trend, index) => (
               <TrendCard key={index} trend={trend} index={index} />
             ))}
           </div>
@@ -454,17 +524,17 @@ const News = ({ dict }) => {
       <section className="py-16 bg-gradient-to-r from-gray-800 to-green-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h3 className="text-3xl font-bold text-white mb-6">
-            {newsData.newsletter.title}
+            订阅我们的资讯
           </h3>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            {newsData.newsletter.description}
+            第一时间获取中日贸易最新动态和市场洞察
           </p>
           <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input
               type="email"
               value={newsletterEmail}
               onChange={handleNewsletterEmailChange}
-              placeholder={newsData.newsletter.placeholder}
+              placeholder="请输入您的邮箱地址"
               className="flex-1 px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 border border-gray-300"
               required
             />
@@ -472,7 +542,7 @@ const News = ({ dict }) => {
               type="submit"
               className="px-8 py-3 bg-white text-gray-800 rounded-lg font-semibold hover:scale-105 transition-transform duration-300 shadow-lg"
             >
-              {newsData.newsletter.subscribe}
+              订阅
             </button>
           </form>
         </div>
