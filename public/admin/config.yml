@@ -1,12 +1,16 @@
-# Netlify CMS 配置文件 - 简化版
-# 保存为: public/admin/config.yml
-
 backend:
   name: git-gateway
   branch: main
 
 media_folder: public/images/uploads
 public_folder: /images/uploads
+
+# 站点URL配置
+site_url: https://steady-clafoutis-c30c37.netlify.app
+display_url: https://steady-clafoutis-c30c37.netlify.app
+
+# 发布模式（允许所有已认证用户访问）
+publish_mode: editorial_workflow
 
 collections:
   # 新闻管理
