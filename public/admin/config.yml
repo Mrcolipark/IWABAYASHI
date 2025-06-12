@@ -49,7 +49,15 @@ collections:
       - { label: "服务特点", name: "features", widget: "list", i18n: true }
       - { label: "服务优势", name: "advantages", widget: "list", i18n: true }
       - { label: "排序权重", name: "order", widget: "number", default: 0, i18n: "duplicate" }
-      - { label: "服务图片", name: "images", widget: "list", field: { label: "图片", name: "image", widget: "image" }, required: false, i18n: "duplicate" }
+      - label: "服务图片"
+        name: "images"
+        widget: "list"
+        required: false
+        i18n: "duplicate"
+        field:
+          label: "图片"
+          name: "image"
+          widget: "image"
 
   # 公司信息
   - name: "company"
@@ -70,7 +78,15 @@ collections:
           - { label: "企业使命", name: "mission", widget: "text", i18n: true }
           - { label: "核心价值观", name: "values", widget: "list", i18n: true }
           - { label: "公司Logo", name: "logo", widget: "image", i18n: "duplicate" }
-          - { label: "团队照片", name: "team_photos", widget: "list", field: { label: "照片", name: "photo", widget: "image" }, required: false, i18n: "duplicate" }
+          - label: "团队照片"
+            name: "team_photos"
+            widget: "list"
+            required: false
+            i18n: "duplicate"
+            field:
+              label: "照片"
+              name: "photo"
+              widget: "image"
 
   # 联系信息
   - name: "contact"
@@ -88,7 +104,15 @@ collections:
           - { label: "营业时间", name: "business_hours", widget: "string", i18n: true }
           - { label: "微信号", name: "wechat", widget: "string", required: false, i18n: "duplicate" }
           - { label: "LinkedIn", name: "linkedin", widget: "string", required: false, i18n: "duplicate" }
-          - { label: "办公室照片", name: "office_photos", widget: "list", field: { label: "照片", name: "photo", widget: "image" }, required: false, i18n: "duplicate" }
+          - label: "办公室照片"
+            name: "office_photos"
+            widget: "list"
+            required: false
+            i18n: "duplicate"
+            field:
+              label: "照片"
+              name: "photo"
+              widget: "image"
 
   # 网站设置
   - name: "settings"
