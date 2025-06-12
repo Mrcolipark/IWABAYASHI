@@ -4,31 +4,45 @@ import { trackEvent } from '../utils/Analytics';
 const Home = ({ dict, lang = 'zh' }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
   const heroRef = useRef(null);
   const videoRef = useRef(null);
 
+  // 移动端检测
+  useEffect(() => {
+    const checkMobile = () => {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isMobileDevice || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // 视差滚动监听
-useEffect(() => {
-  const handleScroll = () => {
-    setScrollY(window.scrollY);
-  };
-  
-  // 添加错误处理
-  try {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-  } catch (error) {
-    console.warn('Failed to add scroll listener:', error);
-  }
-  
-  // 确保清理函数正确执行
-  return () => {
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    // 添加错误处理
     try {
-      window.removeEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', handleScroll, { passive: true });
     } catch (error) {
-      console.warn('Failed to remove scroll listener:', error);
+      console.warn('Failed to add scroll listener:', error);
     }
-  };
-}, []);
+    
+    // 确保清理函数正确执行
+    return () => {
+      try {
+        window.removeEventListener('scroll', handleScroll);
+      } catch (error) {
+        console.warn('Failed to remove scroll listener:', error);
+      }
+    };
+  }, []);
 
   // 页面加载完成
   useEffect(() => {
@@ -37,9 +51,22 @@ useEffect(() => {
 
     // 确保视频自动播放
     if (videoRef.current) {
-      videoRef.current.play().catch(err => {
-        console.log('Video autoplay failed:', err);
-      });
+      // 移动端需要特殊处理
+      const playVideo = async () => {
+        try {
+          await videoRef.current.play();
+          console.log('Video started playing');
+        } catch (err) {
+          console.log('Video autoplay failed:', err);
+          // 视频播放失败时的优雅降级
+          if (videoRef.current) {
+            videoRef.current.style.display = 'none';
+            videoRef.current.parentElement.style.background = 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)';
+          }
+        }
+      };
+      
+      playVideo();
     }
   }, []);
 
@@ -63,6 +90,23 @@ useEffect(() => {
     return result !== undefined && result !== null ? result : defaultValue;
   };
 
+  // 根据设备选择视频源
+  const getVideoSources = () => {
+    if (isMobile) {
+      return [
+        { src: "/videos/hero-forest-mobile.mp4", type: "video/mp4" },
+        { src: "/videos/hero-forest-compressed.mp4", type: "video/mp4" },
+        { src: "/videos/hero-forest.webm", type: "video/webm" }
+      ];
+    } else {
+      return [
+        { src: "/videos/hero-forest-4k.mp4", type: "video/mp4" },
+        { src: "/videos/hero-forest.mp4", type: "video/mp4" },
+        { src: "/videos/hero-forest.webm", type: "video/webm" }
+      ];
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black">
       
@@ -79,6 +123,7 @@ useEffect(() => {
           muted
           loop
           playsInline
+          preload={isMobile ? "none" : "metadata"}
           poster="/videos/hero-forest-poster.jpg"
           className="absolute top-0 left-0"
           style={{
@@ -90,17 +135,32 @@ useEffect(() => {
             objectPosition: 'center center',
             transform: 'translate(-10vw, -10vh) scale(1.2)'
           }}
+          onLoadStart={() => {
+            console.log(`Loading video for ${isMobile ? 'mobile' : 'desktop'} device`);
+          }}
           onError={(e) => {
+            console.error('Video load error:', e);
             e.target.style.display = 'none';
             e.target.parentElement.style.background = 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)';
           }}
+          onCanPlay={() => {
+            console.log('Video can start playing');
+          }}
         >
-          <source src="/videos/hero-forest-4k.mp4" type="video/mp4" />
-          <source src="/videos/hero-forest.mp4" type="video/mp4" />
-          <source src="/videos/hero-forest.webm" type="video/webm" />
+          {getVideoSources().map((source, index) => (
+            <source key={index} src={source.src} type={source.type} />
+          ))}
+          {/* 降级方案：如果视频都无法播放，显示背景图 */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: 'url(/videos/hero-forest-poster.jpg)',
+              background: 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)'
+            }}
+          />
         </video>
 
-        {        /* 轻微渐变遮罩 - 增强文字可读性 */}
+        {/* 轻微渐变遮罩 - 增强文字可读性 */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>
 
         {/* 中心Slogan */}
@@ -159,8 +219,6 @@ useEffect(() => {
           -moz-osx-font-smoothing: auto;
           font-variant-numeric: lining-nums;
         }
-
-        /* 移除动画，简化效果 */
 
         .hero-text-line {
           display: block;
