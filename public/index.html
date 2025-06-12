@@ -25,17 +25,6 @@
     
     <!-- Netlify Identity Widget -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script>
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on("init", user => {
-          if (!user) {
-            window.netlifyIdentity.on("login", () => {
-              document.location.href = "/admin/";
-            });
-          }
-        });
-      }
-    </script>
     
     <title>岩林株式会社 - 专业的中日贸易综合服务商</title>
   </head>
@@ -43,32 +32,158 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     
-    <!-- Netlify Identity Login Handler -->
+    <!-- 修复后的 Netlify Identity 配置 -->
     <script>
-      // 处理邀请链接
       if (window.netlifyIdentity) {
+        // 初始化处理
         window.netlifyIdentity.on("init", user => {
-          // 检查URL中是否有邀请token
+          // 处理邀请链接 - 如果URL中包含邀请token，打开注册窗口
           if (window.location.hash.includes('invite_token')) {
-            // 如果有邀请token且用户未登录，打开登录窗口
             if (!user) {
               window.netlifyIdentity.open('signup');
             }
           }
           
-          // 登录成功后重定向到CMS
-          window.netlifyIdentity.on("login", () => {
-            document.location.href = "/admin/";
-          });
+          // 处理密码重置链接
+          if (window.location.hash.includes('recovery_token')) {
+            window.netlifyIdentity.open('login');
+          }
+          
+          // 只在非登录用户访问时设置登录后跳转
+          if (!user) {
+            window.netlifyIdentity.on("login", () => {
+              // 检查是否是要访问 CMS 管理页面
+              const shouldRedirectToCMS = 
+                window.location.pathname.includes('/admin') || 
+                window.location.search.includes('cms=true') ||
+                sessionStorage.getItem('redirectToCMS') === 'true';
+              
+              if (shouldRedirectToCMS) {
+                document.location.href = "/admin/";
+              } else {
+                // 如果不是要访问CMS，就刷新当前页面
+                window.location.reload();
+              }
+            });
+          }
+        });
+        
+        // 添加管理员工具栏（仅对已登录的管理员显示）
+        window.netlifyIdentity.on("login", (user) => {
+          setTimeout(() => {
+            addAdminToolbar(user);
+          }, 1000);
+        });
+        
+        window.netlifyIdentity.on("logout", () => {
+          removeAdminToolbar();
+          // 清除CMS相关的sessionStorage
+          sessionStorage.removeItem('redirectToCMS');
+          window.location.reload();
         });
       }
       
-      // 处理密码重置
-      if (window.location.hash.includes('recovery_token')) {
-        if (window.netlifyIdentity) {
-          window.netlifyIdentity.open('login');
+      // 添加管理员工具栏
+      function addAdminToolbar(user) {
+        // 检查是否已存在工具栏
+        if (document.getElementById('admin-toolbar')) return;
+        
+        // 检查用户是否有管理员权限
+        const userRoles = user.app_metadata?.roles || [];
+        const isAdmin = userRoles.includes('admin') || userRoles.length === 0; // 如果没有角色限制，默认允许
+        
+        if (isAdmin && !window.location.pathname.includes('/admin')) {
+          const toolbar = document.createElement('div');
+          toolbar.id = 'admin-toolbar';
+          toolbar.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 9999;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+          `;
+          
+          toolbar.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <span style="font-weight: 600;">🔧 管理员模式</span>
+              <span style="opacity: 0.8;">欢迎，${user.user_metadata?.full_name || user.email}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button onclick="goToCMS()" style="
+                background: rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.3);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.3s ease;
+              " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                📝 内容管理
+              </button>
+              <button onclick="logoutAdmin()" style="
+                background: #dc3545;
+                border: none;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.3s ease;
+              " onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                🚪 退出
+              </button>
+            </div>
+          `;
+          
+          document.body.appendChild(toolbar);
+          
+          // 调整页面内容，避免被工具栏遮挡
+          document.body.style.paddingTop = '50px';
         }
       }
+      
+      // 移除管理员工具栏
+      function removeAdminToolbar() {
+        const toolbar = document.getElementById('admin-toolbar');
+        if (toolbar) {
+          toolbar.remove();
+          document.body.style.paddingTop = '0';
+        }
+      }
+      
+      // 前往CMS管理页面
+      function goToCMS() {
+        sessionStorage.setItem('redirectToCMS', 'true');
+        window.location.href = '/admin/';
+      }
+      
+      // 退出管理员登录
+      function logoutAdmin() {
+        if (window.netlifyIdentity) {
+          window.netlifyIdentity.logout();
+        }
+      }
+      
+      // 页面加载完成后检查登录状态
+      window.addEventListener('load', () => {
+        if (window.netlifyIdentity) {
+          const user = window.netlifyIdentity.currentUser();
+          if (user) {
+            addAdminToolbar(user);
+          }
+        }
+      });
     </script>
   </body>
 </html>

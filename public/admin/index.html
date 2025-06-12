@@ -112,9 +112,38 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* 返回网站按钮样式 */
+    .back-to-site {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      z-index: 10000;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(26, 77, 50, 0.2);
+      color: #1a4d32;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .back-to-site:hover {
+      background: #1a4d32;
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
   </style>
 </head>
 <body>
+  <!-- 返回网站按钮 -->
+  <a href="/" class="back-to-site">🏠 返回网站</a>
+
   <!-- 加载界面 -->
   <div id="loading" class="loading-overlay">
     <div class="loading-logo">岩</div>
@@ -132,7 +161,7 @@
   <!-- Netlify CMS -->
   <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
   
-  <!-- 自定义脚本 -->
+  <!-- CMS 专用脚本 -->
   <script>
     // 隐藏加载界面
     window.addEventListener('load', function() {
@@ -145,18 +174,36 @@
       }, 2000);
     });
 
-    // Netlify Identity 配置
+    // Netlify Identity 配置 - CMS 专用
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on("init", user => {
         if (!user) {
+          // 在 CMS 页面，未登录用户应该登录
           window.netlifyIdentity.on("login", () => {
             document.location.href = "/admin/";
           });
+          // 自动打开登录窗口
+          window.netlifyIdentity.open();
+        } else {
+          // 已登录用户，检查权限
+          const userRoles = user.app_metadata?.roles || [];
+          const hasAccess = userRoles.includes('admin') || userRoles.length === 0;
+          
+          if (!hasAccess) {
+            alert('您没有足够的权限访问内容管理系统。请联系管理员。');
+            window.location.href = '/';
+            return;
+          }
         }
+      });
+
+      // 监听登出事件
+      window.netlifyIdentity.on("logout", () => {
+        window.location.href = "/";
       });
     }
 
-    // CMS 初始化完成后的回调
+    // CMS 初始化
     CMS.init({
       config: {
         load_config_file: true,
