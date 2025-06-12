@@ -1,4 +1,4 @@
-# Netlify CMS 配置文件
+# Netlify CMS 配置文件 - 简化版
 # 保存为: public/admin/config.yml
 
 backend:
@@ -8,12 +8,6 @@ backend:
 media_folder: public/images/uploads
 public_folder: /images/uploads
 
-# 多语言配置
-i18n:
-  structure: multiple_folders
-  locales: [zh, ja, en]
-  default_locale: zh
-
 collections:
   # 新闻管理
   - name: "news"
@@ -21,17 +15,14 @@ collections:
     folder: "content/news"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
-    i18n: true
     fields:
-      - { label: "标题", name: "title", widget: "string", i18n: true }
-      - { label: "发布日期", name: "date", widget: "datetime", i18n: duplicate }
-      - { label: "分类", name: "category", widget: "select", options: ["公司动态", "市场分析", "行业洞察"], i18n: duplicate }
-      - { label: "摘要", name: "summary", widget: "text", i18n: true }
-      - { label: "特色图片", name: "featuredImage", widget: "image", required: false, i18n: duplicate }
-      - { label: "内容", name: "body", widget: "markdown", i18n: true }
-      - { label: "状态", name: "status", widget: "select", options: ["草稿", "已发布"], default: "草稿", i18n: duplicate }
-      - { label: "SEO标题", name: "seo_title", widget: "string", required: false, i18n: true }
-      - { label: "SEO描述", name: "seo_description", widget: "text", required: false, i18n: true }
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "发布日期", name: "date", widget: "datetime" }
+      - { label: "分类", name: "category", widget: "select", options: ["公司动态", "市场分析", "行业洞察"] }
+      - { label: "摘要", name: "summary", widget: "text" }
+      - { label: "特色图片", name: "featuredImage", widget: "image", required: false }
+      - { label: "内容", name: "body", widget: "markdown" }
+      - { label: "状态", name: "status", widget: "select", options: ["草稿", "已发布"], default: "草稿" }
 
   # 服务管理
   - name: "services"
@@ -39,23 +30,15 @@ collections:
     folder: "content/services"
     create: true
     slug: "{{slug}}"
-    i18n: true
     fields:
-      - { label: "服务名称", name: "title", widget: "string", i18n: true }
-      - { label: "图标", name: "icon", widget: "string", hint: "输入emoji或图标类名", i18n: duplicate }
-      - { label: "状态", name: "status", widget: "select", options: ["进行中", "规划中", "已完成"], i18n: true }
-      - { label: "简短描述", name: "description", widget: "text", i18n: true }
-      - { label: "详细介绍", name: "body", widget: "markdown", i18n: true }
-      - { label: "服务特点", name: "features", widget: "list", i18n: true }
-      - { label: "服务优势", name: "advantages", widget: "list", i18n: true }
-      - { label: "排序权重", name: "order", widget: "number", default: 0, i18n: duplicate }
-      - label: "服务图片"
-        name: "images"
-        widget: "list"
-        required: false
-        i18n: duplicate
-        fields:
-          - { label: "图片", name: "image", widget: "image" }
+      - { label: "服务名称", name: "title", widget: "string" }
+      - { label: "图标", name: "icon", widget: "string", hint: "输入emoji或图标类名" }
+      - { label: "状态", name: "status", widget: "select", options: ["进行中", "规划中", "已完成"] }
+      - { label: "简短描述", name: "description", widget: "text" }
+      - { label: "详细介绍", name: "body", widget: "markdown" }
+      - { label: "服务特点", name: "features", widget: "list" }
+      - { label: "服务优势", name: "advantages", widget: "list" }
+      - { label: "排序权重", name: "order", widget: "number", default: 0 }
 
   # 公司信息
   - name: "company"
@@ -64,25 +47,17 @@ collections:
       - label: "基本信息"
         name: "basic_info"
         file: "content/company/basic-info.md"
-        i18n: true
         fields:
-          - { label: "公司名称", name: "company_name", widget: "string", i18n: true }
-          - { label: "英文名称", name: "english_name", widget: "string", i18n: duplicate }
-          - { label: "成立年份", name: "established_year", widget: "string", i18n: duplicate }
-          - { label: "总部位置", name: "headquarters", widget: "string", i18n: true }
-          - { label: "主营业务", name: "main_business", widget: "string", i18n: true }
-          - { label: "公司简介", name: "description", widget: "markdown", i18n: true }
-          - { label: "企业愿景", name: "vision", widget: "text", i18n: true }
-          - { label: "企业使命", name: "mission", widget: "text", i18n: true }
-          - { label: "核心价值观", name: "values", widget: "list", i18n: true }
-          - { label: "公司Logo", name: "logo", widget: "image", i18n: duplicate }
-          - label: "团队照片"
-            name: "team_photos"
-            widget: "list"
-            required: false
-            i18n: duplicate
-            fields:
-              - { label: "照片", name: "photo", widget: "image" }
+          - { label: "公司名称", name: "company_name", widget: "string" }
+          - { label: "英文名称", name: "english_name", widget: "string" }
+          - { label: "成立年份", name: "established_year", widget: "string" }
+          - { label: "总部位置", name: "headquarters", widget: "string" }
+          - { label: "主营业务", name: "main_business", widget: "string" }
+          - { label: "公司简介", name: "description", widget: "markdown" }
+          - { label: "企业愿景", name: "vision", widget: "text" }
+          - { label: "企业使命", name: "mission", widget: "text" }
+          - { label: "核心价值观", name: "values", widget: "list" }
+          - { label: "公司Logo", name: "logo", widget: "image" }
 
   # 联系信息
   - name: "contact"
@@ -91,57 +66,11 @@ collections:
       - label: "联系信息"
         name: "contact_info"
         file: "content/contact/info.md"
-        i18n: true
         fields:
-          - { label: "邮箱地址", name: "email", widget: "string", i18n: duplicate }
-          - { label: "电话号码", name: "phone", widget: "string", i18n: duplicate }
-          - { label: "传真号码", name: "fax", widget: "string", required: false, i18n: duplicate }
-          - { label: "详细地址", name: "address", widget: "text", i18n: true }
-          - { label: "营业时间", name: "business_hours", widget: "string", i18n: true }
-          - { label: "微信号", name: "wechat", widget: "string", required: false, i18n: duplicate }
-          - { label: "LinkedIn", name: "linkedin", widget: "string", required: false, i18n: duplicate }
-          - label: "办公室照片"
-            name: "office_photos"
-            widget: "list"
-            required: false
-            i18n: duplicate
-            fields:
-              - { label: "照片", name: "photo", widget: "image" }
-
-  # 网站设置
-  - name: "settings"
-    label: "网站设置"
-    files:
-      - label: "SEO设置"
-        name: "seo"
-        file: "content/settings/seo.md"
-        i18n: true
-        fields:
-          - { label: "网站标题", name: "site_title", widget: "string", i18n: true }
-          - { label: "网站描述", name: "site_description", widget: "text", i18n: true }
-          - { label: "关键词", name: "keywords", widget: "string", i18n: true }
-          - { label: "网站作者", name: "author", widget: "string", i18n: duplicate }
-          - { label: "Favicon", name: "favicon", widget: "image", i18n: duplicate }
-          - { label: "社交媒体图片", name: "social_image", widget: "image", required: false, i18n: duplicate }
-      
-      - label: "导航菜单"
-        name: "navigation"
-        file: "content/settings/navigation.md"
-        i18n: true
-        fields:
-          - label: "主导航"
-            name: "main_nav"
-            widget: "list"
-            i18n: true
-            fields:
-              - { label: "菜单名称", name: "name", widget: "string" }
-              - { label: "链接地址", name: "url", widget: "string" }
-              - { label: "排序", name: "order", widget: "number" }
-          - label: "页脚链接"
-            name: "footer_links"
-            widget: "list"
-            i18n: true
-            fields:
-              - { label: "链接名称", name: "name", widget: "string" }
-              - { label: "链接地址", name: "url", widget: "string" }
-              - { label: "分类", name: "category", widget: "string" }
+          - { label: "邮箱地址", name: "email", widget: "string" }
+          - { label: "电话号码", name: "phone", widget: "string" }
+          - { label: "传真号码", name: "fax", widget: "string", required: false }
+          - { label: "详细地址", name: "address", widget: "text" }
+          - { label: "营业时间", name: "business_hours", widget: "string" }
+          - { label: "微信号", name: "wechat", widget: "string", required: false }
+          - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
