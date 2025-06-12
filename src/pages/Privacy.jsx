@@ -5,7 +5,7 @@ import { trackEvent } from '../utils/Analytics';
 
 const Privacy = () => {
   const { t, i18n } = useTranslation();
-  const [lastUpdated] = useState('2024年12月20日');
+  const [lastUpdated] = useState('2025年6月11日');
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const Privacy = () => {
       case 'ja':
         return {
           title: 'プライバシーポリシー',
-          lastUpdated: '最終更新日：2024年12月20日',
+          lastUpdated: '最終更新日：2025年6月11日',
           sections: [
             {
               title: '1. 基本方針',
@@ -107,7 +107,7 @@ Cookieの使用を無効にしたい場合は、ブラウザの設定で拒否�
       case 'en':
         return {
           title: 'Privacy Policy',
-          lastUpdated: 'Last Updated: December 20, 2024',
+          lastUpdated: 'Last Updated: 6 11, 2025',
           sections: [
             {
               title: '1. Basic Policy',
@@ -185,7 +185,7 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
       default: // 中文
         return {
           title: '隐私政策',
-          lastUpdated: '最后更新：2024年12月20日',
+          lastUpdated: '最后更新：2025年6月11日',
           sections: [
             {
               title: '1. 基本方针',
@@ -288,7 +288,11 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
             </p>
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
               <span>🔒</span>
-              <span>您的隐私对我们很重要</span>
+              <span>
+                {i18n.language === 'ja' ? 'お客様のプライバシーは私たちにとって重要です' : 
+                 i18n.language === 'en' ? 'Your privacy is important to us' : 
+                 '您的隐私对我们很重要'}
+              </span>
             </div>
           </div>
         </div>
@@ -300,7 +304,11 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
           
           {/* 快速导航 */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">快速导航</h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              {i18n.language === 'ja' ? 'クイックナビゲーション' : 
+               i18n.language === 'en' ? 'Quick Navigation' : 
+               '快速导航'}
+            </h2>
             <div className="grid md:grid-cols-2 gap-3">
               {content.sections.map((section, index) => (
                 <a
@@ -344,9 +352,15 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
           {/* 联系信息强调 */}
           <div className="mt-12 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-white">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4">有疑问？我们随时为您解答</h3>
+              <h3 className="text-2xl font-bold mb-4">
+                {i18n.language === 'ja' ? 'ご質問はありますか？いつでもお答えします' : 
+                 i18n.language === 'en' ? 'Have Questions? We\'re Here to Help' : 
+                 '有疑问？我们随时为您解答'}
+              </h3>
               <p className="text-green-100 mb-6">
-                如果您对我们的隐私政策有任何疑问或建议，请随时与我们联系
+                {i18n.language === 'ja' ? 'プライバシーポリシーについてご質問やご提案がございましたら、お気軽にお問い合わせください' : 
+                 i18n.language === 'en' ? 'If you have any questions or suggestions about our privacy policy, please feel free to contact us' : 
+                 '如果您对我们的隐私政策有任何疑问或建议，请随时与我们联系'}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
@@ -355,7 +369,11 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
                   onClick={() => trackEvent('privacy_contact_clicked', { method: 'email' })}
                 >
                   <span>📧</span>
-                  <span>发送邮件</span>
+                  <span>
+                    {i18n.language === 'ja' ? 'メール送信' : 
+                     i18n.language === 'en' ? 'Send Email' : 
+                     '发送邮件'}
+                  </span>
                 </a>
                 <Link
                   to="/contact"
@@ -363,7 +381,11 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
                   onClick={() => trackEvent('privacy_contact_clicked', { method: 'contact_page' })}
                 >
                   <span>💬</span>
-                  <span>联系我们</span>
+                  <span>
+                    {i18n.language === 'ja' ? 'お問い合わせ' : 
+                     i18n.language === 'en' ? 'Contact Us' : 
+                     '联系我们'}
+                  </span>
                 </Link>
               </div>
             </div>
@@ -371,7 +393,11 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
 
           {/* 页面底部导航 */}
           <div className="mt-12 bg-white rounded-2xl shadow-lg p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">相关页面</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">
+              {i18n.language === 'ja' ? '関連ページ' : 
+               i18n.language === 'en' ? 'Related Pages' : 
+               '相关页面'}
+            </h3>
             <div className="grid md:grid-cols-3 gap-4">
               <Link
                 to="/terms"
@@ -380,8 +406,16 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
               >
                 <span className="text-2xl">📄</span>
                 <div>
-                  <div className="font-semibold text-gray-800">使用条款</div>
-                  <div className="text-sm text-gray-500">了解服务使用规则</div>
+                  <div className="font-semibold text-gray-800">
+                    {i18n.language === 'ja' ? '利用規約' : 
+                     i18n.language === 'en' ? 'Terms of Service' : 
+                     '使用条款'}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {i18n.language === 'ja' ? 'サービス利用ルールについて' : 
+                     i18n.language === 'en' ? 'Learn about service usage rules' : 
+                     '了解服务使用规则'}
+                  </div>
                 </div>
               </Link>
               
@@ -392,8 +426,16 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
               >
                 <span className="text-2xl">📞</span>
                 <div>
-                  <div className="font-semibold text-gray-800">联系我们</div>
-                  <div className="text-sm text-gray-500">获取更多帮助</div>
+                  <div className="font-semibold text-gray-800">
+                    {i18n.language === 'ja' ? 'お問い合わせ' : 
+                     i18n.language === 'en' ? 'Contact Us' : 
+                     '联系我们'}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {i18n.language === 'ja' ? 'さらなるサポートを受ける' : 
+                     i18n.language === 'en' ? 'Get more help' : 
+                     '获取更多帮助'}
+                  </div>
                 </div>
               </Link>
               
@@ -404,8 +446,16 @@ Business Hours: Weekdays 9:00-18:00 (JST)`
               >
                 <span className="text-2xl">🗺️</span>
                 <div>
-                  <div className="font-semibold text-gray-800">网站地图</div>
-                  <div className="text-sm text-gray-500">浏览所有页面</div>
+                  <div className="font-semibold text-gray-800">
+                    {i18n.language === 'ja' ? 'サイトマップ' : 
+                     i18n.language === 'en' ? 'Site Map' : 
+                     '网站地图'}
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {i18n.language === 'ja' ? 'すべてのページを閲覧' : 
+                     i18n.language === 'en' ? 'Browse all pages' : 
+                     '浏览所有页面'}
+                  </div>
                 </div>
               </Link>
             </div>
