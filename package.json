@@ -26,9 +26,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "CI=false react-scripts build",
+    "build": "npm run generate-news && CI=false react-scripts build",
+    "generate-news": "node scripts/generate-news-index.js",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prebuild": "npm run generate-news",
+    "dev": "npm run generate-news && npm start"
   },
   "eslintConfig": {
     "extends": [

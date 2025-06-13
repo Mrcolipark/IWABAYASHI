@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useOptimizedTranslation } from '../hooks/useOptimizedTranslation';
 import { trackEvent } from '../utils/Analytics';
 
-
 // 缓存的分类按钮组件
 const CategoryButton = React.memo(({ category, isActive, onCategoryChange }) => {
   const handleClick = useCallback(() => {
@@ -33,7 +32,6 @@ const ArticleCard = React.memo(({ article, index, isVisible, onArticleClick }) =
     onArticleClick(article);
   }, [onArticleClick, article]);
 
-  // 格式化日期
   const formatDate = useCallback((dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('zh-CN', {
@@ -92,32 +90,7 @@ const ArticleCard = React.memo(({ article, index, isVisible, onArticleClick }) =
 
 ArticleCard.displayName = 'ArticleCard';
 
-// 缓存的趋势卡片组件
-const TrendCard = React.memo(({ trend, index }) => {
-  const colorClasses = [
-    'from-gray-800 to-green-800',
-    'from-slate-700 to-gray-800',
-    'from-green-800 to-slate-600'
-  ];
-
-  return (
-    <div className="text-center">
-      <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105">
-        <div className={`w-16 h-16 bg-gradient-to-br ${colorClasses[index]} rounded-xl flex items-center justify-center text-2xl mb-6 mx-auto`}>
-          📊
-        </div>
-        <h4 className="text-xl font-bold text-gray-800 mb-2">{trend.title}</h4>
-        <div className="text-3xl font-bold text-green-800 mb-2">{trend.value}</div>
-        <div className="text-sm text-gray-500 mb-4">{trend.desc}</div>
-        <div className="text-slate-600 text-sm font-medium">{trend.trend}</div>
-      </div>
-    </div>
-  );
-});
-
-TrendCard.displayName = 'TrendCard';
-
-// 缓存的文章详情模态框组件
+// 文章详情模态框组件
 const ArticleModal = React.memo(({ article, onClose }) => {
   const formatDate = useCallback((dateString) => {
     const date = new Date(dateString);
@@ -203,108 +176,102 @@ const ArticleModal = React.memo(({ article, onClose }) => {
 
 ArticleModal.displayName = 'ArticleModal';
 
+// 主要的News组件 - 修复为动态加载
 const News = ({ dict }) => {
   const { t } = useOptimizedTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState(null);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');  const [articles, setArticles] = useState([]); // 动态加载的文章数据
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  // 使用优化翻译缓存News页面数据
-  const newsData = useMemo(() => {
-    // 基础信息
-    const baseInfo = {
-      title: t('news.title', { defaultValue: '新闻动态' }),
-      subtitle: t('news.subtitle', { defaultValue: '最新动态与行业洞察' }),
-      noArticles: t('news.noArticles', { defaultValue: '暂无相关文章' }),
-      selectOtherCategory: t('news.selectOtherCategory', { defaultValue: '请选择其他分类查看更多内容' })
-    };
-
-    // 分类数据
-    const categories = [
-      { id: 'all', label: t('news.categories.0.label', { defaultValue: '全部' }), icon: '📰' },
-      { id: '公司动态', label: t('news.categories.1.label', { defaultValue: '公司动态' }), icon: '🏢' },
-      { id: '市场分析', label: t('news.categories.2.label', { defaultValue: '市场分析' }), icon: '📊' },
-      { id: '行业洞察', label: t('news.categories.3.label', { defaultValue: '行业洞察' }), icon: '🔍' }
-    ];
-
-    // 文章数据
-    const articles = [
-      {
-        id: 1,
-        title: t('news.articles.0.title', { defaultValue: '岩林株式会社正式成立' }),
-        date: '2025-01-15',
-        category: t('news.articles.0.category', { defaultValue: '公司动态' }),
-        summary: t('news.articles.0.summary', { defaultValue: '岩林株式会社正式成立，致力于打造中日贸易新桥梁' }),
-        content: t('news.articles.0.content', { 
-          defaultValue: '2025年1月，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。\n\n公司成立之初，我们就明确了发展方向：以日本保健品进口代理为切入点，逐步拓展到大宗商品出口等领域。我们相信，通过专业的服务和不懈的努力，必将为中日两国的经贸合作贡献力量。' 
-        })
-      },
-      {
-        id: 2,
-        title: t('news.articles.1.title', { defaultValue: '日本保健品市场分析报告' }),
-        date: '2025-01-10',
-        category: t('news.articles.1.category', { defaultValue: '市场分析' }),
-        summary: t('news.articles.1.summary', { defaultValue: '深度解析日本保健品市场现状与发展趋势' }),
-        content: t('news.articles.1.content', { 
-          defaultValue: '日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n市场特点包括：消费者对品质要求极高、功能性产品需求旺盛、老龄化社会推动市场发展等。这为中国市场引入优质日本保健品提供了良好机遇。' 
-        })
-      },
-      {
-        id: 3,
-        title: t('news.articles.2.title', { defaultValue: '中日贸易合作新机遇' }),
-        date: '2025-01-05',
-        category: t('news.articles.2.category', { defaultValue: '行业洞察' }),
-        summary: t('news.articles.2.summary', { defaultValue: '探讨中日两国贸易合作的新发展机遇' }),
-        content: t('news.articles.2.content', { 
-          defaultValue: '随着全球经济一体化的深入发展，中日两国在贸易合作方面迎来了新的发展机遇。双方在健康产业、先进制造业、绿色能源等领域具有广阔的合作空间。\n\n特别是在跨境电商快速发展的背景下，两国贸易模式正在发生深刻变化，为企业提供了更多的合作可能性。' 
-        })
-      }
-    ];
-
-    // 行业趋势数据
-    const industryTrends = {
-      title: t('news.industryTrends.title', { defaultValue: '行业趋势概览' }),
-      description: t('news.industryTrends.description', { defaultValue: '把握中日贸易发展脉搏，洞察市场变化趋势' }),
-      trends: [
-        {
-          title: t('news.industryTrends.trends.0.title', { defaultValue: '日本健康食品市场' }),
-          trend: t('news.industryTrends.trends.0.trend', { defaultValue: '持续增长' }),
-          value: t('news.industryTrends.trends.0.value', { defaultValue: '15.2%' }),
-          desc: t('news.industryTrends.trends.0.desc', { defaultValue: '年增长率' })
-        },
-        {
-          title: t('news.industryTrends.trends.1.title', { defaultValue: '中日贸易总额' }),
-          trend: t('news.industryTrends.trends.1.trend', { defaultValue: '稳步上升' }),
-          value: t('news.industryTrends.trends.1.value', { defaultValue: '¥3.2万亿' }),
-          desc: t('news.industryTrends.trends.1.desc', { defaultValue: '2024年预计' })
-        },
-        {
-          title: t('news.industryTrends.trends.2.title', { defaultValue: '跨境电商增长' }),
-          trend: t('news.industryTrends.trends.2.trend', { defaultValue: '快速发展' }),
-          value: t('news.industryTrends.trends.2.value', { defaultValue: '28.5%' }),
-          desc: t('news.industryTrends.trends.2.desc', { defaultValue: '同比增长' })
+  // 动态加载文章数据
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        setLoading(true);
+        
+        // 方法1: 从API端点加载（如果存在的话）
+        let articlesData = [];
+        
+        try {
+          const response = await fetch('/api/news-index.json');
+          if (response.ok) {
+            articlesData = await response.json();
+            console.log('Loaded articles from API:', articlesData);
+          }
+        } catch (apiError) {
+          console.log('API load failed, trying static method:', apiError);
         }
-      ]
+        
+        // 方法2: 如果API加载失败，使用静态数据作为后备
+        if (articlesData.length === 0) {
+          // 使用你的静态数据作为后备
+          articlesData = [
+            {
+              id: 1,
+              title: '岩林株式会社正式成立',
+              date: '2025-01-15',
+              category: '公司动态',
+              summary: '岩林株式会社正式成立，致力于打造中日贸易新桥梁',
+              content: '2025年1月，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。\n\n公司成立之初，我们就明确了发展方向：以日本保健品进口代理为切入点，逐步拓展到大宗商品出口等领域。我们相信，通过专业的服务和不懈的努力，必将为中日两国的经贸合作贡献力量。'
+            },
+            {
+              id: 2,
+              title: '日本保健品市场分析报告', 
+              date: '2025-01-10',
+              category: '市场分析',
+              summary: '深度解析日本保健品市场现状与发展趋势',
+              content: '日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n市场特点包括：消费者对品质要求极高、功能性产品需求旺盛、老龄化社会推动市场发展等。这为中国市场引入优质日本保健品提供了良好机遇。'
+            },
+            {
+              id: 3,
+              title: '中日贸易合作新机遇',
+              date: '2025-01-05', 
+              category: '行业洞察',
+              summary: '探讨中日两国贸易合作的新发展机遇',
+              content: '随着全球经济一体化的深入发展，中日两国在贸易合作方面迎来了新的发展机遇。双方在健康产业、先进制造业、绿色能源等领域具有广阔的合作空间。\n\n特别是在跨境电商快速发展的背景下，两国贸易模式正在发生深刻变化，为企业提供了更多的合作可能性。'
+            }
+          ];
+        }
+        
+        // 按日期排序，最新的在前
+        articlesData.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        setArticles(articlesData);
+        setError(null);
+      } catch (error) {
+        console.error('Failed to load articles:', error);
+        setError('文章加载失败');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // 订阅资讯数据
-    const newsletter = {
-      title: t('news.newsletter.title', { defaultValue: '订阅我们的资讯' }),
-      description: t('news.newsletter.description', { defaultValue: '第一时间获取中日贸易最新动态和市场洞察' }),
-      placeholder: t('news.newsletter.placeholder', { defaultValue: '请输入您的邮箱地址' }),
-      subscribe: t('news.newsletter.subscribe', { defaultValue: '订阅' })
-    };
+    loadArticles();
+  }, []);
 
-    return {
-      ...baseInfo,
-      categories,
-      articles,
-      industryTrends,
-      newsletter
-    };
-  }, [t]);
+  // 基础翻译数据
+  const newsData = useMemo(() => ({
+    title: t('news.title', { defaultValue: '新闻动态' }),
+    subtitle: t('news.subtitle', { defaultValue: '最新动态与行业洞察' }),
+    noArticles: t('news.noArticles', { defaultValue: '暂无相关文章' }),
+    selectOtherCategory: t('news.selectOtherCategory', { defaultValue: '请选择其他分类查看更多内容' }),
+    categories: [
+      { id: 'all', label: '全部', icon: '📰' },
+      { id: '公司动态', label: '公司动态', icon: '🏢' },
+      { id: '市场分析', label: '市场分析', icon: '📊' },
+      { id: '行业洞察', label: '行业洞察', icon: '🔍' }
+    ],
+    newsletter: {
+      title: '订阅我们的资讯',
+      description: '第一时间获取中日贸易最新动态和市场洞察',
+      placeholder: '请输入您的邮箱地址',
+      subscribe: '订阅'
+    }
+  }), [t]);
 
   // 可见性检测
   useEffect(() => {
@@ -324,9 +291,9 @@ const News = ({ dict }) => {
   // 过滤文章
   const filteredArticles = useMemo(() => {
     return selectedCategory === 'all' 
-      ? newsData.articles 
-      : newsData.articles.filter(article => article.category === selectedCategory);
-  }, [selectedCategory, newsData.articles]);
+      ? articles 
+      : articles.filter(article => article.category === selectedCategory);
+  }, [selectedCategory, articles]);
 
   const handleCategoryChange = useCallback((category) => {
     setSelectedCategory(category);
@@ -351,13 +318,42 @@ const News = ({ dict }) => {
     if (newsletterEmail) {
       trackEvent('newsletter_subscribe_clicked', { email: newsletterEmail });
       setNewsletterEmail('');
-      // 这里可以添加实际的订阅逻辑
     }
   }, [newsletterEmail]);
 
   const handleNewsletterEmailChange = useCallback((e) => {
     setNewsletterEmail(e.target.value);
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-green-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-green-800 font-medium">正在加载文章...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-red-600 text-2xl">⚠️</span>
+          </div>
+          <p className="text-red-600 font-medium">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 px-4 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            重新加载
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 pt-20">
@@ -381,6 +377,9 @@ const News = ({ dict }) => {
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
               {newsData.subtitle}
             </p>
+            <div className="mt-6 text-sm text-gray-500">
+              找到 {articles.length} 篇文章
+            </div>
           </div>
         </div>
       </section>
@@ -428,26 +427,6 @@ const News = ({ dict }) => {
               <p className="text-gray-400">{newsData.selectOtherCategory}</p>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* 行业趋势概览 */}
-      <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
-              {newsData.industryTrends.title}
-            </h3>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              {newsData.industryTrends.description}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {newsData.industryTrends.trends.map((trend, index) => (
-              <TrendCard key={index} trend={trend} index={index} />
-            ))}
-          </div>
         </div>
       </section>
 
