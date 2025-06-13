@@ -38,6 +38,14 @@ const News = React.lazy(() =>
   })
 );
 
+// 导入新闻文章详情页组件
+const NewsArticle = React.lazy(() => 
+  import("./components/NewsArticle").catch(err => {
+    console.error('Failed to load NewsArticle component:', err);
+    return { default: () => <div className="p-8 text-center">Article page failed to load</div> };
+  })
+);
+
 const Contact = React.lazy(() => 
   import("./pages/Contact").catch(err => {
     console.error('Failed to load Contact component:', err);
@@ -217,6 +225,16 @@ function App() {
               } 
             />
             
+            {/* 添加新闻文章详情页路由 */}
+            <Route 
+              path="/news/:slug" 
+              element={
+                <PageWrapper>
+                  <NewsArticle />
+                </PageWrapper>
+              } 
+            />
+            
             <Route 
               path="/contact" 
               element={
@@ -260,6 +278,7 @@ function App() {
               <Route path="/about" element={<PageWrapper><About dict={dict} /></PageWrapper>} />
               <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
               <Route path="/news" element={<PageWrapper><News dict={dict} /></PageWrapper>} />
+              <Route path="/news/:slug" element={<PageWrapper><NewsArticle /></PageWrapper>} />
               <Route path="/contact" element={<PageWrapper><Contact dict={dict} /></PageWrapper>} />
               <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
               <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
@@ -271,6 +290,7 @@ function App() {
               <Route path="/about" element={<PageWrapper><About dict={dict} /></PageWrapper>} />
               <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
               <Route path="/news" element={<PageWrapper><News dict={dict} /></PageWrapper>} />
+              <Route path="/news/:slug" element={<PageWrapper><NewsArticle /></PageWrapper>} />
               <Route path="/contact" element={<PageWrapper><Contact dict={dict} /></PageWrapper>} />
               <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
               <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />
@@ -282,6 +302,7 @@ function App() {
               <Route path="/about" element={<PageWrapper><About dict={dict} /></PageWrapper>} />
               <Route path="/services" element={<PageWrapper><Services /></PageWrapper>} />
               <Route path="/news" element={<PageWrapper><News dict={dict} /></PageWrapper>} />
+              <Route path="/news/:slug" element={<PageWrapper><NewsArticle /></PageWrapper>} />
               <Route path="/contact" element={<PageWrapper><Contact dict={dict} /></PageWrapper>} />
               <Route path="/privacy" element={<PageWrapper><Privacy /></PageWrapper>} />
               <Route path="/terms" element={<PageWrapper><Terms /></PageWrapper>} />

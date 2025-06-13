@@ -1,5 +1,5 @@
 // scripts/generate-news-index.js
-// 这个脚本在构建时运行，将markdown文件转换为JSON索引
+// 改进版：支持CMS文章并增强错误处理
 
 const fs = require('fs');
 const path = require('path');
@@ -18,9 +18,10 @@ function generateNewsIndex() {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // 读取content/news目录
+    // 检查content/news目录
     if (!fs.existsSync(CONTENT_DIR)) {
-      console.log('⚠️  content/news 目录不存在，创建默认索引文件');
+      console.log('⚠️  content/news 目录不存在，创建目录和默认索引文件');
+      fs.mkdirSync(CONTENT_DIR, { recursive: true });
       createDefaultIndex();
       return;
     }
@@ -31,6 +32,8 @@ function generateNewsIndex() {
     console.log(`📁 找到 ${markdownFiles.length} 个markdown文件`);
 
     const articles = [];
+    let processedCount = 0;
+    let errorCount = 0;
 
     markdownFiles.forEach((filename) => {
       try {
@@ -38,29 +41,85 @@ function generateNewsIndex() {
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const { data: frontmatter, content } = matter(fileContent);
         
-        // 只包含已发布的文章
-        if (frontmatter.status === '已发布' || frontmatter.status === 'published') {
+        // 检查文章状态，支持中英文状态
+        const isPublished = frontmatter.status === '已发布' || 
+                           frontmatter.status === 'published' || 
+                           frontmatter.status === '發布' ||
+                           (!frontmatter.status && content.trim().length > 0); // 没有状态但有内容的文章默认为发布
+        
+        if (isPublished) {
+          // 生成文章ID（如果没有的话）
+          const articleId = frontmatter.id || 
+                           frontmatter.slug || 
+                           filename.replace('.md', '').replace(/^\d{4}-\d{2}-\d{2}-/, '');
+          
+          // 生成文章slug
+          const slug = frontmatter.slug || filename.replace('.md', '');
+          
+          // 处理日期
+          let articleDate = frontmatter.date;
+          if (articleDate) {
+            // 确保日期是ISO格式
+            if (typeof articleDate === 'string' && !articleDate.includes('T')) {
+              articleDate = new Date(articleDate).toISOString();
+            } else if (articleDate instanceof Date) {
+              articleDate = articleDate.toISOString();
+            }
+          } else {
+            // 如果没有日期，从文件名提取或使用当前时间
+            const dateMatch = filename.match(/^(\d{4}-\d{2}-\d{2})/);
+            if (dateMatch) {
+              articleDate = new Date(dateMatch[1]).toISOString();
+            } else {
+              articleDate = new Date().toISOString();
+            }
+          }
+          
+          // 生成摘要（如果没有的话）
+          let summary = frontmatter.summary || frontmatter.description || frontmatter.excerpt;
+          if (!summary && content) {
+            // 从内容中提取前200字符作为摘要
+            const plainText = content
+              .replace(/#{1,6}\s/g, '') // 移除markdown标题
+              .replace(/\*\*(.*?)\*\*/g, '$1') // 移除粗体标记
+              .replace(/\*(.*?)\*/g, '$1') // 移除斜体标记
+              .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // 移除链接但保留文本
+              .replace(/\n+/g, ' ') // 替换换行为空格
+              .trim();
+            
+            summary = plainText.length > 200 
+              ? plainText.substring(0, 197) + '...'
+              : plainText;
+          }
+          
           const article = {
-            id: frontmatter.id || filename.replace('.md', ''),
-            title: frontmatter.title || 'Untitled',
-            date: frontmatter.date || new Date().toISOString(),
+            id: articleId,
+            title: frontmatter.title || '无标题文章',
+            date: articleDate,
             category: frontmatter.category || '未分类',
-            summary: frontmatter.summary || content.substring(0, 200) + '...',
-            content: content,
-            featuredImage: frontmatter.featuredImage || null,
+            summary: summary || '暂无摘要',
+            content: content || '',
+            featuredImage: frontmatter.featuredImage || frontmatter.image || null,
             status: frontmatter.status || '已发布',
             author: frontmatter.author || '岩林株式会社',
             keywords: frontmatter.keywords || '',
-            slug: frontmatter.slug || filename.replace('.md', '')
+            slug: slug,
+            // 额外的CMS字段
+            tags: frontmatter.tags || [],
+            readingTime: estimateReadingTime(content),
+            lastModified: frontmatter.lastModified || articleDate
           };
           
           articles.push(article);
-          console.log(`✅ 处理文章: ${article.title}`);
+          processedCount++;
+          console.log(`✅ 处理文章: ${article.title} (${article.category})`);
         } else {
-          console.log(`⏭️  跳过草稿: ${frontmatter.title || filename}`);
+          console.log(`⏭️  跳过草稿: ${frontmatter.title || filename} (状态: ${frontmatter.status || '未设置'})`);
         }
       } catch (error) {
+        errorCount++;
         console.error(`❌ 处理文件 ${filename} 时出错:`, error.message);
+        console.error(`   文件路径: ${path.join(CONTENT_DIR, filename)}`);
       }
     });
 
@@ -68,20 +127,64 @@ function generateNewsIndex() {
     articles.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     // 写入JSON文件
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(articles, null, 2));
+    const indexData = {
+      generated: new Date().toISOString(),
+      totalArticles: articles.length,
+      categories: getUniqueCategories(articles),
+      articles: articles
+    };
+
+    // 美化JSON输出
+    const jsonString = JSON.stringify(articles, null, 2);
+    fs.writeFileSync(OUTPUT_FILE, jsonString, 'utf8');
     
-    console.log(`✅ 成功生成文章索引: ${articles.length} 篇文章`);
+    console.log(`✅ 成功生成文章索引: ${articles.length} 篇已发布文章`);
     console.log(`📄 索引文件位置: ${OUTPUT_FILE}`);
+    console.log(`📊 处理统计: 成功 ${processedCount}, 错误 ${errorCount}, 草稿 ${markdownFiles.length - processedCount - errorCount}`);
+    
+    // 输出分类统计
+    const categoryStats = getUniqueCategories(articles);
+    console.log(`📂 文章分类: ${categoryStats.join(', ')}`);
     
     // 输出文章列表
-    articles.forEach((article, index) => {
-      console.log(`   ${index + 1}. ${article.title} (${article.category})`);
-    });
+    if (articles.length > 0) {
+      console.log('\n📰 已发布文章列表:');
+      articles.forEach((article, index) => {
+        const date = new Date(article.date).toLocaleDateString('zh-CN');
+        console.log(`   ${index + 1}. ${article.title} (${article.category}) - ${date}`);
+      });
+    }
+
+    // 验证生成的JSON
+    try {
+      const testParse = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
+      console.log(`\n✅ JSON文件验证通过，包含 ${testParse.length} 篇文章`);
+    } catch (parseError) {
+      console.error('❌ JSON文件验证失败:', parseError.message);
+    }
 
   } catch (error) {
     console.error('❌ 生成文章索引时出错:', error);
+    console.error('📍 错误堆栈:', error.stack);
     createDefaultIndex();
   }
+}
+
+// 估算阅读时间（基于中文阅读速度）
+function estimateReadingTime(content) {
+  if (!content) return '1分钟';
+  
+  const wordsPerMinute = 300; // 中文阅读速度约300字/分钟
+  const wordCount = content.length;
+  const minutes = Math.ceil(wordCount / wordsPerMinute);
+  
+  return `${minutes}分钟`;
+}
+
+// 获取所有唯一的分类
+function getUniqueCategories(articles) {
+  const categories = articles.map(article => article.category);
+  return [...new Set(categories)].filter(Boolean);
 }
 
 function createDefaultIndex() {
@@ -99,31 +202,40 @@ function createDefaultIndex() {
       status: "已发布",
       author: "岩林株式会社",
       keywords: "CEO,赵子淇,岩林集团,任命",
-      slug: "2025-06-12-赵子淇出任岩林集团ceo"
+      slug: "2025-06-12-赵子淇出任岩林集团ceo",
+      tags: ["人事任命", "管理层", "发展战略"],
+      readingTime: "2分钟",
+      lastModified: "2025-06-12T10:31:33.590Z"
     },
     {
       id: "2025-01-15-company-establishment",
       title: "岩林株式会社正式成立",
-      date: "2025-01-15",
+      date: "2025-01-15T00:00:00.000Z",
       category: "公司动态",
       summary: "岩林株式会社正式成立，致力于打造中日贸易新桥梁，专注于日本保健品进口代理服务",
       content: "2025年1月15日，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。\n\n## 发展愿景\n\n公司成立之初，我们就明确了发展方向：以日本保健品进口代理为切入点，逐步拓展到大宗商品出口等领域。我们相信，通过专业的服务和不懈的努力，必将为中日两国的经贸合作贡献力量。\n\n## 核心业务\n\n### 当前重点业务\n- **日本保健品进口代理**: 严格甄选优质日本保健品，为中国消费者提供安全、健康、可信赖的产品\n\n### 未来规划\n- **中国大宗商品出口**: 计划在2025年下半年开始布局，助力中国优质商品进入日本市场\n\n## 团队特色\n\n作为一家年轻而充满活力的公司，我们拥有开放务实的团队，致力于为合作伙伴提供：\n- 专业的市场咨询\n- 灵活的供应链管理\n- 高效的进出口服务\n\n## 联系我们\n\n如果您对我们的服务感兴趣，欢迎随时联系我们：\n- 邮箱: info@iwabayashi.com\n- 电话: +81-3-1234-5678\n\n让我们携手共创中日贸易新未来！",
       status: "已发布",
       author: "岩林株式会社",
       keywords: "岩林株式会社,成立,中日贸易,保健品进口",
-      slug: "2025-01-15-company-establishment"
+      slug: "2025-01-15-company-establishment",
+      tags: ["公司成立", "中日贸易", "保健品"],
+      readingTime: "3分钟",
+      lastModified: "2025-01-15T00:00:00.000Z"
     },
     {
       id: "2025-01-10-health-product-market-analysis",
       title: "日本保健品市场深度解析",
-      date: "2025-01-10",
+      date: "2025-01-10T00:00:00.000Z",
       category: "市场分析",
       summary: "探索日本保健品行业的发展现状与未来趋势，分析市场机遇与挑战",
-      content: "日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n## 市场特点\n\n### 消费者特征\n- **品质要求极高**: 日本消费者对产品质量和安全性要求严格\n- **功能性需求旺盛**: 偏好具有明确功效的保健品\n- **品牌忠诚度高**: 倾向于选择知名品牌和老字号\n\n### 市场趋势\n1. **老龄化社会推动**: 日本人口老龄化为保健品市场提供了强劲动力\n2. **健康意识提升**: 疫情后消费者更加注重健康管理\n3. **个性化需求**: 针对不同年龄层和健康需求的定制化产品增长\n\n## 主要产品类别\n\n### 营养补充剂\n- 维生素和矿物质补充剂\n- 蛋白质粉和氨基酸\n- 益生菌产品\n\n### 功能性食品\n- 抗氧化产品\n- 关节健康产品\n- 心血管健康产品\n\n### 美容保健品\n- 胶原蛋白产品\n- 抗衰老补充剂\n- 皮肤健康产品\n\n## 市场机遇\n\n对于有意进入日本保健品市场的企业来说，以下几个方面值得关注：\n\n1. **高端市场定位**: 日本消费者愿意为高品质产品支付溢价\n2. **创新产品需求**: 市场对具有创新功效的产品接受度高\n3. **电商渠道发展**: 在线销售渠道快速增长",
+      content: "日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n## 市场特点\n\n### 消费者特征\n- **品质要求极高**: 日本消费者对产品质量和安全性要求严格\n- **功能性需求旺盛**: 偏好具有明确功效的保健品\n- **品牌忠诚度高**: 倾向于选择知名品牌和老字号\n\n### 市场趋势\n1. **老龄化社会推动**: 日本人口老龄化为保健品市场提供了强劲动力\n2. **健康意识提升**: 疫情后消费者更加注重健康管理\n3. **个性化需求**: 针对不同年龄层和健康需求的定制化产品增长",
       status: "已发布",
       author: "市场分析部",
       keywords: "日本保健品,市场分析,健康产业,消费趋势",
-      slug: "2025-01-10-health-product-market-analysis"
+      slug: "2025-01-10-health-product-market-analysis",
+      tags: ["市场分析", "保健品", "日本市场"],
+      readingTime: "4分钟",
+      lastModified: "2025-01-10T00:00:00.000Z"
     }
   ];
 
@@ -133,10 +245,12 @@ function createDefaultIndex() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(defaultArticles, null, 2));
+  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(defaultArticles, null, 2), 'utf8');
   console.log(`✅ 创建默认索引文件成功: ${defaultArticles.length} 篇文章`);
+  console.log(`📄 文件位置: ${OUTPUT_FILE}`);
 }
 
+// 检查是否从命令行直接运行
 if (require.main === module) {
   generateNewsIndex();
 }

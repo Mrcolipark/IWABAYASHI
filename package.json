@@ -31,7 +31,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prebuild": "npm run generate-news",
-    "dev": "npm run generate-news && npm start"
+    "dev": "npm run generate-news && npm start",
+    "build:netlify": "npm run generate-news && npm run build",
+    "cms:preview": "npm run generate-news && npm start"
   },
   "eslintConfig": {
     "extends": [

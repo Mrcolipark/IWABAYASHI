@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useOptimizedTranslation } from '../hooks/useOptimizedTranslation';
 import { trackEvent } from '../utils/Analytics';
 
-
 // 缓存的分类按钮组件
 const CategoryButton = React.memo(({ category, isActive, onCategoryChange }) => {
   const handleClick = useCallback(() => {
@@ -53,6 +52,21 @@ const ArticleCard = React.memo(({ article, index, isVisible, onArticleClick }) =
     >
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:transform hover:scale-105">
         
+        {/* 特色图片 */}
+        {article.featuredImage && (
+          <div className="relative h-48 overflow-hidden">
+            <img 
+              src={article.featuredImage} 
+              alt={article.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.style.display = 'none';
+              }}
+            />
+          </div>
+        )}
+        
         {/* 文章头部 */}
         <div className="p-6 pb-4">
           <div className="flex items-center justify-between mb-4">
@@ -79,6 +93,12 @@ const ArticleCard = React.memo(({ article, index, isVisible, onArticleClick }) =
             <div className="flex items-center space-x-2 text-xs text-gray-500">
               <span>📖</span>
               <span>阅读全文</span>
+              {article.author && (
+                <>
+                  <span>•</span>
+                  <span>{article.author}</span>
+                </>
+              )}
             </div>
             <div className="text-green-800 text-sm font-medium group-hover:translate-x-1 transition-transform duration-300">
               →
@@ -139,6 +159,47 @@ const ArticleModal = React.memo(({ article, onClose }) => {
     onClose();
   }, [article.id, onClose]);
 
+  // 渲染文章内容（支持Markdown转换）
+  const renderContent = useCallback((content) => {
+    // 简单的Markdown渲染（标题和段落）
+    return content.split('\n').map((paragraph, index) => {
+      if (paragraph.trim() === '') return null;
+      
+      // 处理标题
+      if (paragraph.startsWith('## ')) {
+        return (
+          <h3 key={index} className="text-2xl font-bold text-gray-800 mt-8 mb-4">
+            {paragraph.replace('## ', '')}
+          </h3>
+        );
+      }
+      
+      if (paragraph.startsWith('### ')) {
+        return (
+          <h4 key={index} className="text-xl font-bold text-gray-800 mt-6 mb-3">
+            {paragraph.replace('### ', '')}
+          </h4>
+        );
+      }
+      
+      // 处理列表项
+      if (paragraph.startsWith('- ')) {
+        return (
+          <li key={index} className="text-lg text-gray-700 mb-2">
+            {paragraph.replace('- ', '')}
+          </li>
+        );
+      }
+      
+      // 处理粗体文本
+      const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      
+      return (
+        <p key={index} className="text-lg text-gray-700 mb-4 leading-relaxed" dangerouslySetInnerHTML={{ __html: boldText }} />
+      );
+    }).filter(Boolean);
+  }, []);
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
@@ -155,6 +216,11 @@ const ArticleModal = React.memo(({ article, onClose }) => {
             <time className="text-gray-500 text-sm">
               {formatDate(article.date)}
             </time>
+            {article.status && (
+              <span className="px-2 py-1 bg-blue-50 text-blue-600 border border-blue-200 rounded text-xs">
+                {article.status}
+              </span>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -164,6 +230,17 @@ const ArticleModal = React.memo(({ article, onClose }) => {
           </button>
         </div>
 
+        {/* 特色图片 */}
+        {article.featuredImage && (
+          <div className="relative h-64 overflow-hidden">
+            <img 
+              src={article.featuredImage} 
+              alt={article.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
+
         {/* 模态框内容 */}
         <div className="p-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-6">{article.title}</h2>
@@ -172,19 +249,30 @@ const ArticleModal = React.memo(({ article, onClose }) => {
           {/* 文章正文 */}
           <div className="prose prose-gray max-w-none">
             <div className="text-gray-700 leading-relaxed space-y-6">
-              {article.content.split('\n').map((paragraph, index) => (
-                paragraph.trim() && (
-                  <p key={index} className="text-lg">{paragraph}</p>
-                )
-              ))}
+              {renderContent(article.content)}
             </div>
           </div>
+
+          {/* 关键词标签 */}
+          {article.keywords && (
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-500 mb-3">关键词</h4>
+              <div className="flex flex-wrap gap-2">
+                {article.keywords.split(',').map((keyword, index) => (
+                  <span key={index} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                    {keyword.trim()}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* 文章底部 */}
           <div className="mt-12 pt-8 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
               <div className="text-gray-500 text-sm">
-                发布时间：{formatDate(article.date)}
+                <div>发布时间：{formatDate(article.date)}</div>
+                {article.author && <div className="mt-1">作者：{article.author}</div>}
               </div>
               <Link
                 to="/contact"
@@ -209,11 +297,62 @@ const News = ({ dict }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const sectionRef = useRef(null);
 
-  // 使用优化翻译缓存News页面数据
+  // 从CMS加载文章数据
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // 从Netlify CMS生成的JSON文件加载文章
+        const response = await fetch('/api/news-index.json');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const articlesData = await response.json();
+        
+        // 过滤已发布的文章并按日期排序
+        const publishedArticles = articlesData
+          .filter(article => article.status === '已发布' || article.status === 'published')
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        setArticles(publishedArticles);
+        console.log('Successfully loaded articles:', publishedArticles.length);
+        
+      } catch (error) {
+        console.error('Failed to load articles:', error);
+        setError('加载文章失败，请稍后重试');
+        
+        // 使用备用的静态文章数据
+        setArticles([
+          {
+            id: 'fallback-1',
+            title: '岩林株式会社正式成立',
+            date: '2025-01-15',
+            category: '公司动态',
+            summary: '岩林株式会社正式成立，致力于打造中日贸易新桥梁',
+            content: '2025年1月，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念。',
+            status: '已发布',
+            author: '岩林株式会社'
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadArticles();
+  }, []);
+
+  // 使用优化翻译缓存News页面的UI文本（保持不变）
   const newsData = useMemo(() => {
-    // 基础信息
     const baseInfo = {
       title: t('news.title', { defaultValue: '新闻动态' }),
       subtitle: t('news.subtitle', { defaultValue: '最新动态与行业洞察' }),
@@ -221,7 +360,6 @@ const News = ({ dict }) => {
       selectOtherCategory: t('news.selectOtherCategory', { defaultValue: '请选择其他分类查看更多内容' })
     };
 
-    // 分类数据
     const categories = [
       { id: 'all', label: t('news.categories.0.label', { defaultValue: '全部' }), icon: '📰' },
       { id: '公司动态', label: t('news.categories.1.label', { defaultValue: '公司动态' }), icon: '🏢' },
@@ -229,41 +367,6 @@ const News = ({ dict }) => {
       { id: '行业洞察', label: t('news.categories.3.label', { defaultValue: '行业洞察' }), icon: '🔍' }
     ];
 
-    // 文章数据
-    const articles = [
-      {
-        id: 1,
-        title: t('news.articles.0.title', { defaultValue: '岩林株式会社正式成立' }),
-        date: '2025-01-15',
-        category: t('news.articles.0.category', { defaultValue: '公司动态' }),
-        summary: t('news.articles.0.summary', { defaultValue: '岩林株式会社正式成立，致力于打造中日贸易新桥梁' }),
-        content: t('news.articles.0.content', { 
-          defaultValue: '2025年1月，岩林株式会社正式成立。作为一家专注于中日双边贸易的综合性贸易公司，我们将秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。\n\n公司成立之初，我们就明确了发展方向：以日本保健品进口代理为切入点，逐步拓展到大宗商品出口等领域。我们相信，通过专业的服务和不懈的努力，必将为中日两国的经贸合作贡献力量。' 
-        })
-      },
-      {
-        id: 2,
-        title: t('news.articles.1.title', { defaultValue: '日本保健品市场分析报告' }),
-        date: '2025-01-10',
-        category: t('news.articles.1.category', { defaultValue: '市场分析' }),
-        summary: t('news.articles.1.summary', { defaultValue: '深度解析日本保健品市场现状与发展趋势' }),
-        content: t('news.articles.1.content', { 
-          defaultValue: '日本保健品市场以其严格的质量标准和先进的生产工艺而闻名全球。根据最新市场数据显示，日本保健品市场规模持续增长，年增长率达到15.2%。\n\n市场特点包括：消费者对品质要求极高、功能性产品需求旺盛、老龄化社会推动市场发展等。这为中国市场引入优质日本保健品提供了良好机遇。' 
-        })
-      },
-      {
-        id: 3,
-        title: t('news.articles.2.title', { defaultValue: '中日贸易合作新机遇' }),
-        date: '2025-01-05',
-        category: t('news.articles.2.category', { defaultValue: '行业洞察' }),
-        summary: t('news.articles.2.summary', { defaultValue: '探讨中日两国贸易合作的新发展机遇' }),
-        content: t('news.articles.2.content', { 
-          defaultValue: '随着全球经济一体化的深入发展，中日两国在贸易合作方面迎来了新的发展机遇。双方在健康产业、先进制造业、绿色能源等领域具有广阔的合作空间。\n\n特别是在跨境电商快速发展的背景下，两国贸易模式正在发生深刻变化，为企业提供了更多的合作可能性。' 
-        })
-      }
-    ];
-
-    // 行业趋势数据
     const industryTrends = {
       title: t('news.industryTrends.title', { defaultValue: '行业趋势概览' }),
       description: t('news.industryTrends.description', { defaultValue: '把握中日贸易发展脉搏，洞察市场变化趋势' }),
@@ -289,7 +392,6 @@ const News = ({ dict }) => {
       ]
     };
 
-    // 订阅资讯数据
     const newsletter = {
       title: t('news.newsletter.title', { defaultValue: '订阅我们的资讯' }),
       description: t('news.newsletter.description', { defaultValue: '第一时间获取中日贸易最新动态和市场洞察' }),
@@ -300,7 +402,6 @@ const News = ({ dict }) => {
     return {
       ...baseInfo,
       categories,
-      articles,
       industryTrends,
       newsletter
     };
@@ -324,9 +425,9 @@ const News = ({ dict }) => {
   // 过滤文章
   const filteredArticles = useMemo(() => {
     return selectedCategory === 'all' 
-      ? newsData.articles 
-      : newsData.articles.filter(article => article.category === selectedCategory);
-  }, [selectedCategory, newsData.articles]);
+      ? articles 
+      : articles.filter(article => article.category === selectedCategory);
+  }, [selectedCategory, articles]);
 
   const handleCategoryChange = useCallback((category) => {
     setSelectedCategory(category);
@@ -381,6 +482,11 @@ const News = ({ dict }) => {
             <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
               {newsData.subtitle}
             </p>
+            {/* 显示文章统计 */}
+            <div className="mt-4 text-sm text-gray-500">
+              {loading ? '正在加载文章...' : `共${articles.length}篇文章`}
+              {error && <div className="text-red-500 mt-2">{error}</div>}
+            </div>
           </div>
         </div>
       </section>
@@ -405,8 +511,16 @@ const News = ({ dict }) => {
       <section ref={sectionRef} className="py-24">
         <div className="max-w-7xl mx-auto px-4">
           
+          {/* 加载状态 */}
+          {loading && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 border-4 border-green-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">正在加载最新文章...</p>
+            </div>
+          )}
+
           {/* 文章网格 */}
-          {filteredArticles.length > 0 ? (
+          {!loading && filteredArticles.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredArticles.map((article, index) => (
                 <ArticleCard
@@ -418,7 +532,7 @@ const News = ({ dict }) => {
                 />
               ))}
             </div>
-          ) : (
+          ) : !loading ? (
             // 空状态
             <div className="text-center py-16">
               <div className="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center text-4xl mx-auto mb-6">
@@ -426,8 +540,16 @@ const News = ({ dict }) => {
               </div>
               <h3 className="text-2xl font-bold text-gray-500 mb-4">{newsData.noArticles}</h3>
               <p className="text-gray-400">{newsData.selectOtherCategory}</p>
+              {error && (
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="mt-4 px-6 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  重新加载
+                </button>
+              )}
             </div>
-          )}
+          ) : null}
         </div>
       </section>
 
