@@ -13,7 +13,7 @@ display_url: https://steady-clafoutis-c30c37.netlify.app
 publish_mode: editorial_workflow
 
 collections:
-  # 新闻管理
+  # 新闻管理（已有）
   - name: "news"
     label: "新闻动态"
     folder: "content/news"
@@ -27,24 +27,10 @@ collections:
       - { label: "特色图片", name: "featuredImage", widget: "image", required: false }
       - { label: "内容", name: "body", widget: "markdown" }
       - { label: "状态", name: "status", widget: "select", options: ["草稿", "已发布"], default: "草稿" }
+      - { label: "作者", name: "author", widget: "string", default: "岩林株式会社" }
+      - { label: "关键词", name: "keywords", widget: "string", required: false, hint: "用逗号分隔" }
 
-  # 服务管理
-  - name: "services"
-    label: "服务内容"
-    folder: "content/services"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - { label: "服务名称", name: "title", widget: "string" }
-      - { label: "图标", name: "icon", widget: "string", hint: "输入emoji或图标类名" }
-      - { label: "状态", name: "status", widget: "select", options: ["进行中", "规划中", "已完成"] }
-      - { label: "简短描述", name: "description", widget: "text" }
-      - { label: "详细介绍", name: "body", widget: "markdown" }
-      - { label: "服务特点", name: "features", widget: "list" }
-      - { label: "服务优势", name: "advantages", widget: "list" }
-      - { label: "排序权重", name: "order", widget: "number", default: 0 }
-
-  # 公司信息
+  # 公司信息管理（扩展）
   - name: "company"
     label: "公司信息"
     files:
@@ -52,18 +38,140 @@ collections:
         name: "basic_info"
         file: "content/company/basic-info.md"
         fields:
-          - { label: "公司名称", name: "company_name", widget: "string" }
-          - { label: "英文名称", name: "english_name", widget: "string" }
-          - { label: "成立年份", name: "established_year", widget: "string" }
-          - { label: "总部位置", name: "headquarters", widget: "string" }
+          - { label: "公司中文名称", name: "company_name", widget: "string", default: "岩林株式会社" }
+          - { label: "公司英文名称", name: "english_name", widget: "string", default: "IWABAYASHI Corporation" }
+          - { label: "成立年份", name: "established_year", widget: "string", default: "2025" }
+          - { label: "总部位置", name: "headquarters", widget: "string", default: "日本东京" }
           - { label: "主营业务", name: "main_business", widget: "string" }
-          - { label: "公司简介", name: "description", widget: "markdown" }
           - { label: "企业愿景", name: "vision", widget: "text" }
           - { label: "企业使命", name: "mission", widget: "text" }
-          - { label: "核心价值观", name: "values", widget: "list" }
-          - { label: "公司Logo", name: "logo", widget: "image" }
+          - { label: "核心价值观", name: "values", widget: "list", field: { label: "价值观", name: "value", widget: "string" } }
+          - { label: "员工人数", name: "employee_count", widget: "string", default: "20-50人" }
+          - { label: "注册资本", name: "registered_capital", widget: "string", default: "1000万日元" }
+          - { label: "公司Logo", name: "logo", widget: "image", required: false }
+          - { label: "详细介绍", name: "body", widget: "markdown" }
 
-  # 联系信息
+      - label: "团队成员"
+        name: "team_members"
+        file: "content/company/team-members.md"
+        fields:
+          - label: "团队成员列表"
+            name: "members"
+            widget: "list"
+            fields:
+              - { label: "姓名", name: "name", widget: "string" }
+              - { label: "职位", name: "position", widget: "string" }
+              - { label: "头像", name: "avatar", widget: "image", required: false }
+              - { label: "简介", name: "bio", widget: "text" }
+              - { label: "邮箱", name: "email", widget: "string", required: false }
+              - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+              - { label: "排序", name: "order", widget: "number", default: 0 }
+
+      - label: "公司文化"
+        name: "company_culture"
+        file: "content/company/company-values.md"
+        fields:
+          - label: "企业文化"
+            name: "culture"
+            widget: "object"
+            fields:
+              - { label: "标题", name: "title", widget: "string", default: "企业文化" }
+              - { label: "描述", name: "description", widget: "text" }
+              - label: "核心价值"
+                name: "core_values"
+                widget: "list"
+                fields:
+                  - { label: "价值观", name: "value", widget: "string" }
+                  - { label: "描述", name: "description", widget: "text" }
+                  - { label: "图标", name: "icon", widget: "string", hint: "emoji或图标类名" }
+          - { label: "详细内容", name: "body", widget: "markdown" }
+
+      - label: "发展历程"
+        name: "company_history"
+        file: "content/company/history.md"
+        fields:
+          - label: "发展历程"
+            name: "milestones"
+            widget: "list"
+            fields:
+              - { label: "年份", name: "year", widget: "string" }
+              - { label: "标题", name: "title", widget: "string" }
+              - { label: "描述", name: "description", widget: "text" }
+              - { label: "重要性", name: "importance", widget: "select", options: ["重要", "一般", "里程碑"] }
+          - { label: "详细内容", name: "body", widget: "markdown" }
+
+  # 服务内容管理（新增）
+  - name: "services"
+    label: "服务内容"
+    folder: "content/services"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "服务名称", name: "title", widget: "string" }
+      - { label: "服务类型", name: "type", widget: "select", options: ["进行中", "规划中", "已完成"] }
+      - { label: "图标", name: "icon", widget: "string", hint: "输入emoji或图标类名" }
+      - { label: "简短描述", name: "description", widget: "text" }
+      - { label: "详细介绍", name: "body", widget: "markdown" }
+      - label: "服务特点"
+        name: "features"
+        widget: "list"
+        field: { label: "特点", name: "feature", widget: "string" }
+      - label: "服务优势"
+        name: "advantages"
+        widget: "list"
+        field: { label: "优势", name: "advantage", widget: "string" }
+      - label: "服务流程"
+        name: "process"
+        widget: "list"
+        fields:
+          - { label: "步骤号", name: "step", widget: "number" }
+          - { label: "步骤名称", name: "title", widget: "string" }
+          - { label: "步骤描述", name: "description", widget: "text" }
+      - { label: "排序权重", name: "order", widget: "number", default: 0 }
+      - { label: "启用状态", name: "enabled", widget: "boolean", default: true }
+
+  # 首页内容管理（新增）
+  - name: "homepage"
+    label: "首页内容"
+    files:
+      - label: "首页配置"
+        name: "home_content"
+        file: "content/pages/home-content.md"
+        fields:
+          - label: "Hero区域"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "主标语", name: "slogan", widget: "string" }
+              - { label: "副标语", name: "subtitle", widget: "string" }
+              - { label: "描述", name: "description", widget: "text" }
+              - { label: "背景视频", name: "background_video", widget: "file", required: false }
+              - { label: "背景图片", name: "background_image", widget: "image", required: false }
+              - label: "特色标签"
+                name: "features"
+                widget: "list"
+                field: { label: "特色", name: "feature", widget: "string" }
+          
+          - label: "统计数据"
+            name: "stats"
+            widget: "list"
+            fields:
+              - { label: "数值", name: "number", widget: "number" }
+              - { label: "单位", name: "suffix", widget: "string" }
+              - { label: "标签", name: "label", widget: "string" }
+              - { label: "图标", name: "icon", widget: "string" }
+
+          - label: "客户推荐"
+            name: "testimonials"
+            widget: "list"
+            fields:
+              - { label: "客户姓名", name: "name", widget: "string" }
+              - { label: "客户公司", name: "company", widget: "string" }
+              - { label: "推荐内容", name: "content", widget: "text" }
+              - { label: "客户头像", name: "avatar", widget: "image", required: false }
+              - { label: "评分", name: "rating", widget: "number", min: 1, max: 5 }
+
+  # 联系信息管理（扩展）
   - name: "contact"
     label: "联系方式"
     files:
@@ -71,10 +179,58 @@ collections:
         name: "contact_info"
         file: "content/contact/info.md"
         fields:
-          - { label: "邮箱地址", name: "email", widget: "string" }
-          - { label: "电话号码", name: "phone", widget: "string" }
+          - { label: "主邮箱地址", name: "email", widget: "string" }
+          - { label: "客服邮箱", name: "support_email", widget: "string", required: false }
+          - { label: "办公电话", name: "phone", widget: "string" }
           - { label: "传真号码", name: "fax", widget: "string", required: false }
-          - { label: "详细地址", name: "address", widget: "text" }
+          - { label: "紧急联系电话", name: "emergency_phone", widget: "string", required: false }
+          - { label: "详细地址（中文）", name: "address", widget: "text" }
+          - { label: "详细地址（日文）", name: "address_ja", widget: "text", required: false }
           - { label: "营业时间", name: "business_hours", widget: "string" }
+          - { label: "网站地址", name: "website", widget: "string" }
           - { label: "微信号", name: "wechat", widget: "string", required: false }
           - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
+          
+          - label: "交通信息"
+            name: "transportation"
+            widget: "list"
+            field: { label: "交通路线", name: "route", widget: "string" }
+          
+          - label: "办公室信息"
+            name: "office_info"
+            widget: "object"
+            fields:
+              - { label: "楼层", name: "floor", widget: "string" }
+              - { label: "房间号", name: "room", widget: "string", required: false }
+              - { label: "邮政编码", name: "postal_code", widget: "string" }
+              - { label: "附近地标", name: "landmarks", widget: "string", required: false }
+
+  # 页脚内容管理（新增）
+  - name: "footer"
+    label: "页脚内容"
+    files:
+      - label: "页脚配置"
+        name: "footer_content"
+        file: "content/pages/footer-content.md"
+        fields:
+          - { label: "公司描述", name: "description", widget: "text" }
+          - label: "业务内容"
+            name: "business_items"
+            widget: "list"
+            field: { label: "业务项目", name: "item", widget: "string" }
+          - label: "快速链接"
+            name: "quick_links"
+            widget: "list"
+            fields:
+              - { label: "链接名称", name: "name", widget: "string" }
+              - { label: "链接地址", name: "url", widget: "string" }
+              - { label: "是否外部链接", name: "external", widget: "boolean", default: false }
+          - label: "社交媒体"
+            name: "social_media"
+            widget: "list"
+            fields:
+              - { label: "平台名称", name: "platform", widget: "string" }
+              - { label: "链接地址", name: "url", widget: "string" }
+              - { label: "图标", name: "icon", widget: "string" }
+          - { label: "版权信息", name: "copyright", widget: "string" }
+          - { label: "备案信息", name: "filing_info", widget: "string", required: false }
