@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '../utils/Analytics';
+import { useHomeContent } from '../hooks/useCMSContent';
 
 const Home = ({ dict, lang = 'zh' }) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -7,6 +8,7 @@ const Home = ({ dict, lang = 'zh' }) => {
   const [isMobile, setIsMobile] = useState(false);
   const heroRef = useRef(null);
   const videoRef = useRef(null);
+  const { content: homeContent } = useHomeContent();
 
   // 移动端检测
   useEffect(() => {
@@ -178,8 +180,19 @@ const Home = ({ dict, lang = 'zh' }) => {
               isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
             }`}>
               <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center">
-                <span className="hero-text-line">上質な製品で</span>
-                <span className="hero-text-line">ユーザーとつながる</span>
+                {(() => {
+                  const slogan = homeContent?.hero?.slogan || '上質な製品でユーザーとつながる';
+                  const index = slogan.indexOf('で');
+                  if (index !== -1) {
+                    return (
+                      <>
+                        <span className="hero-text-line">{slogan.slice(0, index + 1)}</span>
+                        <span className="hero-text-line">{slogan.slice(index + 1)}</span>
+                      </>
+                    );
+                  }
+                  return <span className="hero-text-line">{slogan}</span>;
+                })()}
               </h1>
             </div>
 
