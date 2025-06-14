@@ -249,6 +249,12 @@ npm start
 # 生产构建
 npm run build
 
+# 构建脚本会自动生成 CMS 与新闻数据
+# (等同于依次执行 `npm run generate-cms` 和 `npm run generate-news`)
+
+# 生成 CMS 数据并启动开发服务器
+npm run dev
+
 # 测试运行
 npm test
 

@@ -26,14 +26,15 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run generate-news && CI=false react-scripts build",
+    "build": "npm run generate-cms && npm run generate-news && CI=false react-scripts build",
     "generate-news": "node scripts/generate-news-index.js",
+    "generate-cms": "node scripts/generate-cms-content.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prebuild": "npm run generate-news",
-    "dev": "npm run generate-news && npm start",
-    "build:netlify": "npm run generate-news && npm run build",
-    "cms:preview": "npm run generate-news && npm start"
+    "prebuild": "npm run generate-cms && npm run generate-news",
+    "dev": "npm run generate-cms && npm run generate-news && npm start",
+    "build:netlify": "npm run generate-cms && npm run generate-news && npm run build",
+    "cms:preview": "npm run generate-cms && npm run generate-news && npm start"
   },
   "eslintConfig": {
     "extends": [
