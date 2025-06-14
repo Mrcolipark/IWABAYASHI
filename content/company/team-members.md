@@ -10,11 +10,6 @@ members:
     bio: 专注网站维护
     email: danaanwer@outlook.com
     order: 2
-  - name: 李美华
-    position: 市场总监
-    bio: 负责市场开拓和客户关系管理
-    email: marketing@iwabayashi.com
-    order: 3
 ---
 
 # 团队成员
