@@ -1,9 +1,9 @@
-// ===== 1. 修复后的 About.jsx =====
 // src/pages/About.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
+import { useCompanyInfo } from '../hooks/useCMSContent';
 
 const About = ({ dict }) => {
   const { t, i18n } = useTranslation();
@@ -30,6 +30,21 @@ const About = ({ dict }) => {
     }
   };
 
+  // 从CMS加载公司信息
+  const { content: cmsCompanyInfo } = useCompanyInfo();
+
+  // 将CMS字段映射为组件使用的字段
+  const mappedCompanyInfo = useMemo(
+    () => ({
+      name: safeGet(cmsCompanyInfo, 'company_name', ''),
+      englishName: safeGet(cmsCompanyInfo, 'english_name', ''),
+      established: safeGet(cmsCompanyInfo, 'established_year', ''),
+      headquarters: safeGet(cmsCompanyInfo, 'headquarters', ''),
+      business: safeGet(cmsCompanyInfo, 'main_business', '')
+    }),
+    [cmsCompanyInfo]
+  );
+
   // 安全的翻译函数
   const safeT = (key, defaultValue = '') => {
     try {
@@ -52,22 +67,23 @@ const About = ({ dict }) => {
     }
   };
 
-  // 获取 about 数据，带默认值
-  const aboutData = {
-    title: safeT('about.title', '关于我们'),
-    subtitle: safeT('about.subtitle', '年轻而充满活力的中日贸易桥梁'),
-    companyInfo: {
-      name: safeT('about.companyInfo.name', '岩林株式会社'),
-      englishName: safeT('about.companyInfo.englishName', 'IWABAYASHI Corporation'),
-      established: safeT('about.companyInfo.established', '2025年'),
-      headquarters: safeT('about.companyInfo.headquarters', '日本'),
-      business: safeT('about.companyInfo.business', '中日双边贸易综合服务')
-    },
-    description: safeT('about.description', '岩林株式会社成立于2025年，总部位于日本。作为一家致力于中日双边贸易的综合性贸易公司，我们秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。'),
-    philosophy: {
-      title: safeT('about.philosophy.title', '经营理念'),
-      values: safeTArray('about.philosophy.values', ['专业', '高效', '共赢']),
-      descriptions: safeTArray('about.philosophy.descriptions', [
+  // 获取 about 数据，带默认值，并与CMS数据合并
+  const aboutData = useMemo(() => {
+    const base = {
+      title: safeT('about.title', '关于我们'),
+      subtitle: safeT('about.subtitle', '年轻而充满活力的中日贸易桥梁'),
+      companyInfo: {
+        name: safeT('about.companyInfo.name', '岩林株式会社'),
+        englishName: safeT('about.companyInfo.englishName', 'IWABAYASHI Corporation'),
+        established: safeT('about.companyInfo.established', '2025年'),
+        headquarters: safeT('about.companyInfo.headquarters', '日本'),
+        business: safeT('about.companyInfo.business', '中日双边贸易综合服务')
+      },
+      description: safeT('about.description', '岩林株式会社成立于2025年，总部位于日本。作为一家致力于中日双边贸易的综合性贸易公司，我们秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。'),
+      philosophy: {
+        title: safeT('about.philosophy.title', '经营理念'),
+        values: safeTArray('about.philosophy.values', ['专业', '高效', '共赢']),
+        descriptions: safeTArray('about.philosophy.descriptions', [
         '以专业为基础，提供高质量服务',
         '追求高效率，创造更大价值', 
         '与合作伙伴共同成长发展'
@@ -98,7 +114,9 @@ const About = ({ dict }) => {
       description: safeT('about.cta.description', '我们期待与您建立长期合作关系，共同开拓中日贸易新机遇'),
       learnServices: safeT('about.cta.learnServices', '了解我们的服务')
     }
-  };
+    };
+    return { ...base, companyInfo: { ...base.companyInfo, ...mappedCompanyInfo } };
+  }, [i18n.language, mappedCompanyInfo]);
 
   // 可见性检测
   useEffect(() => {
@@ -295,7 +313,6 @@ const About = ({ dict }) => {
                       </div>
                     </div>
 
-                    {/* 业务特色 - 修复后的代码 */}
                     <div className="space-y-3">
                       {aboutData.overview.features.map((feature, index) => (
                         <div key={index} className="flex items-center space-x-3">
@@ -378,7 +395,6 @@ const About = ({ dict }) => {
                     {aboutData.team.content}
                   </p>
                   
-                  {/* 团队特色标签 - 修复后的代码 */}
                   <div className="flex flex-wrap justify-center gap-4 mt-8">
                     {aboutData.team.traits.map((trait, index) => (
                       <span 
