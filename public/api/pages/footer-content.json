@@ -1,0 +1,13 @@
+{
+  "description": "岩林株式会社致力于成为中日贸易领域最受信赖的合作伙伴。",
+  "business_items": ["日本保健品进口代理", "中国大宗商品出口", "市场咨询服务", "供应链管理"],
+  "quick_links": [
+    { "name": "关于我们", "url": "/about", "external": false },
+    { "name": "服务内容", "url": "/services", "external": false }
+  ],
+  "social_media": [
+    { "platform": "邮箱", "url": "mailto:info@iwabayashi.com", "icon": "📧" }
+  ],
+  "copyright": "© 2025 岩林株式会社 (IWABAYASHI Corporation). All rights reserved.",
+  "content": "页脚内容配置。"
+}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom';
 import { useOptimizedTranslation } from '../hooks/useOptimizedTranslation';
 import { trackEvent } from '../utils/Analytics';
+import { useServices } from '../hooks/useCMSContent';
 
 // 缓存的服务数据组件 - 使用优化翻译
 const ServiceCard = React.memo(({ service, isActive, onCategoryChange, category }) => {
@@ -118,6 +119,7 @@ CapabilityCard.displayName = 'CapabilityCard';
 
 const Services = () => {
   const { t } = useOptimizedTranslation(); // 使用您的优化翻译Hook
+  const { services: cmsServices } = useServices();
   const [isVisible, setIsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('current');
   const sectionRef = useRef(null);
@@ -260,6 +262,22 @@ const Services = () => {
       learnMore: t('services.cta.learnMore', { defaultValue: '了解我们' })
     };
 
+    const serviceMap = Array.isArray(cmsServices)
+      ? cmsServices.reduce((acc, s) => ({ ...acc, [s.id]: s }), {})
+      : {};
+
+    const mergedCurrent = {
+      ...currentBusinessData.service,
+      ...(serviceMap['health-products-import'] || {})
+    };
+    const mergedFuture = {
+      ...futureBusinessData.service,
+      ...(serviceMap['export-business'] || {})
+    };
+
+    currentBusinessData.service = mergedCurrent;
+    futureBusinessData.service = mergedFuture;
+
     return {
       ...baseTranslations,
       currentBusiness: currentBusinessData,
@@ -267,7 +285,7 @@ const Services = () => {
       serviceCapabilities,
       cta: ctaData
     };
-  }, [t]); // 只有当t函数引用改变时才重新计算
+  }, [t, cmsServices]); // 当翻译或CMS数据更新时重新计算
 
   // 缓存服务选项
   const serviceOptions = useMemo(() => [

@@ -1,0 +1,18 @@
+{
+  "email": "info@iwabayashi.com",
+  "support_email": "support@iwabayashi.com",
+  "phone": "+81-3-1234-5678",
+  "fax": "+81-3-1234-5679",
+  "address": "日本东京都港区赤坂1-2-3 岩林大厦10F",
+  "address_ja": "日本国東京都港区赤坂1-2-3 岩林ビル10F",
+  "business_hours": "周一至周五 9:00-18:00 (JST)",
+  "website": "https://iwabayashi.com",
+  "wechat": "iwabayashi_official",
+  "linkedin": "https://linkedin.com/company/iwabayashi",
+  "transportation": [
+    "东京Metro银座线、丸之内线 赤坂见附站 步行5分钟",
+    "东京Metro千代田线 赤坂站 步行3分钟",
+    "JR中央线、总武线 四谷站 步行10分钟"
+  ],
+  "content": "欢迎联系岩林株式会社。"
+}
