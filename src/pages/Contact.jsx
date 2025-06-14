@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useOptimizedTranslation } from '../hooks/useOptimizedTranslation';
 import { trackEvent } from '../utils/Analytics';
+import { useContactInfo } from '../hooks/useCMSContent';
 
 // 缓存的联系方式卡片组件
 const ContactInfoCard = React.memo(({ icon, label, value, href, onClick, colorClass = 'text-green-800' }) => {
@@ -151,6 +152,7 @@ PromiseCard.displayName = 'PromiseCard';
 
 const Contact = ({ dict }) => {
   const { t } = useOptimizedTranslation();
+  const { content: cmsContactInfo } = useContactInfo();
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -179,6 +181,14 @@ const Contact = ({ dict }) => {
       phone: t('contact.info.phone', { defaultValue: '+81-3-1234-5678' }),
       address: t('contact.info.address', { defaultValue: '日本东京都港区赤坂1-2-3 岩林大厦10F' }),
       businessHours: t('contact.info.businessHours', { defaultValue: '周一至周五 9:00-18:00 (JST)' })
+    };
+
+    const mergedInfo = {
+      ...info,
+      email: cmsContactInfo?.email || info.email,
+      phone: cmsContactInfo?.phone || info.phone,
+      address: cmsContactInfo?.address || info.address,
+      businessHours: cmsContactInfo?.business_hours || info.businessHours
     };
 
     // 表单数据
@@ -316,7 +326,7 @@ const Contact = ({ dict }) => {
 
     return {
       ...baseInfo,
-      info,
+      info: mergedInfo,
       form,
       sections,
       contactMethods,
@@ -326,7 +336,7 @@ const Contact = ({ dict }) => {
       faq,
       servicePromise
     };
-  }, [t]);
+  }, [t, cmsContactInfo]);
 
   // 可见性检测
   useEffect(() => {

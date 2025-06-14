@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useFooterContent } from '../hooks/useCMSContent';
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { content: footerContent } = useFooterContent();
   const currentYear = new Date().getFullYear();
 
   // 安全的翻译函数
@@ -18,36 +20,50 @@ const Footer = () => {
   };
 
   // 导航链接
-  const navLinks = [
-    { path: '/', label: safeT('navigation.home', '首页') },
-    { path: '/about', label: safeT('navigation.about', '会社概要') },
-    { path: '/services', label: safeT('navigation.services', '事业内容') },
-    { path: '/news', label: safeT('navigation.news', 'ニュース') },
-    { path: '/contact', label: safeT('navigation.contact', 'お問い合わせ') }
-  ];
+  const navLinks = footerContent?.quick_links?.length
+    ? footerContent.quick_links.map(link => ({
+        path: link.url,
+        label: link.name,
+        external: link.external
+      }))
+    : [
+        { path: '/', label: safeT('navigation.home', '首页') },
+        { path: '/about', label: safeT('navigation.about', '会社概要') },
+        { path: '/services', label: safeT('navigation.services', '事业内容') },
+        { path: '/news', label: safeT('navigation.news', 'ニュース') },
+        { path: '/contact', label: safeT('navigation.contact', 'お問い合わせ') }
+      ];
 
   // 社交媒体链接
-  const socialLinks = [
-    { 
-      name: 'Email', 
-      icon: '📧', 
-      href: `mailto:${safeT('contact.info.email', 'info@iwabayashi.com')}` 
-    },
-    { 
-      name: 'Phone', 
-      icon: '📞', 
-      href: `tel:${safeT('contact.info.phone', '+81-3-1234-5678')}` 
-    },
-    { name: 'WeChat', icon: '💬', href: '#wechat' }
-  ];
+  const socialLinks = footerContent?.social_media?.length
+    ? footerContent.social_media.map(item => ({
+        name: item.platform,
+        icon: item.icon,
+        href: item.url
+      }))
+    : [
+        {
+          name: 'Email',
+          icon: '📧',
+          href: `mailto:${safeT('contact.info.email', 'info@iwabayashi.com')}`
+        },
+        {
+          name: 'Phone',
+          icon: '📞',
+          href: `tel:${safeT('contact.info.phone', '+81-3-1234-5678')}`
+        },
+        { name: 'WeChat', icon: '💬', href: '#wechat' }
+      ];
 
   // 业务内容列表
-  const businessItems = [
-    safeT('footer.businessItems.0', '日本保健品进口代理'),
-    safeT('footer.businessItems.1', '中国大宗商品出口'),
-    safeT('footer.businessItems.2', '市场咨询服务'),
-    safeT('footer.businessItems.3', '供应链管理')
-  ];
+  const businessItems = footerContent?.business_items?.length
+    ? footerContent.business_items
+    : [
+        safeT('footer.businessItems.0', '日本保健品进口代理'),
+        safeT('footer.businessItems.1', '中国大宗商品出口'),
+        safeT('footer.businessItems.2', '市场咨询服务'),
+        safeT('footer.businessItems.3', '供应链管理')
+      ];
 
   return (
     <footer className="relative bg-white/95 backdrop-blur-sm border-t border-gray-200">
@@ -82,7 +98,11 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-gray-600 mb-6 leading-relaxed">
-              {safeT('footer.description', '岩林株式会社致力于成为中日贸易领域最受信赖的合作伙伴，为客户提供专业、高效的贸易解决方案。')}
+              {footerContent?.description ||
+                safeT(
+                  'footer.description',
+                  '岩林株式会社致力于成为中日贸易领域最受信赖的合作伙伴，为客户提供专业、高效的贸易解决方案。'
+                )}
             </p>
             
             {/* 社交媒体 */}
@@ -109,13 +129,23 @@ const Footer = () => {
             <ul className="space-y-3">
               {navLinks.map((link, index) => (
                 <li key={index}>
-                  <Link 
-                    to={link.path}
-                    className="text-gray-600 hover:text-green-600 transition-colors duration-300 flex items-center space-x-2 group"
-                  >
-                    <span className="w-1 h-1 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                    <span>{link.label}</span>
-                  </Link>
+                  {link.external ? (
+                    <a
+                      href={link.path}
+                      className="text-gray-600 hover:text-green-600 transition-colors duration-300 flex items-center space-x-2 group"
+                    >
+                      <span className="w-1 h-1 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span>{link.label}</span>
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.path}
+                      className="text-gray-600 hover:text-green-600 transition-colors duration-300 flex items-center space-x-2 group"
+                    >
+                      <span className="w-1 h-1 bg-green-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span>{link.label}</span>
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>

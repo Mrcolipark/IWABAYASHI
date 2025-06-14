@@ -1,0 +1,31 @@
+{
+  "generated": "2025-06-14T13:23:42Z",
+  "version": "1.0.0",
+  "collections": {
+    "company": {
+      "basic_info": "/api/company/basic-info.json",
+      "team_members": "/api/company/team-members.json"
+    },
+    "services": {
+      "index": "/api/services/index.json",
+      "health_products": "/api/services/health-products-import.json",
+      "export_business": "/api/services/export-business.json"
+    },
+    "contact": {
+      "info": "/api/contact/info.json"
+    },
+    "pages": {
+      "home_content": "/api/pages/home-content.json",
+      "footer_content": "/api/pages/footer-content.json"
+    },
+    "news": {
+      "index": "/api/news-index.json"
+    }
+  },
+  "stats": {
+    "company_files": 2,
+    "service_files": 3,
+    "contact_files": 1,
+    "page_files": 2
+  }
+}
