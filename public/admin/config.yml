@@ -1,3 +1,4 @@
+# public/admin/config.yml - 完善版本
 backend:
   name: git-gateway
   branch: main
@@ -9,28 +10,37 @@ public_folder: /images/uploads
 site_url: https://steady-clafoutis-c30c37.netlify.app
 display_url: https://steady-clafoutis-c30c37.netlify.app
 
-# 发布模式（允许所有已认证用户访问）
+# 发布模式
 publish_mode: editorial_workflow
 
+# 国际化设置
+i18n:
+  structure: multiple_files
+  locales: [zh, ja, en]
+  default_locale: zh
+
 collections:
-  # 新闻管理（已有）
+  # 新闻管理（已有，增强版）
   - name: "news"
     label: "新闻动态"
     folder: "content/news"
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    editor:
+      preview: true
     fields:
-      - { label: "标题", name: "title", widget: "string" }
-      - { label: "发布日期", name: "date", widget: "datetime" }
-      - { label: "分类", name: "category", widget: "select", options: ["公司动态", "市场分析", "行业洞察"] }
-      - { label: "摘要", name: "summary", widget: "text" }
+      - { label: "标题", name: "title", widget: "string", required: true }
+      - { label: "发布日期", name: "date", widget: "datetime", default: "" }
+      - { label: "分类", name: "category", widget: "select", options: ["公司动态", "市场分析", "行业洞察"], required: true }
+      - { label: "摘要", name: "summary", widget: "text", required: true }
       - { label: "特色图片", name: "featuredImage", widget: "image", required: false }
-      - { label: "内容", name: "body", widget: "markdown" }
+      - { label: "内容", name: "body", widget: "markdown", required: true }
       - { label: "状态", name: "status", widget: "select", options: ["草稿", "已发布"], default: "草稿" }
       - { label: "作者", name: "author", widget: "string", default: "岩林株式会社" }
       - { label: "关键词", name: "keywords", widget: "string", required: false, hint: "用逗号分隔" }
+      - { label: "标签", name: "tags", widget: "list", required: false, field: { label: "标签", name: "tag", widget: "string" } }
 
-  # 公司信息管理（扩展）
+  # 公司信息管理（增强版）
   - name: "company"
     label: "公司信息"
     files:
@@ -66,39 +76,6 @@ collections:
               - { label: "邮箱", name: "email", widget: "string", required: false }
               - { label: "LinkedIn", name: "linkedin", widget: "string", required: false }
               - { label: "排序", name: "order", widget: "number", default: 0 }
-
-      - label: "公司文化"
-        name: "company_culture"
-        file: "content/company/company-values.md"
-        fields:
-          - label: "企业文化"
-            name: "culture"
-            widget: "object"
-            fields:
-              - { label: "标题", name: "title", widget: "string", default: "企业文化" }
-              - { label: "描述", name: "description", widget: "text" }
-              - label: "核心价值"
-                name: "core_values"
-                widget: "list"
-                fields:
-                  - { label: "价值观", name: "value", widget: "string" }
-                  - { label: "描述", name: "description", widget: "text" }
-                  - { label: "图标", name: "icon", widget: "string", hint: "emoji或图标类名" }
-          - { label: "详细内容", name: "body", widget: "markdown" }
-
-      - label: "发展历程"
-        name: "company_history"
-        file: "content/company/history.md"
-        fields:
-          - label: "发展历程"
-            name: "milestones"
-            widget: "list"
-            fields:
-              - { label: "年份", name: "year", widget: "string" }
-              - { label: "标题", name: "title", widget: "string" }
-              - { label: "描述", name: "description", widget: "text" }
-              - { label: "重要性", name: "importance", widget: "select", options: ["重要", "一般", "里程碑"] }
-          - { label: "详细内容", name: "body", widget: "markdown" }
 
   # 服务内容管理（新增）
   - name: "services"
@@ -151,27 +128,8 @@ collections:
                 name: "features"
                 widget: "list"
                 field: { label: "特色", name: "feature", widget: "string" }
-          
-          - label: "统计数据"
-            name: "stats"
-            widget: "list"
-            fields:
-              - { label: "数值", name: "number", widget: "number" }
-              - { label: "单位", name: "suffix", widget: "string" }
-              - { label: "标签", name: "label", widget: "string" }
-              - { label: "图标", name: "icon", widget: "string" }
 
-          - label: "客户推荐"
-            name: "testimonials"
-            widget: "list"
-            fields:
-              - { label: "客户姓名", name: "name", widget: "string" }
-              - { label: "客户公司", name: "company", widget: "string" }
-              - { label: "推荐内容", name: "content", widget: "text" }
-              - { label: "客户头像", name: "avatar", widget: "image", required: false }
-              - { label: "评分", name: "rating", widget: "number", min: 1, max: 5 }
-
-  # 联系信息管理（扩展）
+  # 联系信息管理（增强版）
   - name: "contact"
     label: "联系方式"
     files:
@@ -234,3 +192,58 @@ collections:
               - { label: "图标", name: "icon", widget: "string" }
           - { label: "版权信息", name: "copyright", widget: "string" }
           - { label: "备案信息", name: "filing_info", widget: "string", required: false }
+
+  # 多语言翻译管理（新增）
+  - name: "translations"
+    label: "多语言翻译"
+    files:
+      - label: "中文翻译"
+        name: "zh_translations"
+        file: "src/i18n/resources/zh/cms.json"
+        fields:
+          - label: "导航菜单"
+            name: "navigation"
+            widget: "object"
+            fields:
+              - { label: "首页", name: "home", widget: "string", default: "首页" }
+              - { label: "关于我们", name: "about", widget: "string", default: "关于我们" }
+              - { label: "服务内容", name: "services", widget: "string", default: "服务内容" }
+              - { label: "新闻动态", name: "news", widget: "string", default: "新闻动态" }
+              - { label: "联系我们", name: "contact", widget: "string", default: "联系我们" }
+          
+          - label: "页面标题"
+            name: "pageTitle"
+            widget: "object"
+            fields:
+              - { label: "关于我们", name: "about", widget: "string", default: "关于我们" }
+              - { label: "服务内容", name: "services", widget: "string", default: "服务内容" }
+              - { label: "新闻动态", name: "news", widget: "string", default: "新闻动态" }
+              - { label: "联系我们", name: "contact", widget: "string", default: "联系我们" }
+
+      - label: "日语翻译"
+        name: "ja_translations"
+        file: "src/i18n/resources/ja/cms.json"
+        fields:
+          - label: "導航メニュー"
+            name: "navigation"
+            widget: "object"
+            fields:
+              - { label: "ホーム", name: "home", widget: "string", default: "ホーム" }
+              - { label: "会社概要", name: "about", widget: "string", default: "会社概要" }
+              - { label: "事業内容", name: "services", widget: "string", default: "事業内容" }
+              - { label: "ニュース", name: "news", widget: "string", default: "ニュース" }
+              - { label: "お問い合わせ", name: "contact", widget: "string", default: "お問い合わせ" }
+
+      - label: "英语翻译"
+        name: "en_translations"
+        file: "src/i18n/resources/en/cms.json"
+        fields:
+          - label: "Navigation Menu"
+            name: "navigation"
+            widget: "object"
+            fields:
+              - { label: "Home", name: "home", widget: "string", default: "Home" }
+              - { label: "About", name: "about", widget: "string", default: "About Us" }
+              - { label: "Services", name: "services", widget: "string", default: "Services" }
+              - { label: "News", name: "news", widget: "string", default: "News" }
+              - { label: "Contact", name: "contact", widget: "string", default: "Contact" }
