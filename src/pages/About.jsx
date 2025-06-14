@@ -1,9 +1,9 @@
-// ===== 1. 修复后的 About.jsx =====
 // src/pages/About.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { trackEvent } from '../utils/Analytics';
+import { useCompanyInfo, useTeamMembers } from '../hooks/useCMSContent';
 
 const About = ({ dict }) => {
   const { t, i18n } = useTranslation();
@@ -30,6 +30,33 @@ const About = ({ dict }) => {
     }
   };
 
+  // 从CMS加载公司信息
+  const { content: cmsCompanyInfo } = useCompanyInfo();
+  const { content: cmsTeamMembers } = useTeamMembers();
+
+  // 将CMS字段映射为组件使用的字段
+  const mappedCompanyInfo = useMemo(
+    () => ({
+      name: safeGet(cmsCompanyInfo, 'company_name', ''),
+      englishName: safeGet(cmsCompanyInfo, 'english_name', ''),
+      established: safeGet(cmsCompanyInfo, 'established_year', ''),
+      headquarters: safeGet(cmsCompanyInfo, 'headquarters', ''),
+      business: safeGet(cmsCompanyInfo, 'main_business', '')
+    }),
+    [cmsCompanyInfo]
+  );
+
+  // 提取并排序团队成员
+  const teamMembers = useMemo(
+    () =>
+      Array.isArray(cmsTeamMembers?.members)
+        ? [...cmsTeamMembers.members].sort((a, b) =>
+            (a.order || 0) - (b.order || 0)
+          )
+        : [],
+    [cmsTeamMembers]
+  );
+
   // 安全的翻译函数
   const safeT = (key, defaultValue = '') => {
     try {
@@ -52,22 +79,23 @@ const About = ({ dict }) => {
     }
   };
 
-  // 获取 about 数据，带默认值
-  const aboutData = {
-    title: safeT('about.title', '关于我们'),
-    subtitle: safeT('about.subtitle', '年轻而充满活力的中日贸易桥梁'),
-    companyInfo: {
-      name: safeT('about.companyInfo.name', '岩林株式会社'),
-      englishName: safeT('about.companyInfo.englishName', 'IWABAYASHI Corporation'),
-      established: safeT('about.companyInfo.established', '2025年'),
-      headquarters: safeT('about.companyInfo.headquarters', '日本'),
-      business: safeT('about.companyInfo.business', '中日双边贸易综合服务')
-    },
-    description: safeT('about.description', '岩林株式会社成立于2025年，总部位于日本。作为一家致力于中日双边贸易的综合性贸易公司，我们秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。'),
-    philosophy: {
-      title: safeT('about.philosophy.title', '经营理念'),
-      values: safeTArray('about.philosophy.values', ['专业', '高效', '共赢']),
-      descriptions: safeTArray('about.philosophy.descriptions', [
+  // 获取 about 数据，带默认值，并与CMS数据合并
+  const aboutData = useMemo(() => {
+    const base = {
+      title: safeT('about.title', '关于我们'),
+      subtitle: safeT('about.subtitle', '年轻而充满活力的中日贸易桥梁'),
+      companyInfo: {
+        name: safeT('about.companyInfo.name', '岩林株式会社'),
+        englishName: safeT('about.companyInfo.englishName', 'IWABAYASHI Corporation'),
+        established: safeT('about.companyInfo.established', '2025年'),
+        headquarters: safeT('about.companyInfo.headquarters', '日本'),
+        business: safeT('about.companyInfo.business', '中日双边贸易综合服务')
+      },
+      description: safeT('about.description', '岩林株式会社成立于2025年，总部位于日本。作为一家致力于中日双边贸易的综合性贸易公司，我们秉持专业、高效、共赢的经营理念，积极拓展国际市场资源，搭建中日商品流通的桥梁。'),
+      philosophy: {
+        title: safeT('about.philosophy.title', '经营理念'),
+        values: safeTArray('about.philosophy.values', ['专业', '高效', '共赢']),
+        descriptions: safeTArray('about.philosophy.descriptions', [
         '以专业为基础，提供高质量服务',
         '追求高效率，创造更大价值', 
         '与合作伙伴共同成长发展'
@@ -86,6 +114,7 @@ const About = ({ dict }) => {
       content: safeT('about.team.content', '作为一家年轻而充满活力的公司，我们拥有开放务实的团队，致力于为合作伙伴提供专业的市场咨询、灵活的供应链管理与高效的进出口服务。我们坚信，通过不断的努力与积累，必将赢得市场的信任与支持，成为中日贸易领域值得依赖的合作伙伴。'),
       traits: safeTArray('about.team.traits', ['开放务实', '专业服务', '持续成长', '合作共赢'])
     },
+    teamMembersTitle: safeT('about.teamMembersTitle', '团队成员'),
     overview: {
       title: safeT('about.overview.title', '公司简介'),
       establishedTime: safeT('about.overview.establishedTime', '成立时间'),
@@ -98,7 +127,9 @@ const About = ({ dict }) => {
       description: safeT('about.cta.description', '我们期待与您建立长期合作关系，共同开拓中日贸易新机遇'),
       learnServices: safeT('about.cta.learnServices', '了解我们的服务')
     }
-  };
+    };
+    return { ...base, companyInfo: { ...base.companyInfo, ...mappedCompanyInfo } };
+  }, [i18n.language, mappedCompanyInfo]);
 
   // 可见性检测
   useEffect(() => {
@@ -295,7 +326,6 @@ const About = ({ dict }) => {
                       </div>
                     </div>
 
-                    {/* 业务特色 - 修复后的代码 */}
                     <div className="space-y-3">
                       {aboutData.overview.features.map((feature, index) => (
                         <div key={index} className="flex items-center space-x-3">
@@ -378,10 +408,9 @@ const About = ({ dict }) => {
                     {aboutData.team.content}
                   </p>
                   
-                  {/* 团队特色标签 - 修复后的代码 */}
                   <div className="flex flex-wrap justify-center gap-4 mt-8">
                     {aboutData.team.traits.map((trait, index) => (
-                      <span 
+                      <span
                         key={index}
                         className="px-4 py-2 bg-green-50 text-green-800 border border-green-200 rounded-full text-sm font-medium"
                       >
@@ -389,6 +418,44 @@ const About = ({ dict }) => {
                       </span>
                     ))}
                   </div>
+
+                  {/* 团队成员展示 */}
+                  {teamMembers.length > 0 && (
+                    <div className="mt-12">
+                      <h4 className="text-2xl font-bold text-gray-800 mb-6">
+                        {aboutData.teamMembersTitle}
+                      </h4>
+                      <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
+                        {teamMembers.map((member, idx) => (
+                          <div
+                            key={idx}
+                            className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm text-center"
+                          >
+                            <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-800 to-green-800 text-white flex items-center justify-center text-xl mb-4">
+                              {member.name?.charAt(0) || ''}
+                            </div>
+                            <h5 className="text-lg font-bold text-gray-800 mb-1">
+                              {member.name}
+                            </h5>
+                            <p className="text-green-800 mb-2 text-sm">
+                              {member.position}
+                            </p>
+                            <p className="text-gray-600 text-sm mb-2">
+                              {member.bio}
+                            </p>
+                            {member.email && (
+                              <a
+                                href={`mailto:${member.email}`}
+                                className="text-sm text-gray-500 hover:text-green-800"
+                              >
+                                {member.email}
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
