@@ -56,6 +56,7 @@ export default {
     content: "As a young and dynamic company, we have an open and pragmatic team dedicated to providing partners with professional market consulting, flexible supply chain management, and efficient import and export services. We firmly believe that through continuous efforts and accumulation, we will gain market trust and support and become a reliable partner in the China-Japan trade field.",
     traits: ["Open & Pragmatic", "Professional Service", "Continuous Growth", "Cooperative Win-Win"]
   },
+  teamMembersTitle: "Team Members",
 
   cta: {
     title: "Ready to cooperate with us?",
