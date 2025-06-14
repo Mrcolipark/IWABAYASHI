@@ -19,7 +19,8 @@ export const useCMSContent = (contentPath, defaultContent = {}) => {
         setError(null);
 
         // 尝试从API端点加载内容
-        const response = await fetch(`/api/${contentPath}.json`);
+        const ts = Date.now();
+        const response = await fetch(`/api/${contentPath}.json?ts=${ts}`);
         
         if (response.ok) {
           const data = await response.json();
