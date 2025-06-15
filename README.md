@@ -164,6 +164,9 @@ npm start
 REACT_APP_CMS_URL=http://localhost:1337
 REACT_APP_GA_TRACKING_ID=G-XXXXXXXXXX
 REACT_APP_SITE_URL=http://localhost:3000
+REACT_APP_EMAILJS_SERVICE_ID=your_service_id
+REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id
+REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
 ## 📊 当前开发状态
@@ -182,7 +185,7 @@ REACT_APP_SITE_URL=http://localhost:3000
 
 ### 🚧 开发中功能
 - [ ] **真实内容替换** - 将占位内容替换为真实公司信息
-- [ ] **联系表单功能** - EmailJS集成和邮件发送
+- [x] **联系表单功能** - EmailJS集成和邮件发送
 - [ ] **图片资源优化** - 真实图片素材和压缩优化
 - [ ] **多语言翻译** - 日语和英语内容翻译完善
 
