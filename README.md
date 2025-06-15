@@ -148,6 +148,7 @@ cp .env.example .env.local
 # 编辑 .env.local 配置相关参数
 
 # 4. 启动开发服务器
+# `npm start` 现会在启动前自动生成最新的 CMS 与新闻数据
 npm start
 
 # 5. 访问项目
@@ -250,6 +251,7 @@ REACT_APP_SITE_URL=http://localhost:3000
 ### 可用脚本
 ```bash
 # 开发模式
+# 自动生成 CMS 与新闻数据后启动
 npm start
 
 # 生产构建
