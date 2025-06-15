@@ -211,45 +211,45 @@ collections:
               - { label: "新闻动态", name: "news", widget: "string", default: "新闻动态" }
               - { label: "联系我们", name: "contact", widget: "string", default: "联系我们" }
 
-            - label: "页面标题"
-              name: "pageTitle"
-              widget: "object"
-              fields:
-                - { label: "关于我们", name: "about", widget: "string", default: "关于我们" }
-                - { label: "服务内容", name: "services", widget: "string", default: "服务内容" }
-                - { label: "新闻动态", name: "news", widget: "string", default: "新闻动态" }
-                - { label: "联系我们", name: "contact", widget: "string", default: "联系我们" }
+          - label: "页面标题"
+            name: "pageTitle"
+            widget: "object"
+            fields:
+              - { label: "关于我们", name: "about", widget: "string", default: "关于我们" }
+              - { label: "服务内容", name: "services", widget: "string", default: "服务内容" }
+              - { label: "新闻动态", name: "news", widget: "string", default: "新闻动态" }
+              - { label: "联系我们", name: "contact", widget: "string", default: "联系我们" }
 
-            - label: "页脚"
-              name: "footer"
-              widget: "object"
-              fields:
-                - { label: "快速链接", name: "quickLinks", widget: "string", default: "快速链接" }
-                - { label: "联系方式", name: "contact", widget: "string", default: "联系方式" }
-                - { label: "业务内容", name: "business", widget: "string", default: "业务内容" }
-                - label: "联系方式子项"
-                  name: "contactItems"
-                  widget: "object"
-                  fields:
-                    - { label: "邮箱", name: "email", widget: "string", default: "邮箱" }
-                    - { label: "电话", name: "phone", widget: "string", default: "电话" }
-                    - { label: "地址", name: "address", widget: "string", default: "地址" }
-                    - { label: "营业时间", name: "hours", widget: "string", default: "营业时间" }
-                - label: "底部链接"
-                  name: "links"
-                  widget: "object"
-                  fields:
-                    - { label: "隐私政策", name: "privacy", widget: "string", default: "隐私政策" }
-                    - { label: "使用条款", name: "terms", widget: "string", default: "使用条款" }
-                    - { label: "网站地图", name: "sitemap", widget: "string", default: "网站地图" }
-                - { label: "标语", name: "tagline", widget: "string", default: "专业的中日贸易综合服务商" }
-                - { label: "版权后缀", name: "builtWith", widget: "string", default: "Built with ❤️ for connecting China and Japan" }
+          - label: "页脚"
+            name: "footer"
+            widget: "object"
+            fields:
+              - { label: "快速链接", name: "quickLinks", widget: "string", default: "快速链接" }
+              - { label: "联系方式", name: "contact", widget: "string", default: "联系方式" }
+              - { label: "业务内容", name: "business", widget: "string", default: "业务内容" }
+              - label: "联系方式子项"
+                name: "contactItems"
+                widget: "object"
+                fields:
+                  - { label: "邮箱", name: "email", widget: "string", default: "邮箱" }
+                  - { label: "电话", name: "phone", widget: "string", default: "电话" }
+                  - { label: "地址", name: "address", widget: "string", default: "地址" }
+                  - { label: "营业时间", name: "hours", widget: "string", default: "营业时间" }
+              - label: "底部链接"
+                name: "links"
+                widget: "object"
+                fields:
+                  - { label: "隐私政策", name: "privacy", widget: "string", default: "隐私政策" }
+                  - { label: "使用条款", name: "terms", widget: "string", default: "使用条款" }
+                  - { label: "网站地图", name: "sitemap", widget: "string", default: "网站地图" }
+              - { label: "标语", name: "tagline", widget: "string", default: "专业的中日贸易综合服务商" }
+              - { label: "版权后缀", name: "builtWith", widget: "string", default: "Built with ❤️ for connecting China and Japan" }
 
-        - label: "日语翻译"
-          name: "ja_translations"
-          file: "src/i18n/resources/ja/cms.json"
-          fields:
-            - label: "導航メニュー"
+      - label: "日语翻译"
+        name: "ja_translations"
+        file: "src/i18n/resources/ja/cms.json"
+        fields:
+          - label: "導航メニュー"
             name: "navigation"
             widget: "object"
             fields:
@@ -259,45 +259,45 @@ collections:
               - { label: "ニュース", name: "news", widget: "string", default: "ニュース" }
               - { label: "お問い合わせ", name: "contact", widget: "string", default: "お問い合わせ" }
 
-            - label: "ページタイトル"
-              name: "pageTitle"
-              widget: "object"
-              fields:
-                - { label: "会社概要", name: "about", widget: "string", default: "会社概要" }
-                - { label: "事業内容", name: "services", widget: "string", default: "事業内容" }
-                - { label: "ニュース", name: "news", widget: "string", default: "ニュース" }
-                - { label: "お問い合わせ", name: "contact", widget: "string", default: "お問い合わせ" }
+          - label: "ページタイトル"
+            name: "pageTitle"
+            widget: "object"
+            fields:
+              - { label: "会社概要", name: "about", widget: "string", default: "会社概要" }
+              - { label: "事業内容", name: "services", widget: "string", default: "事業内容" }
+              - { label: "ニュース", name: "news", widget: "string", default: "ニュース" }
+              - { label: "お問い合わせ", name: "contact", widget: "string", default: "お問い合わせ" }
 
-            - label: "フッター"
-              name: "footer"
-              widget: "object"
-              fields:
-                - { label: "クイックリンク", name: "quickLinks", widget: "string", default: "クイックリンク" }
-                - { label: "連絡先", name: "contact", widget: "string", default: "連絡先" }
-                - { label: "事業内容", name: "business", widget: "string", default: "事業内容" }
-                - label: "連絡項目"
-                  name: "contactItems"
-                  widget: "object"
-                  fields:
-                    - { label: "メール", name: "email", widget: "string", default: "メール" }
-                    - { label: "電話", name: "phone", widget: "string", default: "電話" }
-                    - { label: "住所", name: "address", widget: "string", default: "住所" }
-                    - { label: "営業時間", name: "hours", widget: "string", default: "営業時間" }
-                - label: "リンク"
-                  name: "links"
-                  widget: "object"
-                  fields:
-                    - { label: "プライバシー", name: "privacy", widget: "string", default: "プライバシーポリシー" }
-                    - { label: "利用規約", name: "terms", widget: "string", default: "利用規約" }
-                    - { label: "サイトマップ", name: "sitemap", widget: "string", default: "サイトマップ" }
-                - { label: "タグライン", name: "tagline", widget: "string", default: "日中貿易の総合サービスプロバイダー" }
-                - { label: "ビルド情報", name: "builtWith", widget: "string", default: "Built with ❤️ for connecting China and Japan" }
+          - label: "フッター"
+            name: "footer"
+            widget: "object"
+            fields:
+              - { label: "クイックリンク", name: "quickLinks", widget: "string", default: "クイックリンク" }
+              - { label: "連絡先", name: "contact", widget: "string", default: "連絡先" }
+              - { label: "事業内容", name: "business", widget: "string", default: "事業内容" }
+              - label: "連絡項目"
+                name: "contactItems"
+                widget: "object"
+                fields:
+                  - { label: "メール", name: "email", widget: "string", default: "メール" }
+                  - { label: "電話", name: "phone", widget: "string", default: "電話" }
+                  - { label: "住所", name: "address", widget: "string", default: "住所" }
+                  - { label: "営業時間", name: "hours", widget: "string", default: "営業時間" }
+              - label: "リンク"
+                name: "links"
+                widget: "object"
+                fields:
+                  - { label: "プライバシー", name: "privacy", widget: "string", default: "プライバシーポリシー" }
+                  - { label: "利用規約", name: "terms", widget: "string", default: "利用規約" }
+                  - { label: "サイトマップ", name: "sitemap", widget: "string", default: "サイトマップ" }
+              - { label: "タグライン", name: "tagline", widget: "string", default: "日中貿易の総合サービスプロバイダー" }
+              - { label: "ビルド情報", name: "builtWith", widget: "string", default: "Built with ❤️ for connecting China and Japan" }
 
-        - label: "英语翻译"
-          name: "en_translations"
-          file: "src/i18n/resources/en/cms.json"
-          fields:
-            - label: "Navigation Menu"
+      - label: "英语翻译"
+        name: "en_translations"
+        file: "src/i18n/resources/en/cms.json"
+        fields:
+          - label: "Navigation Menu"
             name: "navigation"
             widget: "object"
             fields:
@@ -307,36 +307,36 @@ collections:
               - { label: "News", name: "news", widget: "string", default: "News" }
               - { label: "Contact", name: "contact", widget: "string", default: "Contact" }
 
-            - label: "Page Titles"
-              name: "pageTitle"
-              widget: "object"
-              fields:
-                - { label: "About", name: "about", widget: "string", default: "About Us" }
-                - { label: "Services", name: "services", widget: "string", default: "Services" }
-                - { label: "News", name: "news", widget: "string", default: "News" }
-                - { label: "Contact", name: "contact", widget: "string", default: "Contact" }
+          - label: "Page Titles"
+            name: "pageTitle"
+            widget: "object"
+            fields:
+              - { label: "About", name: "about", widget: "string", default: "About Us" }
+              - { label: "Services", name: "services", widget: "string", default: "Services" }
+              - { label: "News", name: "news", widget: "string", default: "News" }
+              - { label: "Contact", name: "contact", widget: "string", default: "Contact" }
 
-            - label: "Footer"
-              name: "footer"
-              widget: "object"
-              fields:
-                - { label: "Quick Links", name: "quickLinks", widget: "string", default: "Quick Links" }
-                - { label: "Contact Section", name: "contact", widget: "string", default: "Contact Information" }
-                - { label: "Business Section", name: "business", widget: "string", default: "Business Services" }
-                - label: "Contact Items"
-                  name: "contactItems"
-                  widget: "object"
-                  fields:
-                    - { label: "Email", name: "email", widget: "string", default: "Email" }
-                    - { label: "Phone", name: "phone", widget: "string", default: "Phone" }
-                    - { label: "Address", name: "address", widget: "string", default: "Address" }
-                    - { label: "Hours", name: "hours", widget: "string", default: "Business Hours" }
-                - label: "Legal Links"
-                  name: "links"
-                  widget: "object"
-                  fields:
-                    - { label: "Privacy", name: "privacy", widget: "string", default: "Privacy Policy" }
-                    - { label: "Terms", name: "terms", widget: "string", default: "Terms of Service" }
-                    - { label: "Sitemap", name: "sitemap", widget: "string", default: "Sitemap" }
-                - { label: "Tagline", name: "tagline", widget: "string", default: "Professional China-Japan Trade Service Provider" }
-                - { label: "Built With", name: "builtWith", widget: "string", default: "Built with ❤️ for connecting China and Japan" }
+          - label: "Footer"
+            name: "footer"
+            widget: "object"
+            fields:
+              - { label: "Quick Links", name: "quickLinks", widget: "string", default: "Quick Links" }
+              - { label: "Contact Section", name: "contact", widget: "string", default: "Contact Information" }
+              - { label: "Business Section", name: "business", widget: "string", default: "Business Services" }
+              - label: "Contact Items"
+                name: "contactItems"
+                widget: "object"
+                fields:
+                  - { label: "Email", name: "email", widget: "string", default: "Email" }
+                  - { label: "Phone", name: "phone", widget: "string", default: "Phone" }
+                  - { label: "Address", name: "address", widget: "string", default: "Address" }
+                  - { label: "Hours", name: "hours", widget: "string", default: "Business Hours" }
+              - label: "Legal Links"
+                name: "links"
+                widget: "object"
+                fields:
+                  - { label: "Privacy", name: "privacy", widget: "string", default: "Privacy Policy" }
+                  - { label: "Terms", name: "terms", widget: "string", default: "Terms of Service" }
+                  - { label: "Sitemap", name: "sitemap", widget: "string", default: "Sitemap" }
+              - { label: "Tagline", name: "tagline", widget: "string", default: "Professional China-Japan Trade Service Provider" }
+              - { label: "Built With", name: "builtWith", widget: "string", default: "Built with ❤️ for connecting China and Japan" }
