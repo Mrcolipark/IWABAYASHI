@@ -206,7 +206,7 @@ function getDefaultDict() {
     },
     menu: ["首页", "关于我们", "服务", "新闻", "联系我们"],
     home: {
-      slogan: "连接优质产品",
+      slogan: "臻品相联 辉映未来",
       subtitle: "搭建中日贸易桥梁",
       description: "专业的贸易服务商"
     },
