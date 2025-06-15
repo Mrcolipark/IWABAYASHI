@@ -1,0 +1,33 @@
+{
+  "navigation": {
+    "home": "ホーム",
+    "about": "会社概要",
+    "services": "事業内容",
+    "news": "ニュース",
+    "contact": "お問い合わせ"
+  },
+  "pageTitle": {
+    "about": "会社概要",
+    "services": "事業内容",
+    "news": "ニュース",
+    "contact": "お問い合わせ"
+  },
+  "footer": {
+    "quickLinks": "クイックリンク",
+    "contact": "連絡先",
+    "business": "事業内容",
+    "contactItems": {
+      "email": "メール",
+      "phone": "電話",
+      "address": "住所",
+      "hours": "営業時間"
+    },
+    "links": {
+      "privacy": "プライバシーポリシー",
+      "terms": "利用規約",
+      "sitemap": "サイトマップ"
+    },
+    "tagline": "日中貿易の総合サービスプロバイダー",
+    "builtWith": "Built with ❤️ for connecting China and Japan"
+  }
+}

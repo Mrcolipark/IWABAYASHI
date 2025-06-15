@@ -1,0 +1,33 @@
+{
+  "navigation": {
+    "home": "首页",
+    "about": "关于我们",
+    "services": "服务内容",
+    "news": "新闻动态",
+    "contact": "联系我们"
+  },
+  "pageTitle": {
+    "about": "关于我们",
+    "services": "服务内容",
+    "news": "新闻动态",
+    "contact": "联系我们"
+  },
+  "footer": {
+    "quickLinks": "快速链接",
+    "contact": "联系方式",
+    "business": "业务内容",
+    "contactItems": {
+      "email": "邮箱",
+      "phone": "电话",
+      "address": "地址",
+      "hours": "营业时间"
+    },
+    "links": {
+      "privacy": "隐私政策",
+      "terms": "使用条款",
+      "sitemap": "网站地图"
+    },
+    "tagline": "专业的中日贸易综合服务商",
+    "builtWith": "Built with ❤️ for connecting China and Japan"
+  }
+}
