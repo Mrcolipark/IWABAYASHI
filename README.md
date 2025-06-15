@@ -42,6 +42,8 @@
 - **可视化编辑**：类似WordPress的后台管理界面
 - **多语言内容**：每种语言独立管理和发布
 - **实时更新**：内容修改后网站立即生效
+- **本地编辑提示**：修改 `content/` 下的 Markdown 后，需运行 `npm run generate-cms`
+  重新生成 JSON 文件（或直接执行 `npm start`/`npm run build`，脚本会自动完成）。
 - **媒体管理**：图片、文件上传和管理功能
 - **全站动态内容**：首页、关于我们、新闻、服务、联系等页面均从CMS读取
 
@@ -148,6 +150,7 @@ cp .env.example .env.local
 # 编辑 .env.local 配置相关参数
 
 # 4. 启动开发服务器
+# `npm start` 现会在启动前自动生成最新的 CMS 与新闻数据
 npm start
 
 # 5. 访问项目
@@ -250,6 +253,7 @@ REACT_APP_SITE_URL=http://localhost:3000
 ### 可用脚本
 ```bash
 # 开发模式
+# 自动生成 CMS 与新闻数据后启动
 npm start
 
 # 生产构建
