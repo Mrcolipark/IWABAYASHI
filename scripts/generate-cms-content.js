@@ -5,6 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
 
+// Supported language folders under content/ used for translations
+const LANGUAGES = ['en', 'ja'];
+
 // 输出目录
 const OUTPUT_DIR = path.join(__dirname, '../public/api');
 const CONTENT_DIR = path.join(__dirname, '../content');
@@ -38,6 +41,18 @@ function readMarkdownFile(filePath) {
   }
 }
 
+// Generate translation JSON files if translation markdown exists
+function generateTranslations(relativePath, outputDir, outputName) {
+  LANGUAGES.forEach((lang) => {
+    const langPath = path.join(CONTENT_DIR, lang, `${relativePath}.md`);
+    const data = readMarkdownFile(langPath);
+    if (data) {
+      ensureDirectoryExists(outputDir);
+      writeJsonFile(path.join(outputDir, `${outputName}.${lang}.json`), data);
+    }
+  });
+}
+
 // 写入JSON文件
 function writeJsonFile(outputPath, data) {
   try {
@@ -60,7 +75,7 @@ function generateCompanyInfo() {
   
   const outputPath = path.join(OUTPUT_DIR, 'company');
   ensureDirectoryExists(outputPath);
-  
+
   if (companyInfo) {
     writeJsonFile(path.join(outputPath, 'basic-info.json'), companyInfo);
   } else {
@@ -80,6 +95,9 @@ function generateCompanyInfo() {
     };
     writeJsonFile(path.join(outputPath, 'basic-info.json'), defaultInfo);
   }
+
+  // generate translations
+  generateTranslations('company/basic-info', outputPath, 'basic-info');
 }
 
 // 生成团队成员JSON
@@ -124,6 +142,8 @@ function generateTeamMembers() {
     };
     writeJsonFile(path.join(outputPath, 'team-members.json'), defaultTeam);
   }
+
+  generateTranslations('company/team-members', outputPath, 'team-members');
 }
 
 // 生成服务内容JSON
@@ -145,14 +165,15 @@ function generateServices() {
   serviceFiles.forEach(filename => {
     const servicePath = path.join(servicesDir, filename);
     const serviceData = readMarkdownFile(servicePath);
-    
+
     if (serviceData) {
       const serviceId = filename.replace('.md', '');
       serviceData.id = serviceId;
-      
+
       // 写入单独的服务文件
       writeJsonFile(path.join(outputPath, `${serviceId}.json`), serviceData);
-      
+      generateTranslations(`services/${serviceId}`, outputPath, serviceId);
+
       // 添加到总服务列表
       allServices.push(serviceData);
     }
@@ -197,6 +218,7 @@ function generateServices() {
     
     defaultServices.forEach(service => {
       writeJsonFile(path.join(outputPath, `${service.id}.json`), service);
+      generateTranslations(`services/${service.id}`, outputPath, service.id);
       allServices.push(service);
     });
   }
@@ -206,6 +228,27 @@ function generateServices() {
     services: allServices.sort((a, b) => (a.order || 0) - (b.order || 0)),
     total: allServices.length,
     generated: new Date().toISOString()
+  });
+
+  // Translation indexes
+  LANGUAGES.forEach((lang) => {
+    const langServices = [];
+    serviceFiles.forEach((filename) => {
+      const langData = readMarkdownFile(
+        path.join(CONTENT_DIR, lang, 'services', filename)
+      );
+      if (langData) {
+        langData.id = filename.replace('.md', '');
+        langServices.push(langData);
+      }
+    });
+    if (langServices.length) {
+      writeJsonFile(path.join(outputPath, `index.${lang}.json`), {
+        services: langServices.sort((a, b) => (a.order || 0) - (b.order || 0)),
+        total: langServices.length,
+        generated: new Date().toISOString(),
+      });
+    }
   });
 }
 
@@ -243,6 +286,8 @@ function generateContactInfo() {
     };
     writeJsonFile(path.join(outputPath, 'info.json'), defaultContact);
   }
+
+  generateTranslations('contact/info', outputPath, 'info');
 }
 
 // 生成页面内容JSON
@@ -271,6 +316,7 @@ function generatePageContent() {
     };
     writeJsonFile(path.join(outputPath, 'home-content.json'), defaultHome);
   }
+  generateTranslations('pages/home-content', outputPath, 'home-content');
   
   // 页脚内容
   const footerContentPath = path.join(pagesDir, 'footer-content.md');
@@ -294,6 +340,7 @@ function generatePageContent() {
     };
     writeJsonFile(path.join(outputPath, 'footer-content.json'), defaultFooter);
   }
+  generateTranslations('pages/footer-content', outputPath, 'footer-content');
 }
 
 // 生成内容索引
