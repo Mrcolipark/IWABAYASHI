@@ -183,6 +183,11 @@ const Home = ({ dict, lang = 'zh' }) => {
                   return <span className="hero-text-line">{slogan}</span>;
                 })()}
               </h1>
+              <div className="slogan-translations mt-4 text-sm sm:text-base font-light text-white space-y-1">
+                <p>{t('home.slogan', { lng: 'zh' })}</p>
+                <p>{t('home.slogan', { lng: 'ja' })}</p>
+                <p>{t('home.slogan', { lng: 'en' })}</p>
+              </div>
             </div>
 
           </div>
@@ -226,6 +231,10 @@ const Home = ({ dict, lang = 'zh' }) => {
           display: block;
           margin-bottom: 0.2em;
           position: relative;
+        }
+
+        .slogan-translations p {
+          font-family: 'Montserrat', 'Hiragino Kaku Gothic Pro', 'Noto Sans CJK JP', 'Microsoft YaHei', sans-serif;
         }
 
         /* 响应式优化 */
