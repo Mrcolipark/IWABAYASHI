@@ -89,10 +89,9 @@ const Home = ({ dict, lang = 'zh' }) => {
   };
 
   // 根据设备选择视频源
-  const getVideoSources = () =>
-    isMobile
-      ? [{ src: "/videos/hero-forest-mobile.mp4", type: "video/mp4" }]
-      : [{ src: "/videos/hero-forest.mp4", type: "video/mp4" }];
+  const getVideoSources = () => [
+    { src: "/videos/hero-forest.mp4", type: "video/mp4" }
+  ];
 
   const heroBackgroundStyle = isMobile
     ? {
@@ -115,7 +114,8 @@ const Home = ({ dict, lang = 'zh' }) => {
       >
 
         {/* 全屏森林视频背景 */}
-        <video
+        {!isMobile && (
+          <video
             ref={videoRef}
             autoPlay
             muted
@@ -134,7 +134,7 @@ const Home = ({ dict, lang = 'zh' }) => {
               transform: 'translate(-10vw, -10vh) scale(1.2)'
             }}
             onLoadStart={() => {
-              console.log('Loading video');
+              console.log('Loading desktop video');
             }}
             onError={(e) => {
               console.error('Video load error:', e);
@@ -156,6 +156,7 @@ const Home = ({ dict, lang = 'zh' }) => {
               <source key={index} src={source.src} type={source.type} />
             ))}
           </video>
+        )}
 
         {/* 轻微渐变遮罩 - 增强文字可读性 */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>

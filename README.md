@@ -169,7 +169,9 @@ REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id
 REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
+
 `REACT_APP_GA_TRACKING_ID` 为在 Google Analytics 中创建的 Measurement ID，用于初始化统计脚本。
+
 
 ## 📊 当前开发状态
 
@@ -187,16 +189,18 @@ REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 
 ### 🚧 开发中功能
 - [ ] **真实内容替换** - 将占位内容替换为真实公司信息
-- [x] **联系表单功能** - EmailJS集成和邮件发送
+- [ ] **联系表单功能** - EmailJS集成和邮件发送
 - [ ] **图片资源优化** - 真实图片素材和压缩优化
 - [ ] **多语言翻译** - 日语和英语内容翻译完善
 
+
 ### 📋 待开发功能
-- [x] **Google Analytics** - 完整的数据分析配置
+- [ ] **Google Analytics** - 完整的数据分析配置
 - [ ] **SEO优化完善** - 元数据优化和搜索引擎提交
 - [ ] **性能监控** - Web Vitals和错误监控
 - [ ] **PWA功能** - 离线访问和应用化体验
 - [ ] **社交媒体集成** - 分享功能和社交链接
+
 
 ## 🎨 设计系统
 
@@ -314,6 +318,7 @@ npm run analyze
 - **URL**: https://iwabayashi.com (待配置)
 - **CMS**: https://cms.iwabayashi.com (待配置)
 - **自动部署**: 每次提交到main分支
+- Netlify 构建流程会自动执行 `npm run generate-cms` 和 `npm run generate-news`
 
 ## 🤝 贡献指南
 
@@ -323,6 +328,7 @@ npm run analyze
 3. 提交更改 (`git commit -m 'Add some amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
+6. 等待 CI 自动执行 `npm run generate-cms` 与 `npm run generate-news`
 
 ### 代码规范
 - 使用 ESLint 和 Prettier 保持代码风格一致
