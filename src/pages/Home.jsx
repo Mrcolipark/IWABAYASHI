@@ -175,13 +175,11 @@ const Home = ({ dict, lang = 'zh' }) => {
             <div className={`transform transition-all duration-1500 delay-800 ${
               isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
             }`}>
-              <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center">
-                {(() => {
-                  const slogan = t('home.slogan', {
-                    defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
-                  });
-                  return <span className="hero-text-line">{slogan}</span>;
-                })()}
+
+              <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center whitespace-nowrap">
+                {t('home.slogan', {
+                  defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
+                })}
               </h1>
               <div className="slogan-translations mt-4 text-sm sm:text-base font-light text-white space-y-1">
                 <p>{t('home.slogan', { lng: 'zh' })}</p>
@@ -225,16 +223,6 @@ const Home = ({ dict, lang = 'zh' }) => {
           -webkit-font-smoothing: subpixel-antialiased;
           -moz-osx-font-smoothing: auto;
           font-variant-numeric: lining-nums;
-        }
-
-        .hero-text-line {
-          display: block;
-          margin-bottom: 0.2em;
-          position: relative;
-        }
-
-        .slogan-translations p {
-          font-family: 'Montserrat', 'Hiragino Kaku Gothic Pro', 'Noto Sans CJK JP', 'Microsoft YaHei', sans-serif;
         }
 
         /* 响应式优化 */
