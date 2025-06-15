@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
 
+// Languages that have dedicated translation folders
 const LANGUAGES = ['en', 'ja'];
 
 const CONTENT_DIR = path.join(__dirname, '../content/news');
@@ -173,7 +174,12 @@ function generateNewsIndexForDir(contentDir, outputFile) {
 }
 
 function generateNewsIndex() {
+  // 默认中文索引
   generateNewsIndexForDir(CONTENT_DIR, OUTPUT_FILE);
+  // 为语言切换生成 zh 索引文件
+  const zhOut = path.join(__dirname, '../public/api/news-index.zh.json');
+  generateNewsIndexForDir(CONTENT_DIR, zhOut);
+  // 生成其它语言索引
   LANGUAGES.forEach((lang) => {
     const langDir = path.join(__dirname, `../content/${lang}/news`);
     const langOut = path.join(__dirname, `../public/api/news-index.${lang}.json`);
