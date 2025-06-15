@@ -1,5 +1,6 @@
 // src/hooks/useCMSContent.js
 import { useState, useEffect } from 'react';
+import i18n from "../i18n";
 
 /**
  * 通用CMS内容加载Hook
@@ -20,13 +21,15 @@ export const useCMSContent = (contentPath, defaultContent = {}) => {
 
         // 尝试从API端点加载内容
         const ts = Date.now();
-        const response = await fetch(`/api/${contentPath}.json?ts=${ts}`);
-        
+        const lang = i18n.language || "zh";
+        let response = await fetch(`/api/${contentPath}.${lang}.json?ts=${ts}`);
+        if (!response.ok) {
+          response = await fetch(`/api/${contentPath}.json?ts=${ts}`);
+        }
         if (response.ok) {
           const data = await response.json();
           setContent({ ...defaultContent, ...data });
         } else {
-          // 如果API失败，使用默认内容
           console.warn(`Failed to load CMS content from ${contentPath}, using defaults`);
           setContent(defaultContent);
         }
@@ -40,7 +43,7 @@ export const useCMSContent = (contentPath, defaultContent = {}) => {
     };
 
     loadContent();
-  }, [contentPath]);
+  }, [contentPath, i18n.language]);
 
   return { content, loading, error };
 };
@@ -112,7 +115,11 @@ export const useServices = () => {
 
         const servicePromises = serviceFiles.map(async (serviceId) => {
           try {
-            const response = await fetch(`/api/services/${serviceId}.json`);
+            const lang = i18n.language || "zh";
+            let response = await fetch(`/api/services/${serviceId}.${lang}.json`);
+            if (!response.ok) {
+              response = await fetch(`/api/services/${serviceId}.json`);
+            }
             if (response.ok) {
               return await response.json();
             }
@@ -142,7 +149,7 @@ export const useServices = () => {
     };
 
     loadServices();
-  }, []);
+  }, [i18n.language]);
 
   return { services, loading, error };
 };
