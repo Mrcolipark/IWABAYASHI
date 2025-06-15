@@ -1,5 +1,5 @@
 export default {
-  slogan: "Connecting users with high-quality products",
+  slogan: "Connecting users with\nhigh-quality products",
   subtitle: "Building bridges for premium product circulation between China and Japan, promoting economic and trade prosperity",
   description: "IWABAYASHI Corporation aims to become an internationally influential trade service provider",
   

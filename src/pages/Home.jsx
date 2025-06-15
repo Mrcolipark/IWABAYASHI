@@ -176,9 +176,9 @@ const Home = ({ dict, lang = 'zh' }) => {
               isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
             }`}>
 
-              <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center whitespace-nowrap">
+              <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center whitespace-pre-line">
                 {t('home.slogan', {
-                  defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
+                  defaultValue: homeContent?.hero?.slogan || '上質な製品で\nユーザーとつながる'
                 })}
               </h1>
 
