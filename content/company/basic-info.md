@@ -1,18 +1,18 @@
 ---
-company_name: "岩林株式会社"
-english_name: "IWABAYASHI Corporation"
+company_name: 岩林株式会社
+english_name: IWABAYASHI Corporation
 established_year: "2025"
-headquarters: "日本东京"
-main_business: "中日双边贸易综合服务"
-vision: "搭建中日优质商品流通桥梁，促进两国经贸繁荣，成为具有国际影响力的贸易服务商"
-mission: "精选全球好产品，服务中国与日本市场，创造更高品质的生活价值"
+headquarters: 日本东京
+main_business: 中日双边贸易综合服务
+vision: 搭建中日优质商品流通桥梁，促进两国经贸繁荣，成为具有国际影响力的贸易服务商
+mission: 精选全球好产品，服务中国与日本市场，创造更高品质的生活价值
 values:
-  - "专业"
-  - "高效" 
-  - "共赢"
-  - "诚信"
-employee_count: "20-50人"
-registered_capital: "1000万日元"
+  - 专业test
+  - 高效
+  - 共赢
+  - 诚信
+employee_count: 20-50人
+registered_capital: 1000万日元
 ---
 
 # 岩林株式会社
