@@ -53,7 +53,7 @@ const Home = ({ dict, lang = 'zh' }) => {
     setIsLoaded(true);
     trackEvent('home_page_viewed');
 
-    if (!isMobile && videoRef.current) {
+    if (videoRef.current) {
       const playVideo = async () => {
         try {
           await videoRef.current.play();
@@ -89,9 +89,10 @@ const Home = ({ dict, lang = 'zh' }) => {
   };
 
   // 根据设备选择视频源
-  const getVideoSources = () => [
-    { src: "/videos/hero-forest.mp4", type: "video/mp4" }
-  ];
+  const getVideoSources = () =>
+    isMobile
+      ? [{ src: "/videos/hero-forest-mobile.mp4", type: "video/mp4" }]
+      : [{ src: "/videos/hero-forest.mp4", type: "video/mp4" }];
 
   const heroBackgroundStyle = isMobile
     ? {
@@ -114,8 +115,7 @@ const Home = ({ dict, lang = 'zh' }) => {
       >
 
         {/* 全屏森林视频背景 */}
-        {!isMobile && (
-          <video
+        <video
             ref={videoRef}
             autoPlay
             muted
@@ -134,7 +134,7 @@ const Home = ({ dict, lang = 'zh' }) => {
               transform: 'translate(-10vw, -10vh) scale(1.2)'
             }}
             onLoadStart={() => {
-              console.log('Loading desktop video');
+              console.log('Loading video');
             }}
             onError={(e) => {
               console.error('Video load error:', e);
@@ -156,7 +156,6 @@ const Home = ({ dict, lang = 'zh' }) => {
               <source key={index} src={source.src} type={source.type} />
             ))}
           </video>
-        )}
 
         {/* 轻微渐变遮罩 - 增强文字可读性 */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>
@@ -176,9 +175,9 @@ const Home = ({ dict, lang = 'zh' }) => {
               isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
             }`}>
 
-              <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center whitespace-nowrap">
+              <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center whitespace-pre-line">
                 {t('home.slogan', {
-                  defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
+                  defaultValue: homeContent?.hero?.slogan || '上質な製品で\nユーザーとつながる'
                 })}
               </h1>
 

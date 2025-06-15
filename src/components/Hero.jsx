@@ -8,7 +8,7 @@ const Hero = ({ dict, scrollY }) => {
 
   // 保留你的原有文案，只是增强展示效果
   const heroTexts = [
-    dict.slogan || "上質な製品でユーザーとつながる",
+    dict.slogan || "上質な製品で\nユーザーとつながる",
     dict.subtitle || "连接中日优质商品，推动经贸繁荣发展", 
     "专业贸易服务，值得信赖的合作伙伴"
   ];
