@@ -169,6 +169,10 @@ REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id
 REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
+
+`REACT_APP_GA_TRACKING_ID` 为在 Google Analytics 中创建的 Measurement ID，用于初始化统计脚本。
+
+
 ## 📊 当前开发状态
 
 ### ✅ 已完成功能
@@ -185,9 +189,10 @@ REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 
 ### 🚧 开发中功能
 - [ ] **真实内容替换** - 将占位内容替换为真实公司信息
-- [x] **联系表单功能** - EmailJS集成和邮件发送
+- [ ] **联系表单功能** - EmailJS集成和邮件发送
 - [ ] **图片资源优化** - 真实图片素材和压缩优化
 - [ ] **多语言翻译** - 日语和英语内容翻译完善
+
 
 ### 📋 待开发功能
 - [ ] **Google Analytics** - 完整的数据分析配置
@@ -195,6 +200,7 @@ REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 - [ ] **性能监控** - Web Vitals和错误监控
 - [ ] **PWA功能** - 离线访问和应用化体验
 - [ ] **社交媒体集成** - 分享功能和社交链接
+
 
 ## 🎨 设计系统
 
