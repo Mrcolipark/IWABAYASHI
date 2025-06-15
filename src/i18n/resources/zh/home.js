@@ -1,5 +1,5 @@
 export default {
-  slogan: "上質な製品でユーザーとつながる",
+  slogan: "臻品相联 辉映未来",
   subtitle: "搭建中日优质商品流通桥梁，促进两国经贸繁荣",
   description: "岩林株式会社致力于成为具有国际影响力的贸易服务商",
   

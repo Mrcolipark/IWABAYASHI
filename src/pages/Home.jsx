@@ -180,15 +180,6 @@ const Home = ({ dict, lang = 'zh' }) => {
                   const slogan = t('home.slogan', {
                     defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
                   });
-                  const index = slogan.indexOf('で');
-                  if (index !== -1) {
-                    return (
-                      <>
-                        <span className="hero-text-line">{slogan.slice(0, index + 1)}</span>
-                        <span className="hero-text-line">{slogan.slice(index + 1)}</span>
-                      </>
-                    );
-                  }
                   return <span className="hero-text-line">{slogan}</span>;
                 })()}
               </h1>
