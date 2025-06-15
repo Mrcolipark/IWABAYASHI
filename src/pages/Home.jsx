@@ -181,11 +181,7 @@ const Home = ({ dict, lang = 'zh' }) => {
                   defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
                 })}
               </h1>
-              <div className="slogan-translations mt-4 text-sm sm:text-base font-light text-white space-y-1">
-                <p>{t('home.slogan', { lng: 'zh' })}</p>
-                <p>{t('home.slogan', { lng: 'ja' })}</p>
-                <p>{t('home.slogan', { lng: 'en' })}</p>
-              </div>
+
             </div>
 
           </div>
