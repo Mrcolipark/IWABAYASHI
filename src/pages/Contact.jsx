@@ -153,7 +153,8 @@ PromiseCard.displayName = 'PromiseCard';
 const Contact = ({ dict }) => {
   const { t } = useOptimizedTranslation();
   const { content: cmsContactInfo } = useContactInfo();
-  const [isVisible, setIsVisible] = useState(false);
+  const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [isVisible, setIsVisible] = useState(isMobileScreen);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -340,6 +341,12 @@ const Contact = ({ dict }) => {
 
   // 可见性检测
   useEffect(() => {
+    if (isMobileScreen) {
+      setIsVisible(true);
+      trackEvent('contact_page_viewed');
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.2 }

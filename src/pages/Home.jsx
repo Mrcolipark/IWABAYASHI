@@ -112,7 +112,7 @@ const Home = ({ dict, lang = 'zh' }) => {
         ref={heroRef}
         className="relative w-full h-screen overflow-hidden"
         style={{
-          backgroundImage: "url(/videos/hero-forest-poster.jpg)",
+          backgroundImage: "url(/hero-forest-poster.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
@@ -125,8 +125,9 @@ const Home = ({ dict, lang = 'zh' }) => {
           muted
           loop
           playsInline
+          crossOrigin="anonymous"
           preload="auto"
-          poster="/videos/hero-forest-poster.jpg"
+          poster="/hero-forest-poster.jpg"
           className="absolute top-0 left-0"
           style={{
             width: '100vw',
@@ -143,9 +144,16 @@ const Home = ({ dict, lang = 'zh' }) => {
           onError={(e) => {
             console.error('Video load error:', e);
             e.target.style.display = 'none';
+            if (heroRef.current) {
+              heroRef.current.style.backgroundImage = "url('/hero-forest-poster.jpg')";
+            }
           }}
           onCanPlay={() => {
             console.log('Video can start playing');
+            videoRef.current?.play().catch(() => {});
+          }}
+          onLoadedData={() => {
+            videoRef.current?.play().catch(() => {});
           }}
         >
           {getVideoSources().map((source, index) => (
