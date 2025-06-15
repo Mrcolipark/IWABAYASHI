@@ -5,28 +5,31 @@ const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
 
+// Languages that have dedicated translation folders
+const LANGUAGES = ['en', 'ja'];
+
 const CONTENT_DIR = path.join(__dirname, '../content/news');
 const OUTPUT_FILE = path.join(__dirname, '../public/api/news-index.json');
 
-function generateNewsIndex() {
-  console.log('🔄 正在生成新闻文章索引...');
+function generateNewsIndexForDir(contentDir, outputFile) {
+  console.log(`🔄 正在生成新闻文章索引: ${contentDir}`);
   
   try {
     // 确保输出目录存在
-    const outputDir = path.dirname(OUTPUT_FILE);
+    const outputDir = path.dirname(outputFile);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
-    // 检查content/news目录
-    if (!fs.existsSync(CONTENT_DIR)) {
-      console.log('⚠️  content/news 目录不存在，创建目录和默认索引文件');
-      fs.mkdirSync(CONTENT_DIR, { recursive: true });
-      createDefaultIndex();
+    // 检查内容目录
+    if (!fs.existsSync(contentDir)) {
+      console.log(`⚠️  ${contentDir} 目录不存在，创建目录和默认索引文件`);
+      fs.mkdirSync(contentDir, { recursive: true });
+      createDefaultIndex(outputFile);
       return;
     }
 
-    const files = fs.readdirSync(CONTENT_DIR);
+    const files = fs.readdirSync(contentDir);
     const markdownFiles = files.filter(file => file.endsWith('.md'));
     
     console.log(`📁 找到 ${markdownFiles.length} 个markdown文件`);
@@ -37,7 +40,7 @@ function generateNewsIndex() {
 
     markdownFiles.forEach((filename) => {
       try {
-        const filePath = path.join(CONTENT_DIR, filename);
+        const filePath = path.join(contentDir, filename);
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const { data: frontmatter, content } = matter(fileContent);
         
@@ -119,7 +122,7 @@ function generateNewsIndex() {
       } catch (error) {
         errorCount++;
         console.error(`❌ 处理文件 ${filename} 时出错:`, error.message);
-        console.error(`   文件路径: ${path.join(CONTENT_DIR, filename)}`);
+        console.error(`   文件路径: ${path.join(contentDir, filename)}`);
       }
     });
 
@@ -136,10 +139,10 @@ function generateNewsIndex() {
 
     // 美化JSON输出
     const jsonString = JSON.stringify(articles, null, 2);
-    fs.writeFileSync(OUTPUT_FILE, jsonString, 'utf8');
+    fs.writeFileSync(outputFile, jsonString, 'utf8');
     
     console.log(`✅ 成功生成文章索引: ${articles.length} 篇已发布文章`);
-    console.log(`📄 索引文件位置: ${OUTPUT_FILE}`);
+    console.log(`📄 索引文件位置: ${outputFile}`);
     console.log(`📊 处理统计: 成功 ${processedCount}, 错误 ${errorCount}, 草稿 ${markdownFiles.length - processedCount - errorCount}`);
     
     // 输出分类统计
@@ -157,7 +160,7 @@ function generateNewsIndex() {
 
     // 验证生成的JSON
     try {
-      const testParse = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
+      const testParse = JSON.parse(fs.readFileSync(outputFile, 'utf8'));
       console.log(`\n✅ JSON文件验证通过，包含 ${testParse.length} 篇文章`);
     } catch (parseError) {
       console.error('❌ JSON文件验证失败:', parseError.message);
@@ -166,8 +169,22 @@ function generateNewsIndex() {
   } catch (error) {
     console.error('❌ 生成文章索引时出错:', error);
     console.error('📍 错误堆栈:', error.stack);
-    createDefaultIndex();
+    createDefaultIndex(outputFile);
   }
+}
+
+function generateNewsIndex() {
+  // 默认中文索引
+  generateNewsIndexForDir(CONTENT_DIR, OUTPUT_FILE);
+  // 为语言切换生成 zh 索引文件
+  const zhOut = path.join(__dirname, '../public/api/news-index.zh.json');
+  generateNewsIndexForDir(CONTENT_DIR, zhOut);
+  // 生成其它语言索引
+  LANGUAGES.forEach((lang) => {
+    const langDir = path.join(__dirname, `../content/${lang}/news`);
+    const langOut = path.join(__dirname, `../public/api/news-index.${lang}.json`);
+    generateNewsIndexForDir(langDir, langOut);
+  });
 }
 
 // 估算阅读时间（基于中文阅读速度）
@@ -187,7 +204,7 @@ function getUniqueCategories(articles) {
   return [...new Set(categories)].filter(Boolean);
 }
 
-function createDefaultIndex() {
+function createDefaultIndex(outputFile) {
   console.log('🔧 创建默认文章索引...');
   
   const defaultArticles = [
@@ -240,14 +257,14 @@ function createDefaultIndex() {
   ];
 
   // 确保输出目录存在
-  const outputDir = path.dirname(OUTPUT_FILE);
+  const outputDir = path.dirname(outputFile);
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(defaultArticles, null, 2), 'utf8');
+  fs.writeFileSync(outputFile, JSON.stringify(defaultArticles, null, 2), 'utf8');
   console.log(`✅ 创建默认索引文件成功: ${defaultArticles.length} 篇文章`);
-  console.log(`📄 文件位置: ${OUTPUT_FILE}`);
+  console.log(`📄 文件位置: ${outputFile}`);
 }
 
 // 检查是否从命令行直接运行
