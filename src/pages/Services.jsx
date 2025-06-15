@@ -120,7 +120,8 @@ CapabilityCard.displayName = 'CapabilityCard';
 const Services = () => {
   const { t } = useOptimizedTranslation(); // 使用您的优化翻译Hook
   const { services: cmsServices } = useServices();
-  const [isVisible, setIsVisible] = useState(false);
+  const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [isVisible, setIsVisible] = useState(isMobileScreen);
   const [selectedCategory, setSelectedCategory] = useState('current');
   const sectionRef = useRef(null);
 
@@ -303,6 +304,12 @@ const Services = () => {
 
   // 可见性检测
   useEffect(() => {
+    if (isMobileScreen) {
+      setIsVisible(true);
+      trackEvent('services_page_viewed');
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.2 }

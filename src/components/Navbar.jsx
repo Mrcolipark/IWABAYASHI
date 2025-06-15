@@ -111,7 +111,7 @@ const Navbar = React.memo(({ scrollY, currentPath }) => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="relative flex items-center justify-between h-20">
           
           {/* 左侧Logo区域 */}
           <Link 
@@ -142,10 +142,8 @@ const Navbar = React.memo(({ scrollY, currentPath }) => {
           </Link>
 
           {/* 中间品牌标识 */}
-          <div className="hidden lg:block">
-            <h1 className="brand-center text-brand-green">
-              IWABAYASHI
-            </h1>
+          <div className="absolute left-1/2 transform -translate-x-1/2 pointer-events-none">
+            <h1 className="brand-center text-brand-green">IWABAYASHI</h1>
           </div>
 
           {/* 右侧控制区域 */}

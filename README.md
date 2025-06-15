@@ -331,7 +331,7 @@ npm run analyze
 - [Vercel部署文档](https://vercel.com/docs)
 
 ### 项目特定文档
-- [多语言配置指南](./docs/i18n-guide.md) (待创建)
+- [多语言配置指南](./docs/i18n-guide.md)
 - [CMS使用手册](./docs/cms-manual.md) (待创建)
 - [部署操作指南](./docs/deployment-guide.md) (待创建)
 

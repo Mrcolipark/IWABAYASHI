@@ -293,7 +293,8 @@ ArticleModal.displayName = 'ArticleModal';
 
 const News = ({ dict }) => {
   const { t } = useOptimizedTranslation();
-  const [isVisible, setIsVisible] = useState(false);
+  const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [isVisible, setIsVisible] = useState(isMobileScreen);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -409,6 +410,12 @@ const News = ({ dict }) => {
 
   // 可见性检测
   useEffect(() => {
+    if (isMobileScreen) {
+      setIsVisible(true);
+      trackEvent('news_page_viewed');
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.2 }
