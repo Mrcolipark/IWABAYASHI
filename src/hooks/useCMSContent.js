@@ -82,10 +82,10 @@ export const useTeamMembers = () => {
         order: 1
       },
       {
-        name: "田中太郎", 
-        position: "运营总监",
-        bio: "专注于供应链管理和业务运营优化",
-        email: "operations@iwabayashi.com",
+        name: "Dana",
+        position: "打工的",
+        bio: "专注网站维护",
+        email: "danaanwer@outlook.com",
         order: 2
       }
     ]
