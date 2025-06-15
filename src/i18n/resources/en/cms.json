@@ -1,0 +1,33 @@
+{
+  "navigation": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Services",
+    "news": "News",
+    "contact": "Contact"
+  },
+  "pageTitle": {
+    "about": "About Us",
+    "services": "Services",
+    "news": "News",
+    "contact": "Contact"
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "contact": "Contact Information",
+    "business": "Business Services",
+    "contactItems": {
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "hours": "Business Hours"
+    },
+    "links": {
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "sitemap": "Sitemap"
+    },
+    "tagline": "Professional China-Japan Trade Service Provider",
+    "builtWith": "Built with ❤️ for connecting China and Japan"
+  }
+}

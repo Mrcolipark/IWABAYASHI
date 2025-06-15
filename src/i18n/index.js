@@ -6,11 +6,32 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import zhResources from './resources/zh';
 import jaResources from './resources/ja';
 import enResources from './resources/en';
+import zhCms from './resources/zh/cms.json';
+import jaCms from './resources/ja/cms.json';
+import enCms from './resources/en/cms.json';
+
+const deepMerge = (target, source) => {
+  const result = { ...target };
+  for (const key in source) {
+    if (Object.prototype.hasOwnProperty.call(source, key)) {
+      if (
+        source[key] &&
+        typeof source[key] === 'object' &&
+        !Array.isArray(source[key])
+      ) {
+        result[key] = deepMerge(result[key] || {}, source[key]);
+      } else {
+        result[key] = source[key];
+      }
+    }
+  }
+  return result;
+};
 
 const resources = {
-  zh: { translation: zhResources },
-  ja: { translation: jaResources },
-  en: { translation: enResources }
+  zh: { translation: deepMerge(zhResources, zhCms) },
+  ja: { translation: deepMerge(jaResources, jaCms) },
+  en: { translation: deepMerge(enResources, enCms) }
 };
 
 // 初始化 i18n
