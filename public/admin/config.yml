@@ -197,11 +197,11 @@ collections:
   - name: "translations"
     label: "多语言翻译"
     files:
-      - label: "中文翻译"
-        name: "zh_translations"
-        file: "src/i18n/resources/zh/cms.json"
-        fields:
-          - label: "导航菜单"
+        - label: "中文翻译"
+          name: "zh_translations"
+          file: "src/i18n/resources/zh/cms.json"
+          fields:
+            - label: "导航菜单"
             name: "navigation"
             widget: "object"
             fields:
