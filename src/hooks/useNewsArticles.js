@@ -1,5 +1,6 @@
 // src/hooks/useNewsArticles.js
 import { useState, useEffect } from 'react';
+import i18n from '../i18n';
 
 export const useNewsArticles = () => {
   const [articles, setArticles] = useState([]);
@@ -12,8 +13,12 @@ export const useNewsArticles = () => {
         setLoading(true);
         setError(null);
         
-        // 尝试从生成的JSON文件加载文章
-        const response = await fetch('/api/news-index.json');
+        // 尝试从生成的JSON文件加载文章，优先使用当前语言
+        const lang = i18n.language || 'zh';
+        let response = await fetch(`/api/news-index.${lang}.json`);
+        if (!response.ok) {
+          response = await fetch('/api/news-index.json');
+        }
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
