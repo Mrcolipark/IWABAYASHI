@@ -51,25 +51,20 @@ const Home = ({ dict, lang = 'zh' }) => {
     setIsLoaded(true);
     trackEvent('home_page_viewed');
 
-    // 确保视频自动播放
-    if (videoRef.current) {
-      // 移动端需要特殊处理
+    if (!isMobile && videoRef.current) {
       const playVideo = async () => {
         try {
           await videoRef.current.play();
           console.log('Video started playing');
         } catch (err) {
           console.log('Video autoplay failed:', err);
-          // 视频播放失败时的优雅降级
-          if (videoRef.current) {
-            videoRef.current.style.display = 'none';
-          }
+          videoRef.current.style.display = 'none';
         }
       };
-      
+
       playVideo();
     }
-  }, []);
+  }, [isMobile]);
 
   // 计算视差效果
   const heroHeight = typeof window !== 'undefined' ? window.innerHeight : 400;
@@ -92,74 +87,74 @@ const Home = ({ dict, lang = 'zh' }) => {
   };
 
   // 根据设备选择视频源
-  const getVideoSources = () => {
-    if (isMobile) {
-      return [
-        { src: "/videos/hero-forest-mobile.mp4", type: "video/mp4" }
-      ];
-    }
+  const getVideoSources = () => [
+    { src: "/videos/hero-forest.mp4", type: "video/mp4" }
+  ];
 
-    return [
-      { src: "/videos/hero-forest.mp4", type: "video/mp4" }
-    ];
-  };
+  const heroBackgroundStyle = isMobile
+    ? {
+        backgroundImage: "url(/hero-forest-poster.jpg)",
+        backgroundSize: "cover",
+        backgroundPosition: "center"
+      }
+    : {
+        background: "linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)"
+      };
 
   return (
     <div className="min-h-screen bg-black">
-      
+
       {/* 全屏Hero区域 */}
       <section
         ref={heroRef}
         className="relative w-full h-screen overflow-hidden"
-        style={{
-          backgroundImage: "url(/hero-forest-poster.jpg)",
-          backgroundSize: "cover",
-          backgroundPosition: "center"
-        }}
+        style={heroBackgroundStyle}
       >
-        
+
         {/* 全屏森林视频背景 */}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          crossOrigin="anonymous"
-          preload="auto"
-          poster="/hero-forest-poster.jpg"
-          className="absolute top-0 left-0"
-          style={{
-            width: '100vw',
-            height: '100vh',
-            minWidth: '120vw',
-            minHeight: '120vh',
-            objectFit: 'cover',
-            objectPosition: 'center center',
-            transform: 'translate(-10vw, -10vh) scale(1.2)'
-          }}
-          onLoadStart={() => {
-            console.log(`Loading video for ${isMobile ? 'mobile' : 'desktop'} device`);
-          }}
-          onError={(e) => {
-            console.error('Video load error:', e);
-            e.target.style.display = 'none';
-            if (heroRef.current) {
-              heroRef.current.style.backgroundImage = "url('/hero-forest-poster.jpg')";
-            }
-          }}
-          onCanPlay={() => {
-            console.log('Video can start playing');
-            videoRef.current?.play().catch(() => {});
-          }}
-          onLoadedData={() => {
-            videoRef.current?.play().catch(() => {});
-          }}
-        >
-          {getVideoSources().map((source, index) => (
-            <source key={index} src={source.src} type={source.type} />
-          ))}
-        </video>
+        {!isMobile && (
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            crossOrigin="anonymous"
+            preload="auto"
+            className="absolute top-0 left-0"
+            style={{
+              width: '100vw',
+              height: '100vh',
+              minWidth: '120vw',
+              minHeight: '120vh',
+              objectFit: 'cover',
+              objectPosition: 'center center',
+              transform: 'translate(-10vw, -10vh) scale(1.2)'
+            }}
+            onLoadStart={() => {
+              console.log('Loading desktop video');
+            }}
+            onError={(e) => {
+              console.error('Video load error:', e);
+              e.currentTarget.style.display = 'none';
+              if (heroRef.current) {
+                heroRef.current.style.background = 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)';
+              }
+            }}
+            onCanPlay={() => {
+              heroRef.current && (heroRef.current.style.background = 'none');
+              videoRef.current?.play().catch(() => {});
+            }}
+            onLoadedData={() => {
+              heroRef.current && (heroRef.current.style.background = 'none');
+              videoRef.current?.play().catch(() => {});
+            }}
+          >
+            {getVideoSources().map((source, index) => (
+              <source key={index} src={source.src} type={source.type} />
+            ))}
+          </video>
+        )}
 
         {/* 轻微渐变遮罩 - 增强文字可读性 */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>
