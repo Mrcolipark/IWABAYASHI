@@ -63,7 +63,6 @@ const Home = ({ dict, lang = 'zh' }) => {
           // 视频播放失败时的优雅降级
           if (videoRef.current) {
             videoRef.current.style.display = 'none';
-            videoRef.current.parentElement.style.background = 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)';
           }
         }
       };
@@ -96,26 +95,27 @@ const Home = ({ dict, lang = 'zh' }) => {
   const getVideoSources = () => {
     if (isMobile) {
       return [
-        { src: "/videos/hero-forest-mobile.mp4", type: "video/mp4" },
-        { src: "/videos/hero-forest-compressed.mp4", type: "video/mp4" },
-        { src: "/videos/hero-forest.webm", type: "video/webm" }
-      ];
-    } else {
-      return [
-        { src: "/videos/hero-forest-4k.mp4", type: "video/mp4" },
-        { src: "/videos/hero-forest.mp4", type: "video/mp4" },
-        { src: "/videos/hero-forest.webm", type: "video/webm" }
+        { src: "/videos/hero-forest-mobile.mp4", type: "video/mp4" }
       ];
     }
+
+    return [
+      { src: "/videos/hero-forest.mp4", type: "video/mp4" }
+    ];
   };
 
   return (
     <div className="min-h-screen bg-black">
       
       {/* 全屏Hero区域 */}
-      <section 
+      <section
         ref={heroRef}
         className="relative w-full h-screen overflow-hidden"
+        style={{
+          backgroundImage: "url(/videos/hero-forest-poster.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
       >
         
         {/* 全屏森林视频背景 */}
@@ -125,7 +125,7 @@ const Home = ({ dict, lang = 'zh' }) => {
           muted
           loop
           playsInline
-          preload={isMobile ? "none" : "metadata"}
+          preload="auto"
           poster="/videos/hero-forest-poster.jpg"
           className="absolute top-0 left-0"
           style={{
@@ -143,7 +143,6 @@ const Home = ({ dict, lang = 'zh' }) => {
           onError={(e) => {
             console.error('Video load error:', e);
             e.target.style.display = 'none';
-            e.target.parentElement.style.background = 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)';
           }}
           onCanPlay={() => {
             console.log('Video can start playing');
@@ -152,14 +151,6 @@ const Home = ({ dict, lang = 'zh' }) => {
           {getVideoSources().map((source, index) => (
             <source key={index} src={source.src} type={source.type} />
           ))}
-          {/* 降级方案：如果视频都无法播放，显示背景图 */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{
-              backgroundImage: 'url(/videos/hero-forest-poster.jpg)',
-              background: 'linear-gradient(135deg, #1a4d32 0%, #2d5a3d 100%)'
-            }}
-          />
         </video>
 
         {/* 轻微渐变遮罩 - 增强文字可读性 */}
