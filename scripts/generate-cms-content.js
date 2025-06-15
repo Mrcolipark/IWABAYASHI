@@ -300,7 +300,7 @@ function generatePageContent() {
   } else {
     const defaultHome = {
       hero: {
-        slogan: "上質な製品でユーザーとつながる",
+        slogan: "上質な製品で\nユーザーとつながる",
         subtitle: "搭建中日优质商品流通桥梁，促进两国经贸繁荣",
         description: "岩林株式会社致力于成为具有国际影响力的贸易服务商",
         features: ["日本保健品进口代理", "中国大宗商品出口", "供应链管理", "专业服务"]

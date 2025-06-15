@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 
 const SimpleMultiLanguageTypingEffect = ({ 
   chineseText = "搭建中日优质商品流通桥梁，促进两国经贸繁荣",
-  japaneseText = "上質な製品でユーザーとつながる", 
-  englishText = "Connecting users with high-quality products",
+  japaneseText = "上質な製品で\nユーザーとつながる",
+  englishText = "Connecting users with\nhigh-quality products",
   typingSpeed = 100,
   pauseDuration = 2000,
   erasingSpeed = 50
