@@ -312,6 +312,7 @@ npm run analyze
 - **URL**: https://iwabayashi.com (待配置)
 - **CMS**: https://cms.iwabayashi.com (待配置)
 - **自动部署**: 每次提交到main分支
+- Netlify 构建流程会自动执行 `npm run generate-cms` 和 `npm run generate-news`
 
 ## 🤝 贡献指南
 
@@ -321,6 +322,7 @@ npm run analyze
 3. 提交更改 (`git commit -m 'Add some amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
+6. 等待 CI 自动执行 `npm run generate-cms` 与 `npm run generate-news`
 
 ### 代码规范
 - 使用 ESLint 和 Prettier 保持代码风格一致
