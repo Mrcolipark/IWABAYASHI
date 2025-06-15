@@ -164,7 +164,12 @@ npm start
 REACT_APP_CMS_URL=http://localhost:1337
 REACT_APP_GA_TRACKING_ID=G-XXXXXXXXXX
 REACT_APP_SITE_URL=http://localhost:3000
+REACT_APP_EMAILJS_SERVICE_ID=your_service_id
+REACT_APP_EMAILJS_TEMPLATE_ID=your_template_id
+REACT_APP_EMAILJS_PUBLIC_KEY=your_public_key
 ```
+
+`REACT_APP_GA_TRACKING_ID` 为在 Google Analytics 中创建的 Measurement ID，用于初始化统计脚本。
 
 ## 📊 当前开发状态
 
@@ -182,12 +187,12 @@ REACT_APP_SITE_URL=http://localhost:3000
 
 ### 🚧 开发中功能
 - [ ] **真实内容替换** - 将占位内容替换为真实公司信息
-- [ ] **联系表单功能** - EmailJS集成和邮件发送
+- [x] **联系表单功能** - EmailJS集成和邮件发送
 - [ ] **图片资源优化** - 真实图片素材和压缩优化
 - [ ] **多语言翻译** - 日语和英语内容翻译完善
 
 ### 📋 待开发功能
-- [ ] **Google Analytics** - 完整的数据分析配置
+- [x] **Google Analytics** - 完整的数据分析配置
 - [ ] **SEO优化完善** - 元数据优化和搜索引擎提交
 - [ ] **性能监控** - Web Vitals和错误监控
 - [ ] **PWA功能** - 离线访问和应用化体验

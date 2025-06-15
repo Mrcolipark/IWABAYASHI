@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useOptimizedTranslation } from '../hooks/useOptimizedTranslation';
 import { trackEvent } from '../utils/Analytics';
 import { useContactInfo } from '../hooks/useCMSContent';
+import { sendContactEmail } from '../utils/emailService';
 
 // 缓存的联系方式卡片组件
 const ContactInfoCard = React.memo(({ icon, label, value, href, onClick, colorClass = 'text-green-800' }) => {
@@ -371,17 +372,16 @@ const Contact = ({ dict }) => {
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      // 模拟表单提交
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await sendContactEmail(formData);
+
       trackEvent('contact_form_submitted', {
         name: formData.name,
         company: formData.company,
         subject: formData.subject
       });
-      
+
       setSubmitStatus('success');
       setFormData({
         name: '',

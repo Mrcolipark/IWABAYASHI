@@ -1,13 +1,17 @@
 // 用户行为分析和事件追踪
 
 // 初始化分析工具
+const GA_TRACKING_ID = process.env.REACT_APP_GA_TRACKING_ID;
+
 export function initAnalytics() {
-  // Google Analytics 4 初始化（示例）
-  if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', 'GA_MEASUREMENT_ID', {
+  // Google Analytics 4 初始化
+  if (GA_TRACKING_ID && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('config', GA_TRACKING_ID, {
       page_title: document.title,
-      page_location: window.location.href
+      page_location: window.location.href,
     });
+  } else if (!GA_TRACKING_ID) {
+    console.warn('GA_TRACKING_ID is not defined');
   }
   
   console.log('Analytics initialized');
