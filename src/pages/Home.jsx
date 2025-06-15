@@ -112,7 +112,7 @@ const Home = ({ dict, lang = 'zh' }) => {
         ref={heroRef}
         className="relative w-full h-screen overflow-hidden"
         style={{
-          backgroundImage: "url(/videos/hero-forest-poster.jpg)",
+          backgroundImage: "url(/hero-forest-poster.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center"
         }}
@@ -126,7 +126,7 @@ const Home = ({ dict, lang = 'zh' }) => {
           loop
           playsInline
           preload="auto"
-          poster="/videos/hero-forest-poster.jpg"
+          poster="/hero-forest-poster.jpg"
           className="absolute top-0 left-0"
           style={{
             width: '100vw',

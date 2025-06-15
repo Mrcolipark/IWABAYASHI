@@ -142,7 +142,7 @@ const Navbar = React.memo(({ scrollY, currentPath }) => {
           </Link>
 
           {/* 中间品牌标识 */}
-          <div className="hidden lg:block">
+          <div className="block">
             <h1 className="brand-center text-brand-green">
               IWABAYASHI
             </h1>

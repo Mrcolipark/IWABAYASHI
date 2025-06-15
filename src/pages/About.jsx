@@ -7,7 +7,8 @@ import { useCompanyInfo, useTeamMembers } from '../hooks/useCMSContent';
 
 const About = ({ dict }) => {
   const { t, i18n } = useTranslation();
-  const [isVisible, setIsVisible] = useState(false);
+  const isMobileScreen = typeof window !== 'undefined' && window.innerWidth < 768;
+  const [isVisible, setIsVisible] = useState(isMobileScreen);
   const [activeTab, setActiveTab] = useState('overview');
   const sectionRef = useRef(null);
 
@@ -133,6 +134,12 @@ const About = ({ dict }) => {
 
   // 可见性检测
   useEffect(() => {
+    if (isMobileScreen) {
+      setIsVisible(true);
+      trackEvent('about_page_viewed');
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => setIsVisible(entry.isIntersecting),
       { threshold: 0.2 }
