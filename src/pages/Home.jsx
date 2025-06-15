@@ -177,7 +177,9 @@ const Home = ({ dict, lang = 'zh' }) => {
             }`}>
               <h1 className="tiktok-glow-text text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-center">
                 {(() => {
-                  const slogan = homeContent?.hero?.slogan || '上質な製品でユーザーとつながる';
+                  const slogan = t('home.slogan', {
+                    defaultValue: homeContent?.hero?.slogan || '上質な製品でユーザーとつながる'
+                  });
                   const index = slogan.indexOf('で');
                   if (index !== -1) {
                     return (
